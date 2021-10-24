@@ -6,6 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".ServerConnection">
 
+    <ImageView
+        android:id="@+id/candelaIcon"
+        android:layout_width="800dp"
+        android:layout_height="120dp"
+        android:src="@drawable/candelalogo"
+        android:layout_centerInParent="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.100">
+
+    </ImageView>
+
     <EditText
         android:id="@+id/server_entry"
         android:layout_width="280dp"
@@ -42,7 +57,7 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.151" />
+        app:layout_constraintVertical_bias="0.300" />
 
     <ProgressBar
         android:id="@+id/server_state_pb"
