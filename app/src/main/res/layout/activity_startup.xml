@@ -10,24 +10,56 @@
 
 
     <ImageView
-        android:id="@+id/candelaIcon"
-        android:layout_width="890dp"
-        android:layout_height="150dp"
-        android:src="@drawable/candelalogo"
+        android:id="@+id/candelaicon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:src="@drawable/img_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.0001"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.250">
+        app:layout_constraintVertical_bias="0.026">
 
     </ImageView>
+
+    <ImageView
+        android:id="@+id/bgimage"
+        android:layout_width="415sp"
+        android:layout_height="600sp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/img_2"
+        android:contentDescription="@drawable/img_1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.9">
+
+    </ImageView>
+
     <TextView
         android:id="@+id/textView"
-        android:layout_width="249sp"
-        android:layout_height="67sp"
-        android:text="WECAN"
+        android:layout_width="145dp"
+        android:layout_height="35dp"
+        android:text="WE CAN"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.897"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.07" />
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="414sp"
+        android:layout_height="15sp"
+        android:text=""
+        android:background="@color/orange"
         android:textAlignment="center"
         android:textSize="23sp"
         android:textStyle="bold"
@@ -36,5 +68,21 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.550" />
+        app:layout_constraintVertical_bias="0.0" />
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="414sp"
+        android:layout_height="15sp"
+        android:text=""
+        android:background="@color/green"
+        android:textAlignment="center"
+        android:textSize="23sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+
