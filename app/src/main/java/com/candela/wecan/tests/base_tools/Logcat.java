@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Logcat extends AppCompatActivity {
-    public void sg(){
+    public void lc(){
 
         if ( isExternalStorageWritable() ) {
 
