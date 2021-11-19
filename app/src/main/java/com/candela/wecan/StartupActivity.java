@@ -55,7 +55,7 @@ public class StartupActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.enter_button);
         server_ip = findViewById(R.id.ip_enter_page);
 //        Logcat logca = new Logcat();
-//        logca.sg();
+//        logca.lc();
 
         /* Checks if external storage is available for read and write */
 
