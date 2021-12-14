@@ -393,5 +393,19 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
         return pi;
     }
+
+    @Override
+    public Vector<StringKeyVal> ConfigureWifi(String ssid, String password, String encryption) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
+        /*
+            Need to structure the cc_data in a Vector format and collect usefull info from this
+            {
+                "cx_time" : "" // in ms
+            }
+         */
+        System.out.println(configureWifi.cc_data);
+        return null;
+    }
 }
 

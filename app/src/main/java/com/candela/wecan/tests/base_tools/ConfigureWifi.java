@@ -25,7 +25,7 @@ public class ConfigureWifi {
     Context context;
     BroadcastReceiver broadcastReceiver;
     IntentFilter intentFilter;
-    int CC_Status = 0;
+    public static int CC_Status = 0;
     public static ArrayList<String> cc_data;
 
     public ConfigureWifi(Context context, WifiManager wifiManager, String ssid, String password, String encryption) {
@@ -35,12 +35,13 @@ public class ConfigureWifi {
         this.wifiManager = wifiManager;
         this.context = context;
         this.intentFilter = new IntentFilter();
+        this.cc_data = new ArrayList<>();
+        this.CC_Status = 0;
         this.callback();
         this.connect();
     }
     public void callback(){
-        CC_Status = 0;
-        cc_data = new ArrayList<>();
+        ArrayList cc_data = this.cc_data;
         WifiManager wifi = this.wifiManager;
         String wifi_name = this.ssid;
         broadcastReceiver = new BroadcastReceiver() {
