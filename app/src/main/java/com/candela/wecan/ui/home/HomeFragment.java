@@ -411,9 +411,7 @@ public class HomeFragment extends Fragment {
                                 int Tx = 0;
                                 int Rx_Kbps = 0;
                                 int Tx_Kbps = 0;
-                                int Standard = 0;
                                 if (wifiinfo.getSupplicantState() == SupplicantState.COMPLETED) {
-                                    Standard = wifiinfo.getWifiStandard();
                                     IP = Formatter.formatIpAddress(wifiinfo.getIpAddress());
                                     SSID = wifiinfo.getSSID();
                                     BSSID = wifiinfo.getBSSID();
@@ -541,6 +539,11 @@ public class HomeFragment extends Fragment {
                                 List<ScanResult> scan_result = wifiManager.getScanResults();
                                 for (int i = 0; i < scan_result.size(); i++) {
                                     String ssid = scan_result.get(i).SSID; //Get the SSID
+                                    if(ssid.equals(null) || ssid.equals("")){
+                                        ssid = "*hidden*";
+                                        System.out.println("SSID::= "+ ssid);
+                                    }
+
                                     String bssid =  scan_result.get(i).BSSID; //Get the BSSID
                                     String capability = scan_result.get(i).capabilities; //Get Wi-Fi capabilities
                                     int centerFreq0 = scan_result.get(i).centerFreq0; //Get centerFreq0
