@@ -395,7 +395,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     }
 
     @Override
-    public Vector<StringKeyVal> ConfigureWifi(String ssid, String password, String encryption) {
+    public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
         /*

@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class ConfigureWifi {
     String ssid;
@@ -99,37 +100,88 @@ public class ConfigureWifi {
         WifiConfiguration wifiConfiguration = new WifiConfiguration();
 
         wifiConfiguration.SSID = String.format("\"%s\"", this.ssid);
-        wifiConfiguration.preSharedKey = String.format("\"%s\"", this.password);
-        Log.e("log", wifiConfiguration.toString());
-        int wifiID = wifiManager.addNetwork(wifiConfiguration);
-        if (this.encryption.equals("open")){
-            wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-        }
-        if (this.encryption.equals("psk") || this.encryption.equals("psk2")) {
-            wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-            wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-            wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-            wifiConfiguration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-            wifiConfiguration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-            wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-            wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-            wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
 
-        }
+        Log.e("log", "ssid -:" + ssid + ":- password -:" + password + ":-");
+        Log.e("log", "wifiConfiguration: " + wifiConfiguration.toString());
+
+        StringTokenizer st = new StringTokenizer(encryption, "|");
+        while (st.hasMoreTokens()) {
+           String tok = st.nextToken();
+           Log.e("log", "crypt token: " + tok);
+           if (tok.equals("open")) {
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+           }
+           else if (tok.equals("psk")) {
+              wifiConfiguration.preSharedKey = String.format("\"%s\"", this.password);
+              wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+              wifiConfiguration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+              wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP); // TODO:  Not sure this is correct.
+           }
+           else if (tok.equals("psk2")) {
+              wifiConfiguration.preSharedKey = String.format("\"%s\"", this.password);
+              wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+              wifiConfiguration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+              wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+           }
+           else if (tok.equals("owe")) {
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.OWE);
+              wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+              // TODO:  Verify
+           }
+           else if (tok.equals("ieee8021x")) {
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.IEEE8021X);
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
+              wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+              // TODO: More would need to be set I guess.
+           }
+           else if (tok.equals("sae")) {
+              wifiConfiguration.preSharedKey = String.format("\"%s\"", this.password);
+              wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.SAE);
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.SUITE_B_192);
+              wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.GCMP_128);
+              wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.GCMP_256);
+           }
+           else if (tok.equals("wep")) {
+              //https://developer.android.com/reference/android/net/wifi/WifiConfiguration.KeyMgmt
+              //https://www.programcreek.com/java-api-examples/?api=android.net.wifi.WifiConfiguration
+              wifiConfiguration.wepKeys[0] = String.format("\"%s\"", this.password);
+              wifiConfiguration.wepTxKeyIndex = 0;
+              wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE); // TODO:  Verify this config
+              wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+              wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+           }
+        }// for all security types
+
+        // https://stackoverflow.com/questions/17123243/setting-priority-for-wifi-configuration-in-android
+        // priority needs to be highest in the system in order for it to be selected.
+        // TODO:  Maybe record current connection's priority and ID, set it to some lower value if
+        // currently at 99999, and then when we stop this App we could reset to old settings?
+        wifiConfiguration.priority = 99999;
+
+        int wifiID = wifiManager.addNetwork(wifiConfiguration);
+
+        Log.e("log", "wifiID: " + wifiID);
+
+        wifiManager.disconnect();
+        wifiManager.enableNetwork(wifiID, true);
+        wifiManager.reconnect();
+
 //        wifiManager.setWifiEnabled(true);
 //        wifiConfiguration.
-        wifiConfiguration.priority = 40;
-        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-        for( WifiConfiguration i : list ) {
-            System.out.println(i.SSID);
-            if(i.SSID != null && i.SSID.equals("\"" + this.ssid + "\"")) {
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(i.networkId, true);
-                wifiManager.reconnect();
-                break;
-            }
-        }
+//        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+//        for( WifiConfiguration i : list ) {
+//            System.out.println(i.SSID);
+//            if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+//                wifiManager.disconnect();
+//                wifiManager.enableNetwork(i.networkId, true);
+//                wifiManager.reconnect();
+//                break;
+//            }
+//        }
+
 //        wifiID = wifiManager.addNetwork(wifiConfiguration);
 //        wifiManager.disconnect();
 //        wifiManager.enableNetwork(wifiID, true);
