@@ -450,7 +450,7 @@ public class HomeFragment extends Fragment {
                                 live_data.put("CPU util", cpu_used_percent + " %");
                                 live_data.put("DNS1", dns1);
                                 live_data.put("DNS2", dns2);
-                                live_data.put("ServerAddress", serverAddress);
+                                live_data.put("DHCP Server", serverAddress);
                                 live_data.put("Gateway", gateway);
                                 live_data.put("Netmask", netmask);
                                 live_data.put("LeaseDuration", String.valueOf(leaseDuration) + " Sec");
