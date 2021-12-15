@@ -55,6 +55,46 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         // TODO:  Store this info for next time.
     }
 
+    /* Requeste Android/UI to initiate a scan.  Results will be sent back to
+     * lfresource logic in the LANforgeMgr.notifyScanResults() call.
+     */
+    public void requestScan() {
+        // TODO:  Implement this.
+        // TODO:  Add callback listenener (somewhere, not necessarily this code)
+        //  so that LANforgeMgr.notifyScanResults() is called each time scan completes
+        // https://developer.android.com/guide/topics/connectivity/wifi-scan
+    }
+
+    public void notifyManagerConnectException(Exception e) {
+        // TODO:  Notify user that there was issue connecting to the LANforge Mgr.
+        // For instance, here is stack trace of when we cannot reach it:
+        /*
+2021-12-15 10:22:50.908 29606-31123/com.candela.wecan W/System.err: java.net.ConnectException: failed to connect to /192.168.100.222 (port 4002) from /:: (port 53356): connect failed: ETIMEDOUT (Connection timed out)
+2021-12-15 10:22:50.909 29606-31123/com.candela.wecan W/System.err:     at libcore.io.IoBridge.connect(IoBridge.java:142)
+2021-12-15 10:22:50.910 29606-31123/com.candela.wecan W/System.err:     at java.net.PlainSocketImpl.socketConnect(PlainSocketImpl.java:142)
+2021-12-15 10:22:50.910 29606-31123/com.candela.wecan W/System.err:     at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:390)
+2021-12-15 10:22:50.910 29606-31123/com.candela.wecan W/System.err:     at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:230)
+2021-12-15 10:22:50.910 29606-31123/com.candela.wecan W/System.err:     at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:212)
+2021-12-15 10:22:50.910 29606-31123/com.candela.wecan W/System.err:     at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:436)
+2021-12-15 10:22:50.910 29606-31123/com.candela.wecan W/System.err:     at java.net.Socket.connect(Socket.java:621)
+2021-12-15 10:22:50.910 29606-31123/com.candela.wecan W/System.err:     at java.net.Socket.connect(Socket.java:570)
+2021-12-15 10:22:50.911 29606-31123/com.candela.wecan W/System.err:     at java.net.Socket.<init>(Socket.java:450)
+2021-12-15 10:22:50.911 29606-31123/com.candela.wecan W/System.err:     at java.net.Socket.<init>(Socket.java:218)
+2021-12-15 10:22:50.911 29606-31123/com.candela.wecan W/System.err:     at candela.lfresource.SocketManager.connect(SocketManager.java:149)
+2021-12-15 10:22:50.911 29606-31123/com.candela.wecan W/System.err:     at candela.lfresource.LFProtocol.initConnection(LFProtocol.java:382)
+2021-12-15 10:22:50.911 29606-31123/com.candela.wecan W/System.err:     at candela.lfresource.LANforgeMgr.doConnect(LANforgeMgr.java:330)
+2021-12-15 10:22:50.911 29606-31123/com.candela.wecan W/System.err:     at candela.lfresource.LFMainLoop.run(LANforgeMgr.java:423)
+2021-12-15 10:22:50.912 29606-31123/com.candela.wecan W/System.err: Caused by: android.system.ErrnoException: connect failed: ETIMEDOUT (Connection timed out)
+2021-12-15 10:22:50.912 29606-31123/com.candela.wecan W/System.err:     at libcore.io.Linux.connect(Native Method)
+2021-12-15 10:22:50.912 29606-31123/com.candela.wecan W/System.err:     at libcore.io.ForwardingOs.connect(ForwardingOs.java:94)
+2021-12-15 10:22:50.912 29606-31123/com.candela.wecan W/System.err:     at libcore.io.BlockGuardOs.connect(BlockGuardOs.java:138)
+2021-12-15 10:22:50.912 29606-31123/com.candela.wecan W/System.err:     at libcore.io.ForwardingOs.connect(ForwardingOs.java:94)
+2021-12-15 10:22:50.912 29606-31123/com.candela.wecan W/System.err:     at libcore.io.IoBridge.connectErrno(IoBridge.java:156)
+2021-12-15 10:22:50.912 29606-31123/com.candela.wecan W/System.err:     at libcore.io.IoBridge.connect(IoBridge.java:134)
+2021-12-15 10:22:50.913 29606-31123/com.candela.wecan W/System.err: 	... 13 more
+         */
+    }
+
     @SuppressLint({"HardwareIds", "MissingPermission", "NewApi"})
     @Override
     public Vector<StringKeyVal> requestPortUpdate(String s) {

@@ -538,19 +538,30 @@ public class HomeFragment extends Fragment {
                                 Map<String, String> scan_data = new LinkedHashMap<String, String>();
                                 List<ScanResult> scan_result = wifiManager.getScanResults();
                                 for (int i = 0; i < scan_result.size(); i++) {
-                                    String ssid = scan_result.get(i).SSID; //Get the SSID
+                                    ScanResult sr = scan_result.get(i);
+                                    //Log.e("log", "scan-result[" + i + "]: " + sr.toString() + "\n");
+
+                                    // The IEs do not implement toString() in useful manner, so we would have to parse
+                                    // the binary info if we cared to report this.  Ignore for now.
+                                    //if (sr.getInformationElements() != null) {
+                                    //   for (ScanResult.InformationElement ie : sr.getInformationElements()) {
+                                    //      Log.e("log", " IE: " + ie.toString() + "\n");
+                                    //   }
+                                    //}
+
+                                    String ssid = sr.SSID; //Get the SSID
                                     if(ssid.equals(null) || ssid.equals("")){
                                         ssid = "*hidden*";
                                         System.out.println("SSID::= "+ ssid);
                                     }
 
-                                    String bssid =  scan_result.get(i).BSSID; //Get the BSSID
-                                    String capability = scan_result.get(i).capabilities; //Get Wi-Fi capabilities
-                                    int centerFreq0 = scan_result.get(i).centerFreq0; //Get centerFreq0
-                                    int centerFreq1 = scan_result.get(i).centerFreq1; //Get centerFreq1
-                                    int channelWidth = scan_result.get(i).channelWidth; //Get channelWidth
-                                    int level = scan_result.get(i).level; //Get level/rssi
-                                    int frequency = scan_result.get(i).frequency; //Get frequency
+                                    String bssid =  sr.BSSID; //Get the BSSID
+                                    String capability = sr.capabilities; //Get Wi-Fi capabilities
+                                    int centerFreq0 = sr.centerFreq0; //Get centerFreq0
+                                    int centerFreq1 = sr.centerFreq1; //Get centerFreq1
+                                    int channelWidth = sr.channelWidth; //Get channelWidth
+                                    int level = sr.level; //Get level/rssi
+                                    int frequency = sr.frequency; //Get frequency
                                     float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
                                     String dist_in_meters = String.format("%.02f", dist);
                                     data = "\nSSID: " + ssid + "\nbssid: " + bssid + "\ncapability: " + capability + "\ncenterFreq0: " +
