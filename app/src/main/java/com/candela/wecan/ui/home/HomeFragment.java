@@ -535,6 +535,11 @@ public class HomeFragment extends Fragment {
 //                                Scan wi-fi
                                 wifiManager.setWifiEnabled(true);
                                 wifiManager.startScan();
+                                //Log.e("log", "startScan called in HomeFragment");
+
+                                // TODO:  This is not accurate, scan takes time, so this code below is
+                                // really showing previous scan info.  See ResourceUtils.scanSuccess, that
+                                // callback should feed this code.
                                 Map<String, String> scan_data = new LinkedHashMap<String, String>();
                                 List<ScanResult> scan_result = wifiManager.getScanResults();
                                 for (int i = 0; i < scan_result.size(); i++) {
@@ -569,7 +574,7 @@ public class HomeFragment extends Fragment {
                                             "\nlevel: " + level + "\nfrequency: " + frequency + "\ndistance: " + dist_in_meters + " meters\n\n";
                                     scan_data.put(String.valueOf(i+1), String.valueOf(data));
                                 }
-                                wifiManager.startScan();
+
                                 scan_table.setPadding(10, 0, 10, 0);
                                 TableRow heading = new TableRow(getActivity());
                                 heading.setBackgroundColor(Color.rgb(120, 156, 175));
@@ -602,6 +607,8 @@ public class HomeFragment extends Fragment {
 
 
                                 if (scan_table_flag == true) {
+                                    // NOTE:  Scans are normally limited to around one every 30 seconds, but
+                                    // there is a developer option in Android 10 to allow it to run faster.
                                     handler.postDelayed(this, 1000);
                                 } else {
                                     handler.removeCallbacks(this);

@@ -3,6 +3,8 @@ package com.candela.wecan.tests.base_tools;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
@@ -21,6 +23,7 @@ import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -42,9 +45,11 @@ import candela.lfresource.AndroidUI;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.StringKeyVal;
 import candela.lfresource.PlatformInfo;
+import candela.lfresource.LANforgeMgr;
 
 public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public static Context context;
+    private boolean scan_callback_enabled = false;
 
     public ResourceUtils(Context context){
         this.context = context;
@@ -55,14 +60,73 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         // TODO:  Store this info for next time.
     }
 
-    /* Requeste Android/UI to initiate a scan.  Results will be sent back to
+    /* Request Android/UI to initiate a scan.  Results will be sent back to
      * lfresource logic in the LANforgeMgr.notifyScanResults() call.
      */
     public void requestScan() {
-        // TODO:  Implement this.
-        // TODO:  Add callback listenener (somewhere, not necessarily this code)
-        //  so that LANforgeMgr.notifyScanResults() is called each time scan completes
         // https://developer.android.com/guide/topics/connectivity/wifi-scan
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (!scan_callback_enabled) {
+           BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
+
+                 @Override
+                 public void onReceive(Context c, Intent intent) {
+                    boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
+                    if (success) {
+                       scanSuccess();
+                    } else {
+                       // scan failure handling
+                       scanFailure();
+                    }
+                 }
+              };
+
+           IntentFilter intentFilter = new IntentFilter();
+           intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+           context.registerReceiver(wifiScanReceiver, intentFilter);
+           scan_callback_enabled = true;
+        }
+
+        // NOTE:  Can scan 4 times within 2 minutes.
+        // Android 10 and higher:
+
+        // The same throttling limits from Android 9 apply. There is a new developer option to toggle the throttling
+        // off for local testing (under Developer Options > Networking > Wi-Fi scan throttling).
+
+        boolean success = wifiManager.startScan();
+        Log.e("log", "wifiManager.startScan result: " + success + "\n");
+        if (!success) {
+           // scan failure handling
+           scanFailure();
+        }
+    }
+
+    private void scanSuccess() {
+       //Log.e("log", "Scan succeeded.");
+       notifyScanResults(true);
+    }
+
+    // No matter if we succeeded or not, tell LF Manager.  Scanning interval
+    // is limitted, so better to return slightly older results than nothing at
+    // all.
+    private void notifyScanResults(boolean succeeded) {
+       WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+       List<ScanResult> results = wifiManager.getScanResults();
+       // TODO:  Tell HomeFragment somehow
+       Vector<String> srs = new Vector();
+       for (ScanResult sr: results) {
+          StringBuilder sb = new StringBuilder();
+          sb.append("[SCAN_RESULT] " + sr.BSSID + "\n");
+          sb.append(sr.toString().replaceAll(",", "\n"));
+          sb.append("\n\n");
+          srs.add(sb.toString());
+       }
+       LANforgeMgr.notifyScanResults(srs);
+    }
+
+    private void scanFailure() {
+       notifyScanResults(false);
+       //Log.e("log", "Scan failed.");
     }
 
     public void notifyManagerConnectException(Exception e) {

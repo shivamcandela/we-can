@@ -100,6 +100,7 @@ public class ClientConnectivityConfiguration extends AppCompatActivity {
             public void onClick(View view) {
 //                System.out.println(.setWifiEnabled(true));
                 wifiManager.startScan();
+                //Log.e("log", "CCC start-btn onClick: startScan");
 
 
                 String wifi_name = spinner.getSelectedItem().toString();
@@ -139,10 +140,12 @@ public class ClientConnectivityConfiguration extends AppCompatActivity {
             } else {
                 Toast.makeText(ClientConnectivityConfiguration.this, "location turned on", Toast.LENGTH_SHORT).show();
                 wifiManager.startScan();
+                //Log.e("log", "CCC getWifi A: startScan");
             }
         } else {
             Toast.makeText(ClientConnectivityConfiguration.this, "scanning", Toast.LENGTH_SHORT).show();
             wifiManager.startScan();
+            //Log.e("log", "CCC getWifi B: startScan");
         }
     }
 
@@ -158,12 +161,13 @@ public class ClientConnectivityConfiguration extends AppCompatActivity {
         switch (requestCode) {
             case MY_PERMISSIONS_ACCESS_COARSE_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                wifiManager.startScan();
-            } else {
-                return;
-            }
-            break;
-        }
+                   wifiManager.startScan();
+                   //Log.e("log", "CCC onReqPermissionResult: startScan");
+                } else {
+                   return;
+                }
+                break;
+        }//switch
     }
 
 
