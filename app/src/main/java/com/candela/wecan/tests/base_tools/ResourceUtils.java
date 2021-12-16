@@ -114,14 +114,21 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
        List<ScanResult> results = wifiManager.getScanResults();
        // TODO:  Tell HomeFragment somehow
        Vector<String> srs = new Vector();
+
+       long now = System.currentTimeMillis();
+       long uptime = android.os.SystemClock.elapsedRealtime();
+       long booted_at = now - uptime;
+
        for (ScanResult sr: results) {
           StringBuilder sb = new StringBuilder();
           sb.append("[SCAN_RESULT] " + sr.BSSID + "\n");
           sb.append(sr.toString().replaceAll(",", "\n"));
+          sb.append("\nabs_timestamp_ms: ");
+          sb.append((sr.timestamp / 1000) + booted_at);
           sb.append("\n\n");
           srs.add(sb.toString());
        }
-       LANforgeMgr.notifyScanResults(srs);
+       LANforgeMgr.notifyScanResults(srs, succeeded);
     }
 
     private void scanFailure() {

@@ -632,11 +632,18 @@ public class HomeFragment extends Fragment {
                                     int channelWidth = sr.channelWidth; //Get channelWidth
                                     int level = sr.level; //Get level/rssi
                                     int frequency = sr.frequency; //Get frequency
+
+                                    // timestamp is usec since boot.
+                                    //java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime();
+                                    long age = android.os.SystemClock.elapsedRealtime() - (sr.timestamp / 1000);
+                                    age = age / 1000; //convert to seconds.
+
                                     float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
                                     String dist_in_meters = String.format("%.02f", dist);
                                     data = "\nSSID: " + ssid + "\nbssid: " + bssid + "\ncapability: " + capability + "\ncenterFreq0: " +
                                             centerFreq0 + "\ncenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
-                                            "\nlevel: " + level + "\nfrequency: " + frequency + "\ndistance: " + dist_in_meters + " meters\n\n";
+                                            "\nlevel: " + level + "\nfrequency: " + frequency + "\nage: " + age +
+                                            "\ndistance: " + dist_in_meters + " meters\n\n";
                                     scan_data.put(String.valueOf(i+1), String.valueOf(data));
                                 }
 
