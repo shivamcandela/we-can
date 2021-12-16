@@ -13,12 +13,14 @@ import candela.lfresource.PlatformInfo;
 import candela.lfresource.Port;
 import candela.lfresource.StringKeyVal;
 import candela.lfresource.lfresource;
+import com.candela.wecan.StartupActivity;
+
 //LF_Resource p = new LF_Resource(143);
 //        p.start();
 public class LF_Resource extends Thread {
 
     private String realm_id;
-    long minPrime;
+    protected StartupActivity startup_activity;
 
     public lfresource lfresource;
     public PlatformInfo pi;
@@ -26,10 +28,11 @@ public class LF_Resource extends Thread {
     public String resource;
     public Context context;
     public ResourceUtils ru;
+    public boolean do_run = true;
 
     @SuppressLint("NewApi")
-    public LF_Resource(long minPrime, String ip_address, String resource, String realm_id, Context context) {
-        this.minPrime = minPrime;
+    public LF_Resource(StartupActivity act, String ip_address, String resource, String realm_id, Context context) {
+        startup_activity = act;
         this.context = context;
         this.lfresource = new lfresource();
         this.ip_address = ip_address;
@@ -43,13 +46,21 @@ public class LF_Resource extends Thread {
 //        this.pi.dhcp_info = new Vector<>();
         this.pi.username = "";
 
-        this.ru = new ResourceUtils(this.context);
+        this.ru = new ResourceUtils(startup_activity, this.context);
         this.pi = ru.requestPlatformUpdate();
 
         LANforgeMgr.setUI(ru);
         LANforgeMgr.setPlatformInfo(this.pi);
+    }
 
+    public void updateConfig(String ip, String resource_id, String _realm_id) {
+        ip_address = ip;
+        resource = resource_id;
+        realm_id = _realm_id;
+    }
 
+    public String getRemoteHost() {
+        return LANforgeMgr.getProto().getRemoteHost();
     }
 
     public String getResource(){
@@ -64,22 +75,8 @@ public class LF_Resource extends Thread {
     public boolean getConnState(){
         return LANforgeMgr.isConnected();
     }
+
     public void run() {
-        // compute primes larger than minPrime
-//        Handler handler_state = new Handler();
-//        handler_state.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (getConnState()){
-//                    Toast.makeText(context, "Server is Connected", Toast.LENGTH_LONG).show();
-//                }
-//                if (!getConnState()){
-//                    Toast.makeText(context, "Server is Disconnected", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        }, 1000);
-
-
         String[] args = new String[8];
         args[0] = "-s";
         args[1] = this.ip_address; //.put("-s", "192.168.100.222");
@@ -92,7 +89,8 @@ public class LF_Resource extends Thread {
         this.lfresource.init(false, args);
 
 //
-
-
+        //while (do_run) {
+        //    // Poll things
+        //}
     }
 }

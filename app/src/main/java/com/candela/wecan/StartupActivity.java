@@ -50,7 +50,9 @@ public class StartupActivity extends AppCompatActivity {
     static int state;
     private String ssid, passwd;
     public Context context;
-
+    protected LF_Resource lf_resource = null;
+    public View my_view = null;
+    SharedPreferences sharedpreferences = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +63,7 @@ public class StartupActivity extends AppCompatActivity {
         server_ip = findViewById(R.id.ip_enter_page);
         u_name = findViewById(R.id.user_name);
         test_name_tv = findViewById(R.id.test_name);
-        SharedPreferences sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
+        sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String,?> keys = sharedpreferences.getAll();
         String last_ip = (String) keys.get("last");
         String user_name = (String) keys.get("user_name");
@@ -90,7 +92,7 @@ public class StartupActivity extends AppCompatActivity {
                     editor.putString("test_name" ,  test_name_tv.getText().toString());
                     editor.apply();
                     editor.commit();
-                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view, sharedpreferences);
+                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
                 }
                 else{
                     SharedPreferences.Editor editor = sharedpreferences.edit();
@@ -105,53 +107,71 @@ public class StartupActivity extends AppCompatActivity {
                     String ip = server_ip.getText().toString();
                     String realm_id = (String) keys.get("realm-" + ip);
                     String resource_id = (String) keys.get("resource-" + ip);
-                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view, sharedpreferences);
+                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
                 }
-
-
             }
         });
     }
 
-        public void openServerConnection () {
+    public void openServerConnection () {
+       Intent myIntent = new Intent(this, navigation.class);
+       startActivity(myIntent);
+    }
 
-            Intent myIntent = new Intent(this, navigation.class);
-            startActivity(myIntent);
+    public void connect_server(String ip, String resource_id, String realm_id, View v){
+        my_view = v;
 
+        if (lf_resource != null) {
+            lf_resource.do_run = false;
+            try {
+                lf_resource.join(); //wait until it dies
+            }
+            catch (Exception ee) {
+                ee.printStackTrace();
+            }
         }
 
-        public void connect_server(String ip, String resource_id, String realm_id, View v, SharedPreferences sharedPreferences){
-            LF_Resource p = new LF_Resource(143, ip, resource_id, realm_id, getApplicationContext());
-            p.start();
+        lf_resource = new LF_Resource(this, ip, resource_id, realm_id, getApplicationContext());
+        lf_resource.start();
+    }
 
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-
-                @Override
+    public void notifyCxChanged() {
+        runOnUiThread(new Runnable() {
                 public void run() {
-                    state = p.lfresource.get_state();
-                    if (p.getConnState()){
-                        Toast.makeText(v.getContext(), "Connected to LANforge Server", Toast.LENGTH_SHORT).show();
-                        String new_resource_id = p.getResource();
-                        String new_realm_id = p.getRealm();
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(ip, "-1");
-                        editor.putString("last", ip);
-                        editor.putString("resource-" + ip, new_resource_id);
-                        editor.putString("realm-" + ip, new_realm_id);
-
-                        editor.putString("current-ip", ip);
-                        editor.putString("current-resource", new_resource_id);
-                        editor.putString("current-realm", new_realm_id);
-
-                        editor.apply();
-                        editor.commit();
-//                        CardUtils cardUtils = new CardUtils(getApplicationContext());
-                        openServerConnection();
-                    }
+                    _notifyCxChanged();
                 }
-            }, 1000);
+            });
+    }
+
+    public void _notifyCxChanged() {
+        state = lf_resource.lfresource.get_state();
+        Log.e("log", "notifyCxChanged, state: " + state);
+
+        if (lf_resource.getConnState()) {
+            Toast.makeText(my_view.getContext(), "Connected to LANforge Server", Toast.LENGTH_SHORT).show();
+            String new_resource_id = lf_resource.getResource();
+            String new_realm_id = lf_resource.getRealm();
+            String ip = lf_resource.getRemoteHost();
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+
+            editor.putString(ip, "-1");
+            editor.putString("last", ip);
+            editor.putString("resource-" + ip, new_resource_id);
+            editor.putString("realm-" + ip, new_realm_id);
+
+            editor.putString("current-ip", ip);
+            editor.putString("current-resource", new_resource_id);
+            editor.putString("current-realm", new_realm_id);
+
+            editor.apply();
+            editor.commit();
+            // CardUtils cardUtils = new CardUtils(getApplicationContext());
+            openServerConnection();
         }
+        else {
+            // TODO: How to switch back to first view so user can reconnect if they want?
+        }
+    }
 
     // Function to check and request permission
     public void checkPermission(String permission, int requestCode)

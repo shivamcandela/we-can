@@ -46,13 +46,16 @@ import candela.lfresource.PlatformInfo;
 import candela.lfresource.StringKeyVal;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.LANforgeMgr;
+import com.candela.wecan.StartupActivity;
 
 public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public static Context context;
     private boolean scan_callback_enabled = false;
+    protected StartupActivity startup_activity;
 
-    public ResourceUtils(Context context){
+    public ResourceUtils(StartupActivity activity, Context context){
         this.context = context;
+        startup_activity = activity;
     }
 
     @Override
@@ -134,6 +137,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     private void scanFailure() {
        notifyScanResults(false);
        //Log.e("log", "Scan failed.");
+    }
+
+    public void notifyCxChanged() {
+       startup_activity.notifyCxChanged();
     }
 
     public void notifyManagerConnectException(Exception e) {
