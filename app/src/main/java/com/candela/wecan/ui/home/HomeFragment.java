@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.DhcpInfo;
+import android.net.TrafficStats;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
@@ -23,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -81,7 +83,7 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
     private static final String FILE_NAME = "data.conf";
-    private TextView ip_show;
+    private TextView ip_show, link_speed;
     public Boolean live_table_flag = false,scan_table_flag=false, flag;
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
@@ -125,6 +127,69 @@ public class HomeFragment extends Fragment {
                 String current_resource = (String) keys.get("current-resource");
                 String current_realm = (String) keys.get("current-realm");
                 ip_show.setText("User-Name: " + username + "\nServer: " + current_ip + "\nRealm: " + current_realm + "\nResource: " + current_resource);
+
+//                LINK SPEED UP/DOWN
+                link_speed = getView().findViewById(R.id.link_speed);
+                Handler handler = new Handler();
+                final Runnable runnable_link = new Runnable() {
+                    int count = 0;
+                    String pre_rx = "",pre_tx = "";
+                    String Rx = "0 Kbps",Tx = "0 Kbps";
+                    @Override
+                    public void run() {
+                        long BeforeTime = System.currentTimeMillis();
+                        long TotalTxBeforeTest = TrafficStats.getTotalTxBytes();
+                        long TotalRxBeforeTest = TrafficStats.getTotalRxBytes();
+                        double TimeDifference = System.currentTimeMillis() - BeforeTime;
+                        double rxDiff = TrafficStats.getTotalRxBytes() - TotalRxBeforeTest;
+                        double txDiff = TrafficStats.getTotalTxBytes() - TotalTxBeforeTest;
+                        double txBytes = ((txDiff) * 1000 / TimeDifference);
+                        double rxBytes = ((rxDiff) * 1000/ TimeDifference);
+                        if (rxBytes>=1024){
+                            double rxKb = rxBytes/1024;
+                            Rx = String.format("%.2f", rxKb) + " Kbps";
+                            if(rxKb >= 1024){
+                                double rxMb = rxKb/1024;
+                                Rx = String.format("%.2f", rxMb) + " Mbps";
+                                if(rxMb >= 1024){
+                                    double rxGb = rxMb/1024;
+                                    Rx = String.format("%.2f", rxGb) + " Gbps";
+                                }
+                            }
+                        }
+                        if (txBytes>=1024 && txBytes > 0){
+                            double txKb = txBytes/1024;
+                            Tx = String.format("%.2f", txKb) + " Kbps";
+                            if(txKb >= 1024){
+                                double txMb = txKb/1024;
+                                Tx = String.format("%.2f", txMb) + " Mbps";
+                                if(txMb >= 1024){
+                                    double txGb = txKb/1024;
+                                    Tx = String.format("%.2f", txGb) + " Gbps";
+                                }
+                            }
+                        }
+                        if(pre_rx.equals(Rx) && pre_tx.equals(Tx)){
+                            count +=1;
+                            if(count==10){
+                                System.out.println("link updateddddd");
+                                Rx = "0 Kbps";
+                                Tx = "0 Kbps";
+                                link_speed.setText("");
+                                count = 0;
+                            }
+                        }else{
+                            count = 0;
+                        }
+                        System.out.println("count: " + count);
+                        pre_rx = Rx;
+                        pre_tx = Tx;
+                        link_speed.setTextSize(15);
+                        link_speed.setText(Rx + "/" + Tx);
+                        handler.postDelayed(this, 500);
+                    }
+                };
+                handler.post(runnable_link);
 
 //              Share Data Button
                 share_btn.setOnClickListener(new View.OnClickListener() {
