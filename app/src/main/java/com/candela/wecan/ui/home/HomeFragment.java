@@ -77,6 +77,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import candela.lfresource.StringKeyVal;
+import candela.lfresource.LANforgeMgr;
 
 public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
@@ -597,6 +598,12 @@ public class HomeFragment extends Fragment {
         String Rx;
         long rx_bytes = TrafficStats.getTotalRxBytes();
         long tx_bytes = TrafficStats.getTotalTxBytes();
+
+        LANforgeMgr.setTrafficStats(now,
+                                    rx_bytes, TrafficStats.getTotalRxPackets(),
+                                    tx_bytes, TrafficStats.getTotalTxPackets(),
+                                    TrafficStats.getMobileRxBytes(), TrafficStats.getMobileRxPackets(),
+                                    TrafficStats.getMobileTxBytes(), TrafficStats.getMobileTxPackets());
 
         double rxDiff = rx_bytes - last_rx_bytes;
         double txDiff = tx_bytes - last_tx_bytes;
