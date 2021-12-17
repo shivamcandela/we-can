@@ -79,13 +79,20 @@ import java.util.Vector;
 import candela.lfresource.StringKeyVal;
 
 public class HomeFragment extends Fragment {
-    public static Context context;
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
     private static final String FILE_NAME = "data.conf";
     private TextView ip_show, link_speed;
     public Boolean live_table_flag = false,scan_table_flag=false, flag;
+    public static HomeFragment instance = null;
+
+    TableLayout sys_table = null;
+    TableLayout live_table = null;
+    TableLayout scan_table = null;
+
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        instance = this;
+
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -114,9 +121,9 @@ public class HomeFragment extends Fragment {
                 Switch switch_btn;
                 switch_btn = getActivity().findViewById(R.id.save_data_switch);
 //                TABLE LAYOUT FOR SHOWING TABLE DATA...
-                final TableLayout sys_table = (TableLayout) getView().findViewById(R.id.table);
-                final TableLayout live_table = (TableLayout) getView().findViewById(R.id.table);
-                final TableLayout scan_table = (TableLayout) getView().findViewById(R.id.table);
+                sys_table = (TableLayout) getView().findViewById(R.id.table);
+                live_table = (TableLayout) getView().findViewById(R.id.table);
+                scan_table = (TableLayout) getView().findViewById(R.id.table);
 
                 ip_show = getView().findViewById(R.id.server_ip_info);
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
@@ -590,98 +597,25 @@ public class HomeFragment extends Fragment {
                     public void onClick(View v) {
                         scan_table_flag = true;
                         live_table_flag = false;
+
+                        // Do initial update from any saved scan results.
+                        _scanCompleted(true);
+
                         Handler handler = new Handler();
                         final Runnable runnable = new Runnable() {
                             @Override
                             public void run() {
-                                scan_table.removeAllViews();
+                                // Scan wi-fi
                                 WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                String data = "";
-//                                Scan wi-fi
                                 wifiManager.setWifiEnabled(true);
                                 wifiManager.startScan();
-                                //Log.e("log", "startScan called in HomeFragment");
-
-                                // TODO:  This is not accurate, scan takes time, so this code below is
-                                // really showing previous scan info.  See ResourceUtils.scanSuccess, that
-                                // callback should feed this code.
-                                Map<String, String> scan_data = new LinkedHashMap<String, String>();
-                                List<ScanResult> scan_result = wifiManager.getScanResults();
-                                for (int i = 0; i < scan_result.size(); i++) {
-                                    ScanResult sr = scan_result.get(i);
-                                    //Log.e("log", "scan-result[" + i + "]: " + sr.toString() + "\n");
-
-                                    // The IEs do not implement toString() in useful manner, so we would have to parse
-                                    // the binary info if we cared to report this.  Ignore for now.
-                                    //if (sr.getInformationElements() != null) {
-                                    //   for (ScanResult.InformationElement ie : sr.getInformationElements()) {
-                                    //      Log.e("log", " IE: " + ie.toString() + "\n");
-                                    //   }
-                                    //}
-
-                                    String ssid = sr.SSID; //Get the SSID
-                                    if(ssid.equals(null) || ssid.equals("")){
-                                        ssid = "*hidden*";
-                                        System.out.println("SSID::= "+ ssid);
-                                    }
-
-                                    String bssid =  sr.BSSID; //Get the BSSID
-                                    String capability = sr.capabilities; //Get Wi-Fi capabilities
-                                    int centerFreq0 = sr.centerFreq0; //Get centerFreq0
-                                    int centerFreq1 = sr.centerFreq1; //Get centerFreq1
-                                    int channelWidth = sr.channelWidth; //Get channelWidth
-                                    int level = sr.level; //Get level/rssi
-                                    int frequency = sr.frequency; //Get frequency
-
-                                    // timestamp is usec since boot.
-                                    //java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime();
-                                    long age = android.os.SystemClock.elapsedRealtime() - (sr.timestamp / 1000);
-                                    age = age / 1000; //convert to seconds.
-
-                                    float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
-                                    String dist_in_meters = String.format("%.02f", dist);
-                                    data = "\nSSID: " + ssid + "\nbssid: " + bssid + "\ncapability: " + capability + "\ncenterFreq0: " +
-                                            centerFreq0 + "\ncenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
-                                            "\nlevel: " + level + "\nfrequency: " + frequency + "\nage: " + age +
-                                            "\ndistance: " + dist_in_meters + " meters\n\n";
-                                    scan_data.put(String.valueOf(i+1), String.valueOf(data));
-                                }
-
-                                scan_table.setPadding(10, 0, 10, 0);
-                                TableRow heading = new TableRow(getActivity());
-                                heading.setBackgroundColor(Color.rgb(120, 156, 175));
-
-                                TextView val_head = new TextView(getActivity());
-                                val_head.setText("LIVE WI-FI SCAN");
-                                val_head.setTextColor(Color.BLACK);
-                                val_head.setGravity(Gravity.LEFT);
-                                heading.addView(val_head);
-                                scan_table.addView(heading);
-
-                                int i = 1;
-                                for (Map.Entry<String, String> entry : scan_data.entrySet()) {
-                                    TableRow tbrow = new TableRow(getActivity());
-                                    if (i % 2 == 0) {
-                                        tbrow.setBackgroundColor(Color.rgb(211, 211, 211));
-                                    } else {
-                                        tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
-                                    }
-
-                                    TextView val_view = new TextView(getActivity());
-                                    val_view.setText(entry.getValue());
-                                    val_view.setTextSize(15);
-                                    val_view.setTextColor(Color.BLACK);
-                                    val_view.setGravity(Gravity.LEFT);
-                                    tbrow.addView(val_view);
-                                    scan_table.addView(tbrow);
-                                    i = i + 1;
-                                }
-
+                                Log.e("log", "startScan called in HomeFragment");
 
                                 if (scan_table_flag == true) {
                                     // NOTE:  Scans are normally limited to around one every 30 seconds, but
                                     // there is a developer option in Android 10 to allow it to run faster.
-                                    handler.postDelayed(this, 1000);
+                                    // Request poll every 10 seconds.
+                                    handler.postDelayed(this, 10000);
                                 } else {
                                     handler.removeCallbacks(this);
                                 }
@@ -695,10 +629,105 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    public void scanCompleted(boolean success) {
+        Log.e("log", "HomeFragment::scanCompleted: " + success + " scan-table-flag: " + scan_table_flag);
+
+        if (!scan_table_flag)
+            return;
+
+        Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
+                public void run() {
+                    _scanCompleted(success);
+                    handler.removeCallbacks(this);
+                }
+            };
+        handler.post(runnable);
+    }
+
+    public void _scanCompleted(boolean success) {
+        scan_table.removeAllViews();
+        WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        String data = "";
+
+        Map<String, String> scan_data = new LinkedHashMap<String, String>();
+        List<ScanResult> scan_result = wifiManager.getScanResults();
+        for (int i = 0; i < scan_result.size(); i++) {
+            ScanResult sr = scan_result.get(i);
+            //Log.e("log", "scan-result[" + i + "]: " + sr.toString() + "\n");
+
+            // The IEs do not implement toString() in useful manner, so we would have to parse
+            // the binary info if we cared to report this.  Ignore for now.
+            //if (sr.getInformationElements() != null) {
+            //   for (ScanResult.InformationElement ie : sr.getInformationElements()) {
+            //      Log.e("log", " IE: " + ie.toString() + "\n");
+            //   }
+            //}
+
+            String ssid = sr.SSID; //Get the SSID
+            if(ssid.equals(null) || ssid.equals("")){
+                ssid = "*hidden*";
+                System.out.println("SSID::= "+ ssid);
+            }
+
+            String bssid =  sr.BSSID; //Get the BSSID
+            String capability = sr.capabilities; //Get Wi-Fi capabilities
+            int centerFreq0 = sr.centerFreq0; //Get centerFreq0
+            int centerFreq1 = sr.centerFreq1; //Get centerFreq1
+            int channelWidth = sr.channelWidth; //Get channelWidth
+            int level = sr.level; //Get level/rssi
+            int frequency = sr.frequency; //Get frequency
+
+            // timestamp is usec since boot.
+            //java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime();
+            long age = android.os.SystemClock.elapsedRealtime() - (sr.timestamp / 1000);
+            age = age / 1000; //convert to seconds.
+
+            float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
+            String dist_in_meters = String.format("%.02f", dist);
+            data = "\nSSID: " + ssid + "\nbssid: " + bssid + "\ncapability: " + capability + "\ncenterFreq0: " +
+                centerFreq0 + "\ncenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
+                "\nlevel: " + level + "\nfrequency: " + frequency + "\nage: " + age +
+                "\ndistance: " + dist_in_meters + " meters\n\n";
+            scan_data.put(String.valueOf(i+1), String.valueOf(data));
+        }
+
+        scan_table.setPadding(10, 0, 10, 0);
+        TableRow heading = new TableRow(getActivity());
+        heading.setBackgroundColor(Color.rgb(120, 156, 175));
+
+        TextView val_head = new TextView(getActivity());
+        val_head.setText("LIVE WI-FI SCAN");
+        val_head.setTextColor(Color.BLACK);
+        val_head.setGravity(Gravity.LEFT);
+        heading.addView(val_head);
+        scan_table.addView(heading);
+
+        int i = 1;
+        for (Map.Entry<String, String> entry : scan_data.entrySet()) {
+            TableRow tbrow = new TableRow(getActivity());
+            if (i % 2 == 0) {
+                tbrow.setBackgroundColor(Color.rgb(211, 211, 211));
+            } else {
+                tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
+            }
+
+            TextView val_view = new TextView(getActivity());
+            val_view.setText(entry.getValue());
+            val_view.setTextSize(15);
+            val_view.setTextColor(Color.BLACK);
+            val_view.setGravity(Gravity.LEFT);
+            tbrow.addView(val_view);
+            scan_table.addView(tbrow);
+            i = i + 1;
+        }
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        instance = null;
     }
 }
 

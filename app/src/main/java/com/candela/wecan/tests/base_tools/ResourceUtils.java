@@ -47,15 +47,35 @@ import candela.lfresource.StringKeyVal;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.LANforgeMgr;
 import com.candela.wecan.StartupActivity;
+import com.candela.wecan.ui.home.HomeFragment;
 
 public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public static Context context;
-    private boolean scan_callback_enabled = false;
     protected StartupActivity startup_activity;
 
     public ResourceUtils(StartupActivity activity, Context context){
         this.context = context;
         startup_activity = activity;
+
+        // https://developer.android.com/guide/topics/connectivity/wifi-scan
+        // Register for scan callback
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
+              @Override
+              public void onReceive(Context c, Intent intent) {
+                 boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
+                 if (success) {
+                    scanSuccess();
+                 } else {
+                    // scan failure handling
+                    scanFailure();
+                 }
+              }
+           };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        context.registerReceiver(wifiScanReceiver, intentFilter);
     }
 
     @Override
@@ -67,28 +87,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
      * lfresource logic in the LANforgeMgr.notifyScanResults() call.
      */
     public void requestScan() {
-        // https://developer.android.com/guide/topics/connectivity/wifi-scan
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (!scan_callback_enabled) {
-           BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
-
-                 @Override
-                 public void onReceive(Context c, Intent intent) {
-                    boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
-                    if (success) {
-                       scanSuccess();
-                    } else {
-                       // scan failure handling
-                       scanFailure();
-                    }
-                 }
-              };
-
-           IntentFilter intentFilter = new IntentFilter();
-           intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-           context.registerReceiver(wifiScanReceiver, intentFilter);
-           scan_callback_enabled = true;
-        }
 
         // NOTE:  Can scan 4 times within 2 minutes.
         // Android 10 and higher:
@@ -115,8 +114,13 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     private void notifyScanResults(boolean succeeded) {
        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
        List<ScanResult> results = wifiManager.getScanResults();
-       // TODO:  Tell HomeFragment somehow
        Vector<String> srs = new Vector();
+
+       // Tell HomeFragment
+       Log.e("log", "ResourceUtils::notifyScanResults, home-frag: " + (HomeFragment.instance != null));
+       if (HomeFragment.instance != null) {
+          HomeFragment.instance.scanCompleted(succeeded);
+       }
 
        long now = System.currentTimeMillis();
        long uptime = android.os.SystemClock.elapsedRealtime();
