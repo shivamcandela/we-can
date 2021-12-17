@@ -90,6 +90,10 @@ public class HomeFragment extends Fragment {
     TableLayout live_table = null;
     TableLayout scan_table = null;
 
+    long last_bps_time = 0;
+    long last_rx_bytes = 0;
+    long last_tx_bytes = 0;
+
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         instance = this;
 
@@ -137,63 +141,17 @@ public class HomeFragment extends Fragment {
 
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);
+
+                last_bps_time = System.currentTimeMillis();
+                last_tx_bytes = TrafficStats.getTotalTxBytes();
+                last_rx_bytes = TrafficStats.getTotalRxBytes();
+
                 Handler handler = new Handler();
                 final Runnable runnable_link = new Runnable() {
-                    int count = 0;
-                    String pre_rx = "",pre_tx = "";
-                    String Rx = "0 Kbps",Tx = "0 Kbps";
                     @Override
                     public void run() {
-                        long BeforeTime = System.currentTimeMillis();
-                        long TotalTxBeforeTest = TrafficStats.getTotalTxBytes();
-                        long TotalRxBeforeTest = TrafficStats.getTotalRxBytes();
-                        double TimeDifference = System.currentTimeMillis() - BeforeTime;
-                        double rxDiff = TrafficStats.getTotalRxBytes() - TotalRxBeforeTest;
-                        double txDiff = TrafficStats.getTotalTxBytes() - TotalTxBeforeTest;
-                        double txBytes = ((txDiff) * 1000 / TimeDifference);
-                        double rxBytes = ((rxDiff) * 1000/ TimeDifference);
-                        if (rxBytes>=1024){
-                            double rxKb = rxBytes/1024;
-                            Rx = String.format("%.2f", rxKb) + " Kbps";
-                            if(rxKb >= 1024){
-                                double rxMb = rxKb/1024;
-                                Rx = String.format("%.2f", rxMb) + " Mbps";
-                                if(rxMb >= 1024){
-                                    double rxGb = rxMb/1024;
-                                    Rx = String.format("%.2f", rxGb) + " Gbps";
-                                }
-                            }
-                        }
-                        if (txBytes>=1024 && txBytes > 0){
-                            double txKb = txBytes/1024;
-                            Tx = String.format("%.2f", txKb) + " Kbps";
-                            if(txKb >= 1024){
-                                double txMb = txKb/1024;
-                                Tx = String.format("%.2f", txMb) + " Mbps";
-                                if(txMb >= 1024){
-                                    double txGb = txKb/1024;
-                                    Tx = String.format("%.2f", txGb) + " Gbps";
-                                }
-                            }
-                        }
-                        if(pre_rx.equals(Rx) && pre_tx.equals(Tx)){
-                            count +=1;
-                            if(count==10){
-                                System.out.println("link updateddddd");
-                                Rx = "0 Kbps";
-                                Tx = "0 Kbps";
-                                link_speed.setText("");
-                                count = 0;
-                            }
-                        }else{
-                            count = 0;
-                        }
-                        System.out.println("count: " + count);
-                        pre_rx = Rx;
-                        pre_tx = Tx;
-                        link_speed.setTextSize(15);
-                        link_speed.setText(Rx + "/" + Tx);
-                        handler.postDelayed(this, 500);
+                        updateBpsDisplay();
+                        handler.postDelayed(this, 1000);
                     }
                 };
                 handler.post(runnable_link);
@@ -609,7 +567,7 @@ public class HomeFragment extends Fragment {
                                 WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                                 wifiManager.setWifiEnabled(true);
                                 wifiManager.startScan();
-                                Log.e("log", "startScan called in HomeFragment");
+                                //Log.e("log", "startScan called in HomeFragment");
 
                                 if (scan_table_flag == true) {
                                     // NOTE:  Scans are normally limited to around one every 30 seconds, but
@@ -629,8 +587,66 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    public void updateBpsDisplay() {
+        long now = System.currentTimeMillis();
+        double TimeDifference = now - last_bps_time;
+        if (TimeDifference == 0) {
+            return; // no div by zero error!
+        }
+        String Tx;
+        String Rx;
+        long rx_bytes = TrafficStats.getTotalRxBytes();
+        long tx_bytes = TrafficStats.getTotalTxBytes();
+
+        double rxDiff = rx_bytes - last_rx_bytes;
+        double txDiff = tx_bytes - last_tx_bytes;
+        double txbits = ((txDiff) * 1000 / TimeDifference) * 8;
+        double rxbits = ((rxDiff) * 1000 / TimeDifference) * 8;
+
+        last_rx_bytes = rx_bytes;
+        last_tx_bytes = tx_bytes;
+        last_bps_time = now;
+
+        // TODO:  More efficient to test for high numbers first and only assing Rx/Tx string once
+        if (rxbits >= 1000) {
+            double rxKb = rxbits/1000;
+            Rx = String.format("%.2f", rxKb) + " Kbps";
+            if(rxKb >= 1000) {
+                double rxMb = rxKb/1000;
+                Rx = String.format("%.2f", rxMb) + " Mbps";
+                if(rxMb >= 1000){
+                    double rxGb = rxMb/1000;
+                    Rx = String.format("%.2f", rxGb) + " Gbps";
+                }
+            }
+        }
+        else {
+            Rx = (long)(rxbits) + " bps";
+        }
+
+        if (txbits >= 1000) {
+            double txKb = txbits / 1000;
+            Tx = String.format("%.2f", txKb) + " Kbps";
+            if(txKb >= 1000) {
+                double txMb = txKb / 1000;
+                Tx = String.format("%.2f", txMb) + " Mbps";
+                if(txMb >= 1000){
+                    double txGb = txKb / 1000;
+                    Tx = String.format("%.2f", txGb) + " Gbps";
+                }
+            }
+        }
+        else {
+            Tx = (long)(txbits) + " bps";
+        }
+
+        //System.out.println("count: " + count);
+        link_speed.setTextSize(15);
+        link_speed.setText(Rx + "/" + Tx);
+    }
+
     public void scanCompleted(boolean success) {
-        Log.e("log", "HomeFragment::scanCompleted: " + success + " scan-table-flag: " + scan_table_flag);
+        //Log.e("log", "HomeFragment::scanCompleted: " + success + " scan-table-flag: " + scan_table_flag);
 
         if (!scan_table_flag)
             return;
