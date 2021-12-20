@@ -698,11 +698,12 @@ public class HomeFragment extends Fragment {
             String capability = sr.capabilities; //Get Wi-Fi capabilities
             int centerFreq0 = 0;
             int centerFreq1 = 0;
+            int channelWidth = 0;
             if (Build.VERSION.SDK_INT >= 23) {
                centerFreq0 = sr.centerFreq0; //Get centerFreq0
                centerFreq1 = sr.centerFreq1; //Get centerFreq1
+               channelWidth = sr.channelWidth; //Get channelWidth
             }
-            int channelWidth = sr.channelWidth; //Get channelWidth
             int level = sr.level; //Get level/rssi
             int frequency = sr.frequency; //Get frequency
             if(conneted_bssid.equals(bssid)){
