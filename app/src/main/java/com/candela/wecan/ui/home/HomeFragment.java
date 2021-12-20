@@ -672,6 +672,7 @@ public class HomeFragment extends Fragment {
         scan_table.removeAllViews();
         WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         String data = "";
+        String conneted_bssid =  wifiManager.getConnectionInfo().getBSSID();
 
         Map<String, String> scan_data = new LinkedHashMap<String, String>();
         List<ScanResult> scan_result = wifiManager.getScanResults();
@@ -700,7 +701,9 @@ public class HomeFragment extends Fragment {
             int channelWidth = sr.channelWidth; //Get channelWidth
             int level = sr.level; //Get level/rssi
             int frequency = sr.frequency; //Get frequency
-
+            if(conneted_bssid.equals(bssid)){
+                ssid += "(connected)";
+            }
             // timestamp is usec since boot.
             //java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime();
             long age = android.os.SystemClock.elapsedRealtime() - (sr.timestamp / 1000);
@@ -708,10 +711,10 @@ public class HomeFragment extends Fragment {
 
             float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
             String dist_in_meters = String.format("%.02f", dist);
-            data = "\nSSID: " + ssid + "\nbssid: " + bssid + "\ncapability: " + capability + "\ncenterFreq0: " +
-                centerFreq0 + "\ncenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
-                "\nlevel: " + level + "\nfrequency: " + frequency + "\nage: " + age +
-                "\ndistance: " + dist_in_meters + " meters\n\n";
+            data = "SSID: " + '\"' + ssid + '\"' + "\nbssid: " + bssid + "\ncenterFreq0: " +
+                centerFreq0 + "\tcenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
+                "\t\uD83D\uDCF6 " + level + "\nFrequency " + frequency + "\tage⏱ " + age +
+                "\t\t\tdistance: " + dist_in_meters + " meters\n" + "\uD83D\uDD12 " + capability;
             scan_data.put(String.valueOf(i+1), String.valueOf(data));
         }
 
@@ -730,13 +733,17 @@ public class HomeFragment extends Fragment {
         for (Map.Entry<String, String> entry : scan_data.entrySet()) {
             TableRow tbrow = new TableRow(getActivity());
             if (i % 2 == 0) {
-                tbrow.setBackgroundColor(Color.rgb(211, 211, 211));
+                tbrow.setBackgroundColor(Color.rgb(220, 220, 220));
             } else {
                 tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
             }
 
             TextView val_view = new TextView(getActivity());
-            val_view.setText(entry.getValue());
+            String scan_value = entry.getValue();
+            if (scan_value.contains("(connected)")){
+                tbrow.setBackgroundColor(Color.rgb(100, 192, 102));
+            }
+            val_view.setText(scan_value);
             val_view.setTextSize(15);
             val_view.setTextColor(Color.BLACK);
             val_view.setGravity(Gravity.LEFT);
