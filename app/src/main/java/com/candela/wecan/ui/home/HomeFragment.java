@@ -57,6 +57,7 @@ import com.candela.wecan.R;
 import com.candela.wecan.databinding.FragmentHomeBinding;
 import com.candela.wecan.tests.base_tools.CardUtils;
 import com.candela.wecan.tests.base_tools.GetPhoneWifiInfo;
+import com.cardiomood.android.controls.gauge.SpeedometerGauge;
 
 import org.json.JSONObject;
 
@@ -103,14 +104,6 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        Button button = root.findViewById(R.id.update_lf);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CardUtils cardUtils = new CardUtils(getContext());
-            }
-        });
-
 //        final TextView textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @SuppressLint({"MissingPermission", "NewApi"})
@@ -139,6 +132,23 @@ public class HomeFragment extends Fragment {
                 String current_resource = (String) keys.get("current-resource");
                 String current_realm = (String) keys.get("current-realm");
                 ip_show.setText("User-Name: " + username + "\nServer: " + current_ip + "\nRealm: " + current_realm + "\nResource: " + current_resource);
+
+//                // Customize SpeedometerGauge
+//                SpeedometerGauge speedometer = (SpeedometerGauge) getView().findViewById(R.id.speedometer);
+//                speedometer.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+//                    @Override
+//                    public String getLabelFor(double progress, double maxProgress) {
+//                        return String.valueOf((int) Math.round(progress));
+//                    }
+//                });
+////              configure value range and ticks
+//                speedometer.setMaxSpeed(100);
+//                speedometer.setMajorTickStep(5);
+//                speedometer.setMinorTicks(5);
+////              Configure value range colors
+//                speedometer.addColoredRange(0, 30, Color.RED);
+//                speedometer.addColoredRange(30, 50, Color.YELLOW);
+//                speedometer.addColoredRange(50, 100, Color.GREEN);
 
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);
@@ -650,6 +660,25 @@ public class HomeFragment extends Fragment {
         //System.out.println("count: " + count);
         link_speed.setTextSize(15);
         link_speed.setText(Rx + "/" + Tx);
+        // Customize SpeedometerGauge
+        SpeedometerGauge speedometer = (SpeedometerGauge) getView().findViewById(R.id.speedometer);
+        speedometer.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+            @Override
+            public String getLabelFor(double progress, double maxProgress) {
+                return String.valueOf((int) Math.round(progress));
+            }
+        });
+//              configure value range and ticks
+        speedometer.setMaxSpeed(100);
+        speedometer.setMajorTickStep(5);
+        speedometer.setMinorTicks(5);
+//              Configure value range colors
+        speedometer.addColoredRange(0, 30, Color.RED);
+        speedometer.addColoredRange(30, 50, Color.YELLOW);
+        speedometer.addColoredRange(50, 100, Color.GREEN);
+        double ss = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
+        speedometer.setSpeed(ss);
+
     }
 
     public void scanCompleted(boolean success) {
