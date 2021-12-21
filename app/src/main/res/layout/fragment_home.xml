@@ -42,7 +42,6 @@
                 android:textStyle="bold" />
 
         </LinearLayout>
-
     </ScrollView>
 
     <LinearLayout
@@ -134,10 +133,7 @@
 
     </LinearLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:overScrollMode="always">
+
     <TableLayout
         android:id="@+id/table"
         android:layout_marginTop="2dp"
@@ -145,7 +141,6 @@
         android:layout_height="fill_parent"
         android:layout_weight="1">
     </TableLayout>
-      </ScrollView>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -172,18 +167,11 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/update_lf"
-        android:layout_width="285dp"
-        android:layout_height="62dp"
+    <com.cardiomood.android.controls.gauge.SpeedometerGauge
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:layout_gravity="center"
-        android:backgroundTint="#4CAF50"
-        android:text="UPdate"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.595"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95" />
+        android:id="@+id/speedometer" />
+
     <!--    </ScrollView>-->
 </LinearLayout>
