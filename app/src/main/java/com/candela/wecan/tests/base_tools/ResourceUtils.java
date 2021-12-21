@@ -34,7 +34,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -46,6 +45,7 @@ import candela.lfresource.PlatformInfo;
 import candela.lfresource.StringKeyVal;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.LANforgeMgr;
+import candela.lfresource.Stdlib;
 import com.candela.wecan.StartupActivity;
 import com.candela.wecan.ui.home.HomeFragment;
 
@@ -188,7 +188,12 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
             data_structure.add(new StringKeyVal("SSID", info.getSSID().replaceAll("\"","")));
             data_structure.add(new StringKeyVal("BSSID", info.getBSSID()));
             data_structure.add(new StringKeyVal("RSSI", String.valueOf(info.getRssi())));
-            data_structure.add(new StringKeyVal("Frequency",String.valueOf(info.getFrequency())));
+            if (Build.VERSION.SDK_INT >= 21) {
+               data_structure.add(new StringKeyVal("Frequency",String.valueOf(info.getFrequency())));
+            }
+            else {
+               // TODO:  Get frequency from scan results for these old android versions.
+            }
             data_structure.add(new StringKeyVal("Link speed",String.valueOf(info.getLinkSpeed())));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 data_structure.add(new StringKeyVal("Tx Link speed",String.valueOf(info.getTxLinkSpeedMbps())));
@@ -216,7 +221,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                     if (nif.getName().equals("wlan0")){
                         System.out.println(nif.getName());
                         System.out.println(nif.getInetAddresses().toString());
-                        data_structure.add(new StringKeyVal("Hardware-Address",Base64.getEncoder().encodeToString(nif.getHardwareAddress())));
+                        data_structure.add(new StringKeyVal("Hardware-Address", Stdlib.toStringMac(nif.getHardwareAddress())));
                         data_structure.add(new StringKeyVal("MTU", String.valueOf(nif.getMTU())));
                         data_structure.add(new StringKeyVal("is-P2P", String.valueOf(nif.isPointToPoint())));
                         data_structure.add(new StringKeyVal("Supports-Multicast", String.valueOf(nif.supportsMulticast())));
@@ -283,7 +288,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         String board = Build.BOARD;
         String brand = Build.BRAND;
         String cpu_abi = Build.CPU_ABI;
-        String[] cpu_abi2 = (Build.SUPPORTED_ABIS);
+        String cpu_abi2 = Build.CPU_ABI2;
         String hardware = Build.HARDWARE;
         String host = Build.HOST;
         String id = Build.ID;
@@ -301,10 +306,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.release = Build.VERSION.RELEASE;
         pi.version_incremental = Build.VERSION.INCREMENTAL;
         pi.version_sdk_number = String.valueOf(Build.VERSION.SDK_INT);
-        pi.board = Build.BOARD;
-        pi.brand = Build.BRAND;
+        pi.board = board;
+        pi.brand = brand;
         pi.cpu_abi = Build.CPU_ABI;
-        pi.cpu_abi2 = Build.CPU_ABI2;
+        pi.cpu_abi2 = cpu_abi2;
         pi.hardware = Build.HARDWARE;
         pi.host = Build.HOST;
         pi.id = Build.ID;

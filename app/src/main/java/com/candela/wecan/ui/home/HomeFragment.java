@@ -458,11 +458,20 @@ public class HomeFragment extends Fragment {
                                     BSSID = wifiinfo.getBSSID();
                                     Rssi = wifiinfo.getRssi();
                                     LinkSpeed = wifiinfo.getLinkSpeed() + " Mbps";
-                                    channel = wifiinfo.getFrequency() + " MHz";
-                                    Rx = wifiinfo.getRxLinkSpeedMbps();
-                                    Tx = wifiinfo.getTxLinkSpeedMbps();
-                                    Rx_Kbps = wifiinfo.getRxLinkSpeedMbps() * 1024;
-                                    Tx_Kbps = wifiinfo.getTxLinkSpeedMbps() * 1024;
+                                    if (Build.VERSION.SDK_INT >= 21) {
+                                       channel = wifiinfo.getFrequency() + " MHz";
+                                    }
+                                    if (Build.VERSION.SDK_INT >= 29) {
+                                       Rx = wifiinfo.getRxLinkSpeedMbps();
+                                       Tx = wifiinfo.getTxLinkSpeedMbps();
+                                    }
+                                    else {
+                                       // TODO: Deal with: wifiinfo.LINK_SPEED_UNITS;
+                                       Rx = wifiinfo.getLinkSpeed();
+                                       Tx = wifiinfo.getLinkSpeed();
+                                    }
+                                    Rx_Kbps = Rx * 1000;
+                                    Tx_Kbps = Tx * 1000;
                                 }
                                 DhcpInfo Dhcp_details = wifiManager.getDhcpInfo();
                                 String dns1 = Formatter.formatIpAddress(Dhcp_details.dns1);
@@ -660,14 +669,16 @@ public class HomeFragment extends Fragment {
         //System.out.println("count: " + count);
         link_speed.setTextSize(15);
         link_speed.setText(Rx + "/" + Tx);
+
         // Customize SpeedometerGauge
+        // NOTE:  Saw NPE here on slow 8.1 Android test phone.
         SpeedometerGauge speedometer = (SpeedometerGauge) getView().findViewById(R.id.speedometer);
         speedometer.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-            @Override
-            public String getLabelFor(double progress, double maxProgress) {
-                return String.valueOf((int) Math.round(progress));
-            }
-        });
+              @Override
+              public String getLabelFor(double progress, double maxProgress) {
+                 return String.valueOf((int) Math.round(progress));
+              }
+           });
 //              configure value range and ticks
         speedometer.setMaxSpeed(100);
         speedometer.setMajorTickStep(5);
@@ -678,7 +689,6 @@ public class HomeFragment extends Fragment {
         speedometer.addColoredRange(50, 100, Color.GREEN);
         double ss = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
         speedometer.setSpeed(ss);
-
     }
 
     public void scanCompleted(boolean success) {
