@@ -80,7 +80,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public void setResourceInfo(int i, int i1) {
-        // TODO:  Store this info for next time.
+       startup_activity.updateRealmInfo();
     }
 
     /* Request Android/UI to initiate a scan.  Results will be sent back to
@@ -237,7 +237,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
             return data_structure;
         }
-        else if (s.startsWith("epdg") || (s.startsWith("rmnet"))){
+        else if (s.startsWith("epdg") || s.startsWith("rmnet") || (s.startsWith("ccmni") /* mtk phones */)) {
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             data_structure.add(new StringKeyVal("Network-Operator",String.valueOf(telephonyManager.getNetworkOperatorName())));
             List<CellInfo> cellInfos = telephonyManager.getAllCellInfo();
@@ -422,58 +422,52 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
 //        List<ScanResult> scanResults = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).getScanResults();
 
-        Boolean AC_11;
-        Boolean AX_11;
-        Boolean N_11;
-        Boolean legacy;
+        boolean AC_11 = false;
+        boolean AX_11 = false;
+        boolean N_11 = false;
+        boolean legacy = true;
+        boolean is_5g = false;
+        boolean is_2g = true;
+        boolean is_6g = false;
 
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= 30) {
+            is_6g = wifiManager.is6GHzBandSupported();
+        }
+
         if (Build.VERSION.SDK_INT >= 31){
             AC_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11AC);
-        }else {
-            AC_11 = false;
         }
 
         if (Build.VERSION.SDK_INT >= 30){
             AX_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11AX);
-        }else {
-            AX_11 = false;
         }
 
         if (Build.VERSION.SDK_INT >= 30){
             N_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11N);
-        }else {
-            N_11 = false;
         }
 
         if(Build.VERSION.SDK_INT >= 30){
             legacy = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_LEGACY);
-        }else {
-            legacy = false;
         }
 //        Boolean AX_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11AX);
 
 //        Boolean N_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11N);
 //        Boolean legacy = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_LEGACY);
-        if (Build.VERSION.SDK_INT >= 21) {
-            wifi_capabilities.add(new StringKeyVal("supports_5G", String.valueOf((wifiManager.is5GHzBandSupported()))));
-        }else {
-            wifi_capabilities.add(new StringKeyVal("supports_5G", String.valueOf(true)));
-        }
 
-        if (Build.VERSION.SDK_INT >= 30) {
-            wifi_capabilities.add(new StringKeyVal("supports_6G", String.valueOf((wifiManager.is6GHzBandSupported()))));
-        }else {
-            wifi_capabilities.add(new StringKeyVal("supports_6G", String.valueOf(true)));
-        }
+        // Hack overrides for certain chipsets that may have older android versions that cannot
+        // query useful things.
+         if (Build.VERSION.SDK_INT < 30) {
+            if (Build.HARDWARE.equals("mt6572")) {
+               // bgn
+               N_11 = true;
+            }
+         }
 
-        if (Build.VERSION.SDK_INT >= 31) {
-            // This was added in API 31, I guess before then 2.4 was always supported.
-            wifi_capabilities.add(new StringKeyVal("supports_2G", String.valueOf((wifiManager.is24GHzBandSupported())))); // This line gives an error
-        }
-        else {
-            wifi_capabilities.add(new StringKeyVal("supports_2G", String.valueOf(true)));
-        }
+        wifi_capabilities.add(new StringKeyVal("supports_5G", String.valueOf(is_5g)));
+        wifi_capabilities.add(new StringKeyVal("supports_6G", String.valueOf(is_6g)));
+        wifi_capabilities.add(new StringKeyVal("supports_2G", String.valueOf(is_2g)));
 
         wifi_capabilities.add(new StringKeyVal("11-AC", String.valueOf(AC_11)));
         wifi_capabilities.add(new StringKeyVal("11-AX", String.valueOf(AX_11)));
