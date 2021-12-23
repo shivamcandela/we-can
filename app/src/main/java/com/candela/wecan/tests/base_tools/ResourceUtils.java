@@ -34,7 +34,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -46,6 +45,7 @@ import candela.lfresource.PlatformInfo;
 import candela.lfresource.StringKeyVal;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.LANforgeMgr;
+import candela.lfresource.Stdlib;
 import com.candela.wecan.StartupActivity;
 import com.candela.wecan.ui.home.HomeFragment;
 
@@ -80,7 +80,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public void setResourceInfo(int i, int i1) {
-        // TODO:  Store this info for next time.
+       startup_activity.updateRealmInfo();
     }
 
     /* Request Android/UI to initiate a scan.  Results will be sent back to
@@ -188,7 +188,12 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
             data_structure.add(new StringKeyVal("SSID", info.getSSID().replaceAll("\"","")));
             data_structure.add(new StringKeyVal("BSSID", info.getBSSID()));
             data_structure.add(new StringKeyVal("RSSI", String.valueOf(info.getRssi())));
-            data_structure.add(new StringKeyVal("Frequency",String.valueOf(info.getFrequency())));
+            if (Build.VERSION.SDK_INT >= 21) {
+               data_structure.add(new StringKeyVal("Frequency",String.valueOf(info.getFrequency())));
+            }
+            else {
+               // TODO:  Get frequency from scan results for these old android versions.
+            }
             data_structure.add(new StringKeyVal("Link speed",String.valueOf(info.getLinkSpeed())));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 data_structure.add(new StringKeyVal("Tx Link speed",String.valueOf(info.getTxLinkSpeedMbps())));
@@ -216,7 +221,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                     if (nif.getName().equals("wlan0")){
                         System.out.println(nif.getName());
                         System.out.println(nif.getInetAddresses().toString());
-                        data_structure.add(new StringKeyVal("Hardware-Address",Base64.getEncoder().encodeToString(nif.getHardwareAddress())));
+                        data_structure.add(new StringKeyVal("Hardware-Address", Stdlib.toStringMac(nif.getHardwareAddress())));
                         data_structure.add(new StringKeyVal("MTU", String.valueOf(nif.getMTU())));
                         data_structure.add(new StringKeyVal("is-P2P", String.valueOf(nif.isPointToPoint())));
                         data_structure.add(new StringKeyVal("Supports-Multicast", String.valueOf(nif.supportsMulticast())));
@@ -232,7 +237,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
             return data_structure;
         }
-        else if (s.startsWith("epdg") || (s.startsWith("rmnet"))){
+        else if (s.startsWith("epdg") || s.startsWith("rmnet") || (s.startsWith("ccmni") /* mtk phones */)) {
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             data_structure.add(new StringKeyVal("Network-Operator",String.valueOf(telephonyManager.getNetworkOperatorName())));
             List<CellInfo> cellInfos = telephonyManager.getAllCellInfo();
@@ -283,7 +288,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         String board = Build.BOARD;
         String brand = Build.BRAND;
         String cpu_abi = Build.CPU_ABI;
-        String[] cpu_abi2 = (Build.SUPPORTED_ABIS);
+        String cpu_abi2 = Build.CPU_ABI2;
         String hardware = Build.HARDWARE;
         String host = Build.HOST;
         String id = Build.ID;
@@ -301,10 +306,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.release = Build.VERSION.RELEASE;
         pi.version_incremental = Build.VERSION.INCREMENTAL;
         pi.version_sdk_number = String.valueOf(Build.VERSION.SDK_INT);
-        pi.board = Build.BOARD;
-        pi.brand = Build.BRAND;
+        pi.board = board;
+        pi.brand = brand;
         pi.cpu_abi = Build.CPU_ABI;
-        pi.cpu_abi2 = Build.CPU_ABI2;
+        pi.cpu_abi2 = cpu_abi2;
         pi.hardware = Build.HARDWARE;
         pi.host = Build.HOST;
         pi.id = Build.ID;
@@ -417,58 +422,52 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
 //        List<ScanResult> scanResults = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).getScanResults();
 
-        Boolean AC_11;
-        Boolean AX_11;
-        Boolean N_11;
-        Boolean legacy;
+        boolean AC_11 = false;
+        boolean AX_11 = false;
+        boolean N_11 = false;
+        boolean legacy = true;
+        boolean is_5g = false;
+        boolean is_2g = true;
+        boolean is_6g = false;
 
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= 30) {
+            is_6g = wifiManager.is6GHzBandSupported();
+        }
+
         if (Build.VERSION.SDK_INT >= 31){
             AC_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11AC);
-        }else {
-            AC_11 = false;
         }
 
         if (Build.VERSION.SDK_INT >= 30){
             AX_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11AX);
-        }else {
-            AX_11 = false;
         }
 
         if (Build.VERSION.SDK_INT >= 30){
             N_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11N);
-        }else {
-            N_11 = false;
         }
 
         if(Build.VERSION.SDK_INT >= 30){
             legacy = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_LEGACY);
-        }else {
-            legacy = false;
         }
 //        Boolean AX_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11AX);
 
 //        Boolean N_11 = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_11N);
 //        Boolean legacy = wifiManager.isWifiStandardSupported(ScanResult.WIFI_STANDARD_LEGACY);
-        if (Build.VERSION.SDK_INT >= 21) {
-            wifi_capabilities.add(new StringKeyVal("supports_5G", String.valueOf((wifiManager.is5GHzBandSupported()))));
-        }else {
-            wifi_capabilities.add(new StringKeyVal("supports_5G", String.valueOf(true)));
-        }
 
-        if (Build.VERSION.SDK_INT >= 30) {
-            wifi_capabilities.add(new StringKeyVal("supports_6G", String.valueOf((wifiManager.is6GHzBandSupported()))));
-        }else {
-            wifi_capabilities.add(new StringKeyVal("supports_6G", String.valueOf(true)));
-        }
+        // Hack overrides for certain chipsets that may have older android versions that cannot
+        // query useful things.
+         if (Build.VERSION.SDK_INT < 30) {
+            if (Build.HARDWARE.equals("mt6572")) {
+               // bgn
+               N_11 = true;
+            }
+         }
 
-        if (Build.VERSION.SDK_INT >= 31) {
-            // This was added in API 31, I guess before then 2.4 was always supported.
-            wifi_capabilities.add(new StringKeyVal("supports_2G", String.valueOf((wifiManager.is24GHzBandSupported())))); // This line gives an error
-        }
-        else {
-            wifi_capabilities.add(new StringKeyVal("supports_2G", String.valueOf(true)));
-        }
+        wifi_capabilities.add(new StringKeyVal("supports_5G", String.valueOf(is_5g)));
+        wifi_capabilities.add(new StringKeyVal("supports_6G", String.valueOf(is_6g)));
+        wifi_capabilities.add(new StringKeyVal("supports_2G", String.valueOf(is_2g)));
 
         wifi_capabilities.add(new StringKeyVal("11-AC", String.valueOf(AC_11)));
         wifi_capabilities.add(new StringKeyVal("11-AX", String.valueOf(AX_11)));
