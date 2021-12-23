@@ -661,24 +661,56 @@ public class HomeFragment extends Fragment {
         link_speed.setTextSize(15);
         link_speed.setText(Rx + "/" + Tx);
         // Customize SpeedometerGauge
-        SpeedometerGauge speedometer = (SpeedometerGauge) getView().findViewById(R.id.speedometer);
-        speedometer.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+        SpeedometerGauge speedometerdown = (SpeedometerGauge) getView().findViewById(R.id.speedometerdown);
+        SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
+        speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+            @Override
+            public String getLabelFor(double progress, double maxProgress) {
+                return String.valueOf((int) Math.round(progress));
+            }
+        });
+
+        speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
             @Override
             public String getLabelFor(double progress, double maxProgress) {
                 return String.valueOf((int) Math.round(progress));
             }
         });
 //              configure value range and ticks
-        speedometer.setMaxSpeed(100);
-        speedometer.setMajorTickStep(5);
-        speedometer.setMinorTicks(5);
+        speedometerdown.setLabelTextSize(10);
+        speedometerdown.setMaxSpeed(100);
+        speedometerdown.setMajorTickStep(10);
 //              Configure value range colors
-        speedometer.addColoredRange(0, 30, Color.RED);
-        speedometer.addColoredRange(30, 50, Color.YELLOW);
-        speedometer.addColoredRange(50, 100, Color.GREEN);
-        double ss = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
-        speedometer.setSpeed(ss);
+        speedometerdown.addColoredRange(0, 30, Color.RED);
+        speedometerdown.addColoredRange(30, 50, Color.YELLOW);
+        speedometerdown.addColoredRange(50, 100, Color.GREEN);
+        String unit = Rx.substring(Rx.length()-4);
+        double downlink = 0;
+        if (unit.equals(" bps")){
+            downlink = 0;
+        }else if (unit.equals("Mbps")){
+            downlink = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
+        }
 
+
+        speedometerdown.setSpeed(downlink);
+
+        speedometerup.setLabelTextSize(10);
+        speedometerup.setMaxSpeed(100);
+        speedometerup.setMajorTickStep(10);
+
+        speedometerup.addColoredRange(0, 30, Color.RED);
+        speedometerup.addColoredRange(30, 50, Color.YELLOW);
+        speedometerup.addColoredRange(50, 100, Color.GREEN);
+        String unitTx = Tx.substring(Tx.length()-4);
+        double uplink = 0;
+        speedometerup.setSpeed(uplink);
+        if (unit.equals(" bps")){
+            uplink = 0;
+        }else if (unit.equals("Mbps")){
+            uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
+        }
+        speedometerup.setSpeed(uplink);
     }
 
     public void scanCompleted(boolean success) {

@@ -133,6 +133,26 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.cardiomood.android.controls.gauge.SpeedometerGauge
+            android:layout_height="wrap_content"
+            android:layout_width="200dp"
+            android:layout_gravity="left"
+            android:id="@+id/speedometerdown" />
+
+        <com.cardiomood.android.controls.gauge.SpeedometerGauge
+            android:layout_height="wrap_content"
+            android:layout_width="200dp"
+            android:layout_gravity="right"
+            android:id="@+id/speedometerup" />
+    </LinearLayout>
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TableLayout
         android:id="@+id/table"
@@ -141,19 +161,20 @@
         android:layout_height="fill_parent"
         android:layout_weight="1">
     </TableLayout>
+</ScrollView>
+
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:layout_gravity="left">
 
         <Switch
             android:id="@+id/save_data_switch"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:checked="false"
-            android:gravity="center"
             android:text="Save Data"
             android:textColor="@color/light_green">
 
@@ -166,12 +187,4 @@
             app:srcCompat="@android:drawable/ic_menu_share" />
 
     </LinearLayout>
-
-    <com.cardiomood.android.controls.gauge.SpeedometerGauge
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_gravity="center"
-        android:id="@+id/speedometer" />
-
-    <!--    </ScrollView>-->
 </LinearLayout>
