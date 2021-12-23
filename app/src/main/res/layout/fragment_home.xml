@@ -133,6 +133,23 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <com.cardiomood.android.controls.gauge.SpeedometerGauge
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/speedometerdown" />
+
+        <com.cardiomood.android.controls.gauge.SpeedometerGauge
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/speedometerup" />
+    </LinearLayout>
 
     <TableLayout
         android:id="@+id/table"
@@ -167,11 +184,7 @@
 
     </LinearLayout>
 
-    <com.cardiomood.android.controls.gauge.SpeedometerGauge
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_gravity="center"
-        android:id="@+id/speedometer" />
+
 
     <!--    </ScrollView>-->
 </LinearLayout>
