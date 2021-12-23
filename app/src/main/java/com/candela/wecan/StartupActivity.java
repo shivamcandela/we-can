@@ -143,28 +143,32 @@ public class StartupActivity extends AppCompatActivity {
             });
     }
 
+    public void updateRealmInfo() {
+       String new_resource_id = lf_resource.getResource();
+       String new_realm_id = lf_resource.getRealm();
+       String ip = lf_resource.getRemoteHost();
+       SharedPreferences.Editor editor = sharedpreferences.edit();
+
+       editor.putString(ip, "-1");
+       editor.putString("last", ip);
+       editor.putString("resource-" + ip, new_resource_id);
+       editor.putString("realm-" + ip, new_realm_id);
+
+       editor.putString("current-ip", ip);
+       editor.putString("current-resource", new_resource_id);
+       editor.putString("current-realm", new_realm_id);
+
+       editor.apply();
+       editor.commit();
+    }
+
     public void _notifyCxChanged() {
         state = lf_resource.lfresource.get_state();
         Log.e("log", "notifyCxChanged, state: " + state);
 
         if (lf_resource.getConnState()) {
             Toast.makeText(my_view.getContext(), "Connected to LANforge Server", Toast.LENGTH_SHORT).show();
-            String new_resource_id = lf_resource.getResource();
-            String new_realm_id = lf_resource.getRealm();
-            String ip = lf_resource.getRemoteHost();
-            SharedPreferences.Editor editor = sharedpreferences.edit();
-
-            editor.putString(ip, "-1");
-            editor.putString("last", ip);
-            editor.putString("resource-" + ip, new_resource_id);
-            editor.putString("realm-" + ip, new_realm_id);
-
-            editor.putString("current-ip", ip);
-            editor.putString("current-resource", new_resource_id);
-            editor.putString("current-realm", new_realm_id);
-
-            editor.apply();
-            editor.commit();
+            updateRealmInfo();
             // CardUtils cardUtils = new CardUtils(getApplicationContext());
             openServerConnection();
         }
