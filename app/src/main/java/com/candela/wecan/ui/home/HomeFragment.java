@@ -458,11 +458,20 @@ public class HomeFragment extends Fragment {
                                     BSSID = wifiinfo.getBSSID();
                                     Rssi = wifiinfo.getRssi();
                                     LinkSpeed = wifiinfo.getLinkSpeed() + " Mbps";
-                                    channel = wifiinfo.getFrequency() + " MHz";
-                                    Rx = wifiinfo.getRxLinkSpeedMbps();
-                                    Tx = wifiinfo.getTxLinkSpeedMbps();
-                                    Rx_Kbps = wifiinfo.getRxLinkSpeedMbps() * 1024;
-                                    Tx_Kbps = wifiinfo.getTxLinkSpeedMbps() * 1024;
+                                    if (Build.VERSION.SDK_INT >= 21) {
+                                        channel = wifiinfo.getFrequency() + " MHz";
+                                    }
+                                    if (Build.VERSION.SDK_INT >= 29) {
+                                        Rx = wifiinfo.getRxLinkSpeedMbps();
+                                        Tx = wifiinfo.getTxLinkSpeedMbps();
+                                    }
+                                    else {
+                                        // TODO: Deal with: wifiinfo.LINK_SPEED_UNITS;
+                                        Rx = wifiinfo.getLinkSpeed();
+                                        Tx = wifiinfo.getLinkSpeed();
+                                    }
+                                    Rx_Kbps = Rx * 1000;
+                                    Tx_Kbps = Tx * 1000;
                                 }
                                 DhcpInfo Dhcp_details = wifiManager.getDhcpInfo();
                                 String dns1 = Formatter.formatIpAddress(Dhcp_details.dns1);
@@ -610,10 +619,10 @@ public class HomeFragment extends Fragment {
         long tx_bytes = TrafficStats.getTotalTxBytes();
 
         LANforgeMgr.setTrafficStats(now,
-                                    rx_bytes, TrafficStats.getTotalRxPackets(),
-                                    tx_bytes, TrafficStats.getTotalTxPackets(),
-                                    TrafficStats.getMobileRxBytes(), TrafficStats.getMobileRxPackets(),
-                                    TrafficStats.getMobileTxBytes(), TrafficStats.getMobileTxPackets());
+                rx_bytes, TrafficStats.getTotalRxPackets(),
+                tx_bytes, TrafficStats.getTotalTxPackets(),
+                TrafficStats.getMobileRxBytes(), TrafficStats.getMobileRxPackets(),
+                TrafficStats.getMobileTxBytes(), TrafficStats.getMobileTxPackets());
 
         double rxDiff = rx_bytes - last_rx_bytes;
         double txDiff = tx_bytes - last_tx_bytes;
@@ -660,9 +669,10 @@ public class HomeFragment extends Fragment {
         //System.out.println("count: " + count);
         link_speed.setTextSize(15);
         link_speed.setText(Rx + "/" + Tx);
+
         // Customize SpeedometerGauge
+        // NOTE:  Saw NPE here on slow 8.1 Android test phone.
         SpeedometerGauge speedometerdown = (SpeedometerGauge) getView().findViewById(R.id.speedometerdown);
-        SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
         speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
             @Override
             public String getLabelFor(double progress, double maxProgress) {
@@ -670,30 +680,13 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
         speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
             @Override
             public String getLabelFor(double progress, double maxProgress) {
                 return String.valueOf((int) Math.round(progress));
             }
         });
-//              configure value range and ticks
-        speedometerdown.setLabelTextSize(10);
-        speedometerdown.setMaxSpeed(100);
-        speedometerdown.setMajorTickStep(10);
-//              Configure value range colors
-        speedometerdown.addColoredRange(0, 30, Color.RED);
-        speedometerdown.addColoredRange(30, 50, Color.YELLOW);
-        speedometerdown.addColoredRange(50, 100, Color.GREEN);
-        String unit = Rx.substring(Rx.length()-4);
-        double downlink = 0;
-        if (unit.equals(" bps")){
-            downlink = 0;
-        }else if (unit.equals("Mbps")){
-            downlink = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
-        }
-
-
-        speedometerdown.setSpeed(downlink);
 
         speedometerup.setLabelTextSize(10);
         speedometerup.setMaxSpeed(100);
@@ -704,13 +697,29 @@ public class HomeFragment extends Fragment {
         speedometerup.addColoredRange(50, 100, Color.GREEN);
         String unitTx = Tx.substring(Tx.length()-4);
         double uplink = 0;
-        speedometerup.setSpeed(uplink);
-        if (unit.equals(" bps")){
+        if (unitTx.equals(" bps")){
             uplink = 0;
-        }else if (unit.equals("Mbps")){
+        }else if (unitTx.equals("Mbps")){
             uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
         }
         speedometerup.setSpeed(uplink);
+//              configurAAPe value range and ticks
+        speedometerdown.setLabelTextSize(10);
+        speedometerdown.setMaxSpeed(100);
+        speedometerdown.setMajorTickStep(10);
+//        speedometerdown.setMinorTicks(5);
+//              Configure value range colors
+        speedometerdown.addColoredRange(0, 30, Color.RED);
+        speedometerdown.addColoredRange(30, 50, Color.YELLOW);
+        speedometerdown.addColoredRange(50, 100, Color.GREEN);
+        String unitRx = Rx.substring(Rx.length()-4);
+        double downlink = 0;
+        if (unitRx.equals(" bps")){
+            downlink = 0;
+        }else if (unitRx.equals("Mbps")){
+            downlink = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
+        }
+        speedometerdown.setSpeed(downlink);
     }
 
     public void scanCompleted(boolean success) {
@@ -721,11 +730,11 @@ public class HomeFragment extends Fragment {
 
         Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
-                public void run() {
-                    _scanCompleted(success);
-                    handler.removeCallbacks(this);
-                }
-            };
+            public void run() {
+                _scanCompleted(success);
+                handler.removeCallbacks(this);
+            }
+        };
         handler.post(runnable);
     }
 
@@ -757,9 +766,14 @@ public class HomeFragment extends Fragment {
 
             String bssid =  sr.BSSID; //Get the BSSID
             String capability = sr.capabilities; //Get Wi-Fi capabilities
-            int centerFreq0 = sr.centerFreq0; //Get centerFreq0
-            int centerFreq1 = sr.centerFreq1; //Get centerFreq1
-            int channelWidth = sr.channelWidth; //Get channelWidth
+            int centerFreq0 = 0;
+            int centerFreq1 = 0;
+            int channelWidth = 0;
+            if (Build.VERSION.SDK_INT >= 23) {
+                centerFreq0 = sr.centerFreq0; //Get centerFreq0
+                centerFreq1 = sr.centerFreq1; //Get centerFreq1
+                channelWidth = sr.channelWidth; //Get channelWidth
+            }
             int level = sr.level; //Get level/rssi
             int frequency = sr.frequency; //Get frequency
             if(conneted_bssid.equals(bssid)){
@@ -773,9 +787,9 @@ public class HomeFragment extends Fragment {
             float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
             String dist_in_meters = String.format("%.02f", dist);
             data = "SSID: " + '\"' + ssid + '\"' + "\nbssid: " + bssid + "\ncenterFreq0: " +
-                centerFreq0 + "\tcenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
-                "\t\uD83D\uDCF6 " + level + "\nFrequency " + frequency + "\tage⏱ " + age +
-                "\t\t\tdistance: " + dist_in_meters + " meters\n" + "\uD83D\uDD12 " + capability;
+                    centerFreq0 + "\tcenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
+                    "\t\uD83D\uDCF6 " + level + "\nFrequency " + frequency + "\tage⏱ " + age +
+                    "\t\t\tdistance: " + dist_in_meters + " meters\n" + "\uD83D\uDD12 " + capability;
             scan_data.put(String.valueOf(i+1), String.valueOf(data));
         }
 
