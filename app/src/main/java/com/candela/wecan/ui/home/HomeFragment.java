@@ -593,7 +593,7 @@ public class HomeFragment extends Fragment {
                                     // NOTE:  Scans are normally limited to around one every 30 seconds, but
                                     // there is a developer option in Android 10 to allow it to run faster.
                                     // Request poll every 10 seconds.
-                                    handler.postDelayed(this, 10000);
+                                    handler.postDelayed(this, 30000);
                                 } else {
                                     handler.removeCallbacks(this);
                                 }
