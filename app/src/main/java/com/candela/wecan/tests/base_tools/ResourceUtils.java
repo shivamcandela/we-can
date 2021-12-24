@@ -463,8 +463,12 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                // bgn
                N_11 = true;
             }
+            else if (Build.HARDWARE.equals("mt6580")) {
+               // bgn, 1.3ghz quad-core, 32-bit.
+               N_11 = true;
+            }
             else if (Build.HARDWARE.equals("mt6739")) { // blackview bv550 pro, for instance. Android 9 (version 28)
-               // abgn
+               // abgn, 1.5ghz quad-core, 64 bit
                N_11 = true;
                is_5g = true;
             }
