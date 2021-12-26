@@ -608,6 +608,11 @@ public class HomeFragment extends Fragment {
     }
 
     public void updateBpsDisplay() {
+        if (binding == null) {
+           // we have been destroyed, return w/out trying to update anything.
+           return;
+        }
+
         long now = System.currentTimeMillis();
         double TimeDifference = now - last_bps_time;
         if (TimeDifference == 0) {
