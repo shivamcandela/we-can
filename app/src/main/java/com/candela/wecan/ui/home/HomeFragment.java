@@ -637,6 +637,7 @@ public class HomeFragment extends Fragment {
     }
 
     public int[] updateBpsDisplay() {
+
         long now = System.currentTimeMillis();
         double TimeDifference = now - last_bps_time;
         if (TimeDifference == 0) {
@@ -733,6 +734,28 @@ public class HomeFragment extends Fragment {
         handler.post(runnable);
     }
 
+    //https://electronics.stackexchange.com/questions/83354/calculate-distance-from-rssi
+    static double getDistance(double rssi, int freq_mhz) {
+       //https://www.pasternack.com/t-calculator-fspl.aspx
+       // Values below assume a 20db txpower
+       double A;
+       if (freq_mhz < 2500)
+          A = -20;
+       else if (freq_mhz < 6000)
+          A = -27;
+       else
+          A = -29;
+
+       //double n = 2; // free space path loss
+       double n = 2.5; // Gives better results for my tests.
+
+       //RSSI (dBm) = -10n log10(d) + A
+       // RSSI - A = -10n log10(d)
+       // (RSSI - A) / -10n = log10(d)
+       // 10 ^ ((RSSI - A) / -10n) = d
+       return Math.pow(10d, (rssi - A) / (-10 * n));
+    }
+
     public void _scanCompleted(boolean success) {
         scan_table.removeAllViews();
         WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -779,12 +802,14 @@ public class HomeFragment extends Fragment {
             long age = android.os.SystemClock.elapsedRealtime() - (sr.timestamp / 1000);
             age = age / 1000; //convert to seconds.
 
-            float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
+            //float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
+            double dist = getDistance(level, frequency);
             String dist_in_meters = String.format("%.02f", dist);
+
             data = "SSID: " + '\"' + ssid + '\"' + "\nbssid: " + bssid + "\ncenterFreq0: " +
                     centerFreq0 + "\tcenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
                     "\t\uD83D\uDCF6 " + level + "\nFrequency " + frequency + "\tage⏱ " + age +
-                    "\t\t\tdistance: " + dist_in_meters + " meters\n" + "\uD83D\uDD12 " + capability;
+                    "\t\t\tdistance: " + dist_in_meters + "m\n" + "\uD83D\uDD12 " + capability;
             scan_data.put(String.valueOf(i+1), String.valueOf(data));
         }
 
