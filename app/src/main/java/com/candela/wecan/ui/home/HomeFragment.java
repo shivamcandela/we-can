@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -49,6 +50,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
 import android.widget.Toast;
@@ -133,23 +135,6 @@ public class HomeFragment extends Fragment {
                 String current_realm = (String) keys.get("current-realm");
                 ip_show.setText("User-Name: " + username + "\nServer: " + current_ip + "\nRealm: " + current_realm + "\nResource: " + current_resource);
 
-//                // Customize SpeedometerGauge
-//                SpeedometerGauge speedometer = (SpeedometerGauge) getView().findViewById(R.id.speedometer);
-//                speedometer.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-//                    @Override
-//                    public String getLabelFor(double progress, double maxProgress) {
-//                        return String.valueOf((int) Math.round(progress));
-//                    }
-//                });
-////              configure value range and ticks
-//                speedometer.setMaxSpeed(100);
-//                speedometer.setMajorTickStep(5);
-//                speedometer.setMinorTicks(5);
-////              Configure value range colors
-//                speedometer.addColoredRange(0, 30, Color.RED);
-//                speedometer.addColoredRange(30, 50, Color.YELLOW);
-//                speedometer.addColoredRange(50, 100, Color.GREEN);
-
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);
 
@@ -157,11 +142,49 @@ public class HomeFragment extends Fragment {
                 last_tx_bytes = TrafficStats.getTotalTxBytes();
                 last_rx_bytes = TrafficStats.getTotalRxBytes();
 
+                SpeedometerGauge speedometerdown = (SpeedometerGauge) getActivity().findViewById(R.id.speedometerdown);
+                speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+                    @Override
+                    public String getLabelFor(double progress, double maxProgress) {
+                        return String.valueOf((int) Math.round(progress));
+                    }
+                });
+
+                SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
+                speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+                    @Override
+                    public String getLabelFor(double progress, double maxProgress) {
+                        return String.valueOf((int) Math.round(progress));
+                    }
+                });
                 Handler handler = new Handler();
                 final Runnable runnable_link = new Runnable() {
                     @Override
                     public void run() {
-                        updateBpsDisplay();
+                        int up_down[] = updateBpsDisplay();
+                        int downlink = up_down[0];
+                        int uplink = up_down[1];
+//              Configure upload value range colors
+                        speedometerup.setLabelTextSize(10);
+                        speedometerup.setMaxSpeed(100);
+                        speedometerup.setMajorTickStep(10);
+                        speedometerup.addColoredRange(0, 30, Color.RED);
+                        speedometerup.addColoredRange(30, 50, Color.YELLOW);
+                        speedometerup.addColoredRange(50, 100, Color.GREEN);
+//                        Set the uplink value
+                        speedometerup.setSpeed(uplink);
+
+//                      Download Starts here
+//                      Configure download value range colors
+                        speedometerdown.setLabelTextSize(10);
+                        speedometerdown.setMaxSpeed(100);
+                        speedometerdown.setMajorTickStep(10);
+                        speedometerdown.addColoredRange(0, 30, Color.RED);
+                        speedometerdown.addColoredRange(30, 50, Color.YELLOW);
+                        speedometerdown.addColoredRange(50, 100, Color.GREEN);
+//                        Set the downlink value
+                        speedometerdown.setSpeed(downlink);
+//
                         handler.postDelayed(this, 1000);
                     }
                 };
@@ -439,7 +462,10 @@ public class HomeFragment extends Fragment {
 //                                };
 //                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
+
                                 live_table.removeAllViews();
+                                LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+                                if (getActivity() != null) {
                                 WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                                 WifiInfo wifiinfo = wifiManager.getConnectionInfo();
                                 String IP = null;
@@ -464,8 +490,7 @@ public class HomeFragment extends Fragment {
                                     if (Build.VERSION.SDK_INT >= 29) {
                                         Rx = wifiinfo.getRxLinkSpeedMbps();
                                         Tx = wifiinfo.getTxLinkSpeedMbps();
-                                    }
-                                    else {
+                                    } else {
                                         // TODO: Deal with: wifiinfo.LINK_SPEED_UNITS;
                                         Rx = wifiinfo.getLinkSpeed();
                                         Tx = wifiinfo.getLinkSpeed();
@@ -504,6 +529,7 @@ public class HomeFragment extends Fragment {
                                 live_data.put("Gateway", gateway);
                                 live_data.put("Netmask", netmask);
                                 live_data.put("LeaseDuration", String.valueOf(leaseDuration) + " Sec");
+
 //                                Table Heading
                                 live_table.setPadding(10, 0, 10, 0);
                                 TableRow heading = new TableRow(getActivity());
@@ -561,6 +587,7 @@ public class HomeFragment extends Fragment {
                                     handler.removeCallbacks(this);
                                 }
                             }
+                            }
                         };
                         handler.post(r);
                     }
@@ -584,10 +611,12 @@ public class HomeFragment extends Fragment {
                             @Override
                             public void run() {
                                 // Scan wi-fi
-                                WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                wifiManager.setWifiEnabled(true);
-                                wifiManager.startScan();
-                                //Log.e("log", "startScan called in HomeFragment");
+                                if (getActivity() != null){
+                                    WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                    wifiManager.setWifiEnabled(true);
+                                    wifiManager.startScan();
+                                    //Log.e("log", "startScan called in HomeFragment");
+                                }
 
                                 if (scan_table_flag == true) {
                                     // NOTE:  Scans are normally limited to around one every 30 seconds, but
@@ -607,11 +636,11 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-    public void updateBpsDisplay() {
+    public int[] updateBpsDisplay() {
         long now = System.currentTimeMillis();
         double TimeDifference = now - last_bps_time;
         if (TimeDifference == 0) {
-            return; // no div by zero error!
+            return new int[] {0, 0}; // no div by zero error!
         }
         String Tx;
         String Rx;
@@ -670,48 +699,6 @@ public class HomeFragment extends Fragment {
         link_speed.setTextSize(15);
         link_speed.setText(Rx + "/" + Tx);
 
-        // Customize SpeedometerGauge
-        // NOTE:  Saw NPE here on slow 8.1 Android test phone.
-        SpeedometerGauge speedometerdown = (SpeedometerGauge) getView().findViewById(R.id.speedometerdown);
-        speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-            @Override
-            public String getLabelFor(double progress, double maxProgress) {
-                return String.valueOf((int) Math.round(progress));
-            }
-        });
-
-        SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
-        speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-            @Override
-            public String getLabelFor(double progress, double maxProgress) {
-                return String.valueOf((int) Math.round(progress));
-            }
-        });
-
-        speedometerup.setLabelTextSize(10);
-        speedometerup.setMaxSpeed(100);
-        speedometerup.setMajorTickStep(10);
-
-        speedometerup.addColoredRange(0, 30, Color.RED);
-        speedometerup.addColoredRange(30, 50, Color.YELLOW);
-        speedometerup.addColoredRange(50, 100, Color.GREEN);
-        String unitTx = Tx.substring(Tx.length()-4);
-        double uplink = 0;
-        if (unitTx.equals(" bps")){
-            uplink = 0;
-        }else if (unitTx.equals("Mbps")){
-            uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
-        }
-        speedometerup.setSpeed(uplink);
-//              configurAAPe value range and ticks
-        speedometerdown.setLabelTextSize(10);
-        speedometerdown.setMaxSpeed(100);
-        speedometerdown.setMajorTickStep(10);
-//        speedometerdown.setMinorTicks(5);
-//              Configure value range colors
-        speedometerdown.addColoredRange(0, 30, Color.RED);
-        speedometerdown.addColoredRange(30, 50, Color.YELLOW);
-        speedometerdown.addColoredRange(50, 100, Color.GREEN);
         String unitRx = Rx.substring(Rx.length()-4);
         double downlink = 0;
         if (unitRx.equals(" bps")){
@@ -719,7 +706,15 @@ public class HomeFragment extends Fragment {
         }else if (unitRx.equals("Mbps")){
             downlink = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
         }
-        speedometerdown.setSpeed(downlink);
+
+        String unitTx = Tx.substring(Tx.length()-4);
+        double uplink = 0;
+        if (unitTx.equals(" bps")){
+            uplink = 0;
+        }else if (unitTx.equals("Mbps")){
+            uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
+        }
+        return new int[] {(int) downlink, (int) uplink};
     }
 
     public void scanCompleted(boolean success) {
