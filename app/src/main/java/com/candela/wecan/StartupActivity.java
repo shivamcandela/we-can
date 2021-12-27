@@ -71,11 +71,18 @@ public class StartupActivity extends AppCompatActivity {
         server_ip.setText(last_ip);
         u_name.setText(user_name);
         test_name_tv.setText(test_name);
-        checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, 1);
-        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, 2);
-        checkPermission(Manifest.permission.ACCESS_WIFI_STATE, 3);
-        checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, 4);
-        checkPermission(Manifest.permission.CHANGE_WIFI_STATE, 5);
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_WIFI_STATE,
+                android.Manifest.permission.ACCESS_NETWORK_STATE,
+                android.Manifest.permission.CHANGE_WIFI_STATE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        };
+        if (!hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
 //        Intent myIntent = new Intent(this, ClientConnectivityConfiguration.class);
 //        startActivity(myIntent);
         button.setOnClickListener(new View.OnClickListener() {
@@ -178,15 +185,15 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     // Function to check and request permission
-    public void checkPermission(String permission, int requestCode)
-    {
-        // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(StartupActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(StartupActivity.this, new String[] { permission }, requestCode);
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
         }
-        else {
-            Toast.makeText(StartupActivity.this, "Permission already granted", Toast.LENGTH_SHORT).show();
-        }
+        return true;
     }
 
 
