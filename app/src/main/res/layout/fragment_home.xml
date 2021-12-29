@@ -118,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="UP &amp; DOWN SPEED "
+            android:text="DOWN &amp; UP SPEED (⇵) "
             android:textColor="@color/light_gray_info"
             android:textStyle="bold"></TextView>
 
@@ -140,14 +140,35 @@
         <com.cardiomood.android.controls.gauge.SpeedometerGauge
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:id="@+id/speedometerdown" />
 
         <com.cardiomood.android.controls.gauge.SpeedometerGauge
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:id="@+id/speedometerup" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="DOWNLOAD/mbps"
+            android:textAlignment="center"></TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="UPLOAD/mbps"
+            android:textAlignment="center"></TextView>
     </LinearLayout>
 
 <ScrollView

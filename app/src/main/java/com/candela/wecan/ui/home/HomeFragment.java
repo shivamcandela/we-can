@@ -114,6 +114,7 @@ public class HomeFragment extends Fragment {
             public void onChanged(@Nullable String s) {
                 Button scan_btn, system_info_btn, live_btn;
                 scan_btn = getActivity().findViewById(R.id.scan_data);
+                scan_btn.setEnabled(false);
                 system_info_btn = getActivity().findViewById(R.id.system_info_btn);
                 live_btn = getActivity().findViewById(R.id.rxtx_btn);
                 ImageView share_btn = getActivity().findViewById(R.id.share_btn);
@@ -166,22 +167,22 @@ public class HomeFragment extends Fragment {
                         int uplink = up_down[1];
 //              Configure upload value range colors
                         speedometerup.setLabelTextSize(10);
-                        speedometerup.setMaxSpeed(100);
-                        speedometerup.setMajorTickStep(10);
-                        speedometerup.addColoredRange(0, 30, Color.RED);
-                        speedometerup.addColoredRange(30, 50, Color.YELLOW);
-                        speedometerup.addColoredRange(50, 100, Color.GREEN);
+                        speedometerup.setMaxSpeed(500);
+                        speedometerup.setMajorTickStep(25);
+                        speedometerup.addColoredRange(0, 25, Color.RED);
+                        speedometerup.addColoredRange(25, 100, Color.YELLOW);
+                        speedometerup.addColoredRange(100, 500, Color.GREEN);
 //                        Set the uplink value
                         speedometerup.setSpeed(uplink);
 
 //                      Download Starts here
 //                      Configure download value range colors
                         speedometerdown.setLabelTextSize(10);
-                        speedometerdown.setMaxSpeed(100);
-                        speedometerdown.setMajorTickStep(10);
-                        speedometerdown.addColoredRange(0, 30, Color.RED);
-                        speedometerdown.addColoredRange(30, 50, Color.YELLOW);
-                        speedometerdown.addColoredRange(50, 100, Color.GREEN);
+                        speedometerdown.setMaxSpeed(500);
+                        speedometerdown.setMajorTickStep(25);
+                        speedometerdown.addColoredRange(0, 25, Color.RED);
+                        speedometerdown.addColoredRange(25, 100, Color.YELLOW);
+                        speedometerdown.addColoredRange(100, 500, Color.GREEN);
 //                        Set the downlink value
                         speedometerdown.setSpeed(downlink);
 //
