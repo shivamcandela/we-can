@@ -89,7 +89,7 @@ public class HomeFragment extends Fragment {
     private TextView ip_show, link_speed;
     public Boolean live_table_flag = false,scan_table_flag=false, flag;
     public static HomeFragment instance = null;
-
+    public String[] up_down_global;
     TableLayout sys_table = null;
     TableLayout live_table = null;
     TableLayout scan_table = null;
@@ -162,9 +162,10 @@ public class HomeFragment extends Fragment {
                 final Runnable runnable_link = new Runnable() {
                     @Override
                     public void run() {
-                        int up_down[] = updateBpsDisplay();
-                        int downlink = up_down[0];
-                        int uplink = up_down[1];
+                        String up_down[] = updateBpsDisplay();
+                        up_down_global = up_down;
+                        int downlink = Integer.parseInt(up_down[0]);
+                        int uplink = Integer.parseInt(up_down[1]);
 //              Configure upload value range colors
                         speedometerup.setLabelTextSize(10);
                         speedometerup.setMaxSpeed(500);
@@ -230,18 +231,15 @@ public class HomeFragment extends Fragment {
                                 int Rssi = wifiinfo.getRssi();
                                 String LinkSpeed = wifiinfo.getLinkSpeed() + " Mbps";
                                 String channel = wifiinfo.getFrequency() + " MHz";
-                                int Rx = wifiinfo.getRxLinkSpeedMbps();
-                                int Tx = wifiinfo.getTxLinkSpeedMbps();
-                                int Rx_Kbps = wifiinfo.getRxLinkSpeedMbps() * 1024;
-                                int Tx_Kbps = wifiinfo.getTxLinkSpeedMbps() * 1024;
                                 long availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
                                 long totalMem = Runtime.getRuntime().totalMemory();
                                 long usedMem = totalMem - availMem;
+                                String uplink = up_down_global[2];
+                                String downlink = up_down_global[3];
                                 String cpu_used_percent = String.format("%.2f", (usedMem / (double) totalMem) * 100);
                                 String currentDateTimeString = java.text.DateFormat.getDateTimeInstance().format(new Date());
                                 String livedata = currentDateTimeString + "," + IP + "," + SSID + "," + BSSID + "," + Rssi
-                                        + "," + LinkSpeed + "," + channel + "," + Rx_Kbps + "Kbps,"
-                                        + Tx_Kbps + "Kbps," + Rx + "Mbps," + Tx + "Mbps," + cpu_used_percent + "\n";
+                                        + "," + LinkSpeed + "," + uplink  + "," + downlink + ","+ channel + ","  + cpu_used_percent + "\n";
 
                                 if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||
                                         Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState())) {
@@ -271,7 +269,7 @@ public class HomeFragment extends Fragment {
                                         FileOutputStream stream;
                                         try {
                                             stream = new FileOutputStream(logFile);
-                                            stream.write("Date/Time,IP,SSID,BSSID,Rssi,Linkspeed,Channel,Rx_Kbps,Tx_Kbps,Rx_Mbps,Tx_Mbps,CPU_Utilization\n".getBytes());
+                                            stream.write("Date/Time,IP,SSID,BSSID,Rssi,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
                                             stream.close();
                                         } catch (FileNotFoundException e) {
                                             e.printStackTrace();
@@ -475,10 +473,6 @@ public class HomeFragment extends Fragment {
                                 int Rssi = 0;
                                 String LinkSpeed = null;
                                 String channel = null;
-                                int Rx = 0;
-                                int Tx = 0;
-                                int Rx_Kbps = 0;
-                                int Tx_Kbps = 0;
                                 if (wifiinfo.getSupplicantState() == SupplicantState.COMPLETED) {
                                     IP = Formatter.formatIpAddress(wifiinfo.getIpAddress());
                                     SSID = wifiinfo.getSSID();
@@ -488,16 +482,6 @@ public class HomeFragment extends Fragment {
                                     if (Build.VERSION.SDK_INT >= 21) {
                                         channel = wifiinfo.getFrequency() + " MHz";
                                     }
-                                    if (Build.VERSION.SDK_INT >= 29) {
-                                        Rx = wifiinfo.getRxLinkSpeedMbps();
-                                        Tx = wifiinfo.getTxLinkSpeedMbps();
-                                    } else {
-                                        // TODO: Deal with: wifiinfo.LINK_SPEED_UNITS;
-                                        Rx = wifiinfo.getLinkSpeed();
-                                        Tx = wifiinfo.getLinkSpeed();
-                                    }
-                                    Rx_Kbps = Rx * 1000;
-                                    Tx_Kbps = Tx * 1000;
                                 }
                                 DhcpInfo Dhcp_details = wifiManager.getDhcpInfo();
                                 String dns1 = Formatter.formatIpAddress(Dhcp_details.dns1);
@@ -519,10 +503,6 @@ public class HomeFragment extends Fragment {
                                 live_data.put("Rssi", String.valueOf(Rssi) + " dBm");
                                 live_data.put("LinkSpeed", LinkSpeed);
                                 live_data.put("Channel", channel);
-                                live_data.put("Rx_Mbps", String.valueOf(Rx) + " Mbps");
-                                live_data.put("Tx_Mbps", String.valueOf(Tx) + " Mbps");
-                                live_data.put("Rx_Kbps", String.valueOf(Rx_Kbps) + " Kbps");
-                                live_data.put("Tx_Kbps", String.valueOf(Tx_Kbps) + " Kbps");
                                 live_data.put("CPU util", cpu_used_percent + " %");
                                 live_data.put("DNS1", dns1);
                                 live_data.put("DNS2", dns2);
@@ -637,12 +617,12 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-    public int[] updateBpsDisplay() {
+    public String[] updateBpsDisplay() {
 
         long now = System.currentTimeMillis();
         double TimeDifference = now - last_bps_time;
         if (TimeDifference == 0) {
-            return new int[] {0, 0}; // no div by zero error!
+            return new String[] {"0", "0", "0", "0"}; // no div by zero error!
         }
         String Tx;
         String Rx;
@@ -716,7 +696,7 @@ public class HomeFragment extends Fragment {
         }else if (unitTx.equals("Mbps")){
             uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
         }
-        return new int[] {(int) downlink, (int) uplink};
+        return new String[] {String.valueOf((int) downlink), String.valueOf((int) uplink), Rx, Tx};
     }
 
     public void scanCompleted(boolean success) {
