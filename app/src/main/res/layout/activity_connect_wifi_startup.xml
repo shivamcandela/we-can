@@ -72,7 +72,7 @@
         android:layout_height="37dp"
         android:background="#52009688"
         android:ems="10"
-        android:hint=" Enter User Name"
+        android:hint="Test SSID"
         android:inputType="textPersonName"
 
         android:textAlignment="center"
@@ -81,35 +81,10 @@
         android:textColor="#000000"
         android:textColorHint="#000000"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/test_network_encrypion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView7"
-        app:layout_constraintVertical_bias="0.252" />
-
-    <EditText
-        android:id="@+id/test_network_encrypion"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="294dp"
-        android:layout_height="37dp"
-        android:background="#52009688"
-        android:ems="10"
-        android:hint=" Enter Server IP"
-        android:inputType="textPersonName"
-
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="#000000"
-        android:textColorHint="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.871" />
+        app:layout_constraintTop_toTopOf="@+id/imageView7" />
 
     <EditText
         android:id="@+id/test_network_passkey"
@@ -118,8 +93,8 @@
         android:layout_height="37dp"
         android:background="#52009688"
         android:ems="10"
-        android:hint=" Enter Test Name"
-        android:inputType="textPersonName"
+        android:hint="Passkey"
+        android:inputType="textPassword"
 
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -138,14 +113,14 @@
         android:id="@+id/enter_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="44dp"
         android:backgroundTint="#009688"
-        android:text="Enter Test Room"
+        android:text="Connect to Test Network"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/test_network_encrypion"
-        app:layout_constraintVertical_bias="0.367" />
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView2"
@@ -189,6 +164,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.056"
         app:srcCompat="@drawable/ic_candelalogo" />
+
+    <Spinner
+        android:id="@+id/test_network_encryption"
+        android:layout_width="291dp"
+        android:layout_height="46dp"
+        android:background="#52009688"
+        app:layout_constraintBottom_toBottomOf="@+id/enter_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/test_network_passkey"
+        app:layout_constraintVertical_bias="0.156" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

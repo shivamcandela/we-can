@@ -27,7 +27,7 @@ public class splash_screen extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(splash_screen.this, StartupActivity.class));
+                startActivity(new Intent(splash_screen.this, ConnectWifiStartup.class));
                 finish();
             }
         },1000);

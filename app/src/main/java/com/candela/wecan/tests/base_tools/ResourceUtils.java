@@ -11,6 +11,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.HardwarePropertiesManager;
 import android.os.Parcel;
 import android.telephony.CellIdentity;
@@ -34,6 +35,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -527,14 +529,27 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     @Override
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-//        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                handler.removeCallbacks(this);
+//                ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, wifiInfo.getSSID(), wifiInfo.password, wifiInfo);
+            }
+        },30000);
+
         /*
             Need to structure the cc_data in a Vector format and collect usefull info from this
             {
                 "cx_time" : "" // in ms
             }
          */
-//        System.out.println(configureWifi.cc_data);
+        System.out.println("Ironman: " + configureWifi.cc_data.get(0).split("-:-")[0]);
+        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
+        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
+        System.out.println("IronSpider: " + timestamp.toString());
         return null;
     }
 }
