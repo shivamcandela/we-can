@@ -40,19 +40,6 @@
         app:layout_constraintVertical_bias="0.202" />
 
     <ImageView
-        android:id="@+id/imageView7"
-        android:layout_width="416dp"
-        android:layout_height="235dp"
-        android:background="#FFFFFF"
-        android:backgroundTint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="@+id/textView3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.969" />
-
-    <ImageView
         android:id="@+id/imageView8"
         android:layout_width="match_parent"
         android:layout_height="103dp"
@@ -66,35 +53,13 @@
         app:layout_constraintVertical_bias="0.027" />
 
     <EditText
-        android:id="@+id/test_network_ssid"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="294dp"
-        android:layout_height="37dp"
-        android:background="#52009688"
-        android:ems="10"
-        android:hint="Test SSID"
-        android:inputType="textPersonName"
-
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="#000000"
-        android:textColorHint="#000000"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView7" />
-
-    <EditText
         android:id="@+id/test_network_passkey"
         style="@style/Widget.AppCompat.EditText"
-        android:layout_width="294dp"
-        android:layout_height="37dp"
+        android:layout_width="264dp"
+        android:layout_height="40dp"
         android:background="#52009688"
         android:ems="10"
         android:hint="Passkey"
-        android:inputType="textPassword"
 
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -104,23 +69,24 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintHorizontal_bias="0.302"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/test_network_ssid"
-        app:layout_constraintVertical_bias="0.084" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.72" />
 
     <Button
-        android:id="@+id/enter_button"
+        android:id="@+id/connect_nw_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="44dp"
         android:backgroundTint="#009688"
         android:text="Connect to Test Network"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/textView3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.95" />
 
     <TextView
         android:id="@+id/textView2"
@@ -166,15 +132,48 @@
         app:srcCompat="@drawable/ic_candelalogo" />
 
     <Spinner
-        android:id="@+id/test_network_encryption"
-        android:layout_width="291dp"
-        android:layout_height="46dp"
+        android:id="@+id/test_network_ssid"
+        android:layout_width="264dp"
+        android:layout_height="40dp"
         android:background="#52009688"
-        app:layout_constraintBottom_toBottomOf="@+id/enter_button"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.302"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/test_network_passkey"
-        app:layout_constraintVertical_bias="0.156" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.65999997"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/network_description"
+        android:layout_width="334dp"
+        android:layout_height="85dp"
+        android:text="Sample"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.428"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.857" />
+
+    <ImageButton
+        android:id="@+id/refresh_scan"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toEndOf="@+id/test_network_ssid"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.65999997"
+        app:srcCompat="@android:drawable/ic_popup_sync"
+        tools:ignore="SpeakableTextPresentCheck" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

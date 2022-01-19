@@ -45,7 +45,7 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
         getSupportActionBar().hide();
-        button = (Button) findViewById(R.id.enter_button);
+        button = (Button) findViewById(R.id.connect_nw_btn);
         server_ip = findViewById(R.id.test_network_encrypion);
         u_name = findViewById(R.id.test_network_ssid);
         test_name_tv = findViewById(R.id.test_network_passkey);

@@ -66,7 +66,7 @@
         app:layout_constraintVertical_bias="0.027" />
 
     <EditText
-        android:id="@+id/test_network_ssid"
+        android:id="@+id/test_network_username"
         style="@style/Widget.AppCompat.EditText"
         android:layout_width="294dp"
         android:layout_height="37dp"
@@ -135,7 +135,7 @@
         app:layout_constraintVertical_bias="0.084" />
 
     <Button
-        android:id="@+id/enter_button"
+        android:id="@+id/connect_nw_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#009688"
