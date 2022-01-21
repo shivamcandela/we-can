@@ -575,7 +575,7 @@ public class HomeFragment extends Fragment {
                 });
 
 //              Perform Click on System Info
-                system_info_btn.performClick();
+                live_btn.performClick();
 
 //              Scanning Nearest Wi-Fi
                 scan_btn.setOnClickListener(new View.OnClickListener() {
