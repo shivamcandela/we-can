@@ -17,89 +17,51 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             tools:ignore="MissingConstraints">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_candelalogo"
-                    tools:ignore="VectorDrawableCompat" />
-
-                <TextView
-                    android:id="@+id/server_ip_info"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginRight="30sp"
-                    android:layout_gravity="center"
-                    android:textColor="#42ba96"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="#D8000C" />
-            </LinearLayout>
-
-
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/system_info_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="#808080"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:text="@string/sys_info" />
 
                 <Button
                     android:id="@+id/rxtx_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:backgroundTint="#808080"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
+                    app:cornerRadius="0dp"
                     android:text="@string/live_data" />
+
+                <Button
+                    android:id="@+id/system_info_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#808080"
+                    app:cornerRadius="0dp"
+                    android:text="@string/sys_info" />
+
+                <Button
+                    android:id="@+id/speedometer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#808080"
+                    app:cornerRadius="0dp"
+                    android:text="Speedometer" />
 
                 <Button
                     android:id="@+id/scan_data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:backgroundTint="#808080"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:text=" scan " />
-
-
+                    app:cornerRadius="0dp"
+                    android:text="scan" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+        </HorizontalScrollView>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="#D8000C" />
-            </LinearLayout>
+
+
 
             <LinearLayout
                 android:layout_width="match_parent"

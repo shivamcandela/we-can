@@ -126,15 +126,15 @@ public class HomeFragment extends Fragment {
                 live_table = (TableLayout) getView().findViewById(R.id.table);
                 scan_table = (TableLayout) getView().findViewById(R.id.table);
 
-                ip_show = getView().findViewById(R.id.server_ip_info);
+//                ip_show = getView().findViewById(R.id.server_ip_info);
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
                 Map<String, ?> keys = sharedPreferences.getAll();
                 String username = (String) keys.get("user_name");
-                ip_show = getView().findViewById(R.id.server_ip_info);
+//                ip_show = getView().findViewById(R.id.server_ip_info);
                 String current_ip = (String) keys.get("current-ip");
                 String current_resource = (String) keys.get("current-resource");
                 String current_realm = (String) keys.get("current-realm");
-                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip + "\nRealm: " + current_realm + "\nResource: " + current_resource);
+//                ip_show.setText("User-Name: " + username + "\tServer: " + current_ip + "\nRealm: " + current_realm + "\tResource: " + current_resource);
 
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);
