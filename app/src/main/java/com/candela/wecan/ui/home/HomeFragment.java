@@ -836,6 +836,3 @@ public class HomeFragment extends Fragment {
         instance = null;
     }
 }
-
-//    double dist_in_meters = Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - rssi) / 20.0d) * 1000;
-//                        System.out.println("dist_in_meters: " + dist_in_meters);
