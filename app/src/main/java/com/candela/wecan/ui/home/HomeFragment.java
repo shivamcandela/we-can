@@ -97,6 +97,9 @@ public class HomeFragment extends Fragment {
     long last_bps_time = 0;
     long last_rx_bytes = 0;
     long last_tx_bytes = 0;
+    String username = "";
+
+    public String getUserName() { return username; }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         instance = this;
@@ -129,12 +132,13 @@ public class HomeFragment extends Fragment {
                 ip_show = getView().findViewById(R.id.server_ip_info);
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
                 Map<String, ?> keys = sharedPreferences.getAll();
-                String username = (String) keys.get("user_name");
+                username = (String) keys.get("user_name");
                 ip_show = getView().findViewById(R.id.server_ip_info);
                 String current_ip = (String) keys.get("current-ip");
                 String current_resource = (String) keys.get("current-resource");
                 String current_realm = (String) keys.get("current-realm");
-                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip + "\nRealm: " + current_realm + "\nResource: " + current_resource);
+                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip
+                                + "\nRealm: " + current_realm + "\nResource: " + current_resource);
 
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);

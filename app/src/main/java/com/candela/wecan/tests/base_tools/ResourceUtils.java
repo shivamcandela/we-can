@@ -316,6 +316,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         pi.totalMem = Runtime.getRuntime().totalMemory();
 
+        if (HomeFragment.instance != null) {
+            pi.wecan_user_name = HomeFragment.instance.getUserName();
+        }
+
         // CPU Info
         pi.cores = 0;
         pi.processor = "";
