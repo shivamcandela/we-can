@@ -273,7 +273,7 @@ public class HomeFragment extends Fragment {
                                         FileOutputStream stream;
                                         try {
                                             stream = new FileOutputStream(logFile);
-                                            stream.write("Date/Time,IP,SSID,BSSID,Rssi,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
+                                            stream.write("Date/Time,IP,SSID,BSSID,signal,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
                                             stream.close();
                                         } catch (FileNotFoundException e) {
                                             e.printStackTrace();
@@ -504,7 +504,7 @@ public class HomeFragment extends Fragment {
                                 live_data.put("IP", String.valueOf(IP));
                                 live_data.put("SSID", SSID);
                                 live_data.put("BSSID", BSSID);
-                                live_data.put("Rssi", String.valueOf(Rssi) + " dBm");
+                                live_data.put("Signal", String.valueOf(Rssi) + " dBm");
                                 live_data.put("LinkSpeed", LinkSpeed);
                                 live_data.put("Channel", channel);
                                 live_data.put("CPU util", cpu_used_percent + " %");
