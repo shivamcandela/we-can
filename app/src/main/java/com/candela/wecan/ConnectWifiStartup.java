@@ -8,11 +8,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.WifiNetworkSpecifier;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,13 +27,14 @@ import android.widget.Toast;
 
 import com.candela.wecan.tests.base_tools.ConfigureWifi;
 import com.candela.wecan.tests.base_tools.GetPhoneWifiInfo;
-import com.candela.wecan.tests.base_tools.HTTPHandler;
+import com.candela.wecan.tests.base_tools.WECANManager;
 import com.candela.wecan.tests.base_tools.WifiReceiver;
 
 import java.util.List;
 
 public class ConnectWifiStartup extends AppCompatActivity {
 
+    SharedPreferences sharedpreferences = null;
     private ListView wifiList;
     WifiManager wifiManager;
     private final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
@@ -43,16 +43,33 @@ public class ConnectWifiStartup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_wifi_startup);
         getSupportActionBar().hide();
+
+        sharedpreferences = getBaseContext().getSharedPreferences("test_network_main", Context.MODE_PRIVATE);
         TextView network_description = findViewById(R.id.network_description);
         Spinner spinner = findViewById(R.id.test_network_ssid);
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         Button connect_nw_btn = findViewById(R.id.connect_nw_btn);
-        EditText passkey = findViewById(R.id.test_network_passkey);
+        EditText passkey = findViewById(R.id.test_name);
         ImageButton refresh_scan = findViewById(R.id.refresh_scan);
+        Button skip_conn_btn = findViewById(R.id.skip_conn_btn);
+
         GetPhoneWifiInfo getPhoneWifiInfo = new GetPhoneWifiInfo();
         getPhoneWifiInfo.GetWifiData(wifiManager);
 //
+        WECANManager.getTestNetwork(sharedpreferences);
+        System.out.println("iron spider: "+ wifiManager.getConnectionInfo().getSSID());
+        System.out.println("iron spider: "+ WECANManager.TEST_NETWORK_SSID);
+        if (WECANManager.TEST_NETWORK_SSID != null && (wifiManager.getConnectionInfo().getSSID()).equals("\"" + WECANManager.TEST_NETWORK_SSID + "\"")){
+            skip_conn_btn.setEnabled(true);
+        }
+        skip_conn_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                passkey.setText(WECANManager.TEST_NETWORK_PASSKEY);
+                openStartupActivity();
+            }
+        });
         refresh_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +86,7 @@ public class ConnectWifiStartup extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 List<ScanResult> results = wifiManager.getScanResults();
-                System.out.println("spider: " + parent.getSelectedItem().toString());
+//                System.out.println("spider: " + parent.getSelectedItem().toString());
                 System.out.println(results);
                 for (int i = 0; i < results.size() ; i++){
                     ScanResult scanResult = results.get(i);
@@ -131,12 +148,16 @@ public class ConnectWifiStartup extends AppCompatActivity {
                 else {
                     ConfigureWifi configureWifi = new ConfigureWifi(getApplicationContext(), wifiManager, ssid, password, encryption);
                     Handler handler = new Handler();
+                    String finalEncryption = encryption;
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             handler.removeCallbacks(this);
-                            if (ssid.equals(wifiManager.getConnectionInfo().getSSID())){
+//                            System.out.println("iron_spider: " + ssid);
+//                            System.out.println("iron_spider: " + wifiManager.getConnectionInfo().getSSID());
+                            if (("\"" + ssid + "\"").equals(wifiManager.getConnectionInfo().getSSID())){
                                 Toast.makeText(getApplicationContext(), "Connected to Test Network...", Toast.LENGTH_LONG).show();
+                                WECANManager.setTestNetwork(sharedpreferences, ssid, password, finalEncryption);
                                 openStartupActivity();
                             }
                             else{
@@ -151,9 +172,10 @@ public class ConnectWifiStartup extends AppCompatActivity {
 
     }
     public void openStartupActivity () {
-        Intent myIntent = new Intent(getApplicationContext(), navigation.class);
+        Intent myIntent = new Intent(getApplicationContext(), StartupActivity.class);
         startActivity(myIntent);
     }
+
     private void getWifi() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -169,4 +191,6 @@ public class ConnectWifiStartup extends AppCompatActivity {
             //Log.e("log", "CCC getWifi B: startScan");
         }
     }
+
+
 }

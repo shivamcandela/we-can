@@ -46,9 +46,9 @@ public class StartupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_startup);
         getSupportActionBar().hide();
         button = (Button) findViewById(R.id.connect_nw_btn);
-        server_ip = findViewById(R.id.test_network_encrypion);
-        u_name = findViewById(R.id.test_network_ssid);
-        test_name_tv = findViewById(R.id.test_network_passkey);
+        server_ip = findViewById(R.id.server_ip);
+        u_name = findViewById(R.id.user_name);
+        test_name_tv = findViewById(R.id.test_name);
         sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String,?> keys = sharedpreferences.getAll();
         String last_ip = (String) keys.get("last");
