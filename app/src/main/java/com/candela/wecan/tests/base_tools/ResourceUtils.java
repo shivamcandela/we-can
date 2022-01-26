@@ -83,6 +83,11 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
        startup_activity.updateRealmInfo();
     }
 
+    @Override
+    public void setTestId(String id) {
+        // TODO:  Update this in UI, use as needed to record test results.
+    }
+
     /* Request Android/UI to initiate a scan.  Results will be sent back to
      * lfresource logic in the LANforgeMgr.notifyScanResults() call.
      */
