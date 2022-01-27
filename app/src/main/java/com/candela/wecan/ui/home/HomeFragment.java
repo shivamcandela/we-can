@@ -97,6 +97,9 @@ public class HomeFragment extends Fragment {
     long last_bps_time = 0;
     long last_rx_bytes = 0;
     long last_tx_bytes = 0;
+    String username = "";
+
+    public String getUserName() { return username; }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         instance = this;
@@ -129,12 +132,13 @@ public class HomeFragment extends Fragment {
                 ip_show = getView().findViewById(R.id.server_ip_info);
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
                 Map<String, ?> keys = sharedPreferences.getAll();
-                String username = (String) keys.get("user_name");
+                username = (String) keys.get("user_name");
                 ip_show = getView().findViewById(R.id.server_ip_info);
                 String current_ip = (String) keys.get("current-ip");
                 String current_resource = (String) keys.get("current-resource");
                 String current_realm = (String) keys.get("current-realm");
-                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip + "\nRealm: " + current_realm + "\nResource: " + current_resource);
+                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip
+                                + "\nRealm: " + current_realm + "\nResource: " + current_resource);
 
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);
@@ -269,7 +273,7 @@ public class HomeFragment extends Fragment {
                                         FileOutputStream stream;
                                         try {
                                             stream = new FileOutputStream(logFile);
-                                            stream.write("Date/Time,IP,SSID,BSSID,Rssi,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
+                                            stream.write("Date/Time,IP,SSID,BSSID,signal,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
                                             stream.close();
                                         } catch (FileNotFoundException e) {
                                             e.printStackTrace();
@@ -500,7 +504,7 @@ public class HomeFragment extends Fragment {
                                 live_data.put("IP", String.valueOf(IP));
                                 live_data.put("SSID", SSID);
                                 live_data.put("BSSID", BSSID);
-                                live_data.put("Rssi", String.valueOf(Rssi) + " dBm");
+                                live_data.put("Signal", String.valueOf(Rssi) + " dBm");
                                 live_data.put("LinkSpeed", LinkSpeed);
                                 live_data.put("Channel", channel);
                                 live_data.put("CPU util", cpu_used_percent + " %");
@@ -575,7 +579,7 @@ public class HomeFragment extends Fragment {
                 });
 
 //              Perform Click on System Info
-                system_info_btn.performClick();
+                live_btn.performClick();
 
 //              Scanning Nearest Wi-Fi
                 scan_btn.setOnClickListener(new View.OnClickListener() {
@@ -836,6 +840,3 @@ public class HomeFragment extends Fragment {
         instance = null;
     }
 }
-
-//    double dist_in_meters = Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - rssi) / 20.0d) * 1000;
-//                        System.out.println("dist_in_meters: " + dist_in_meters);
