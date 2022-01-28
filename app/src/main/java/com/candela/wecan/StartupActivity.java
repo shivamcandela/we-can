@@ -45,8 +45,8 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
         getSupportActionBar().hide();
-        button = (Button) findViewById(R.id.connect_nw_btn);
-        server_ip = findViewById(R.id.server_ip);
+        button = (Button) findViewById(R.id.enter_button);
+        server_ip = findViewById(R.id.ip_enter_page);
         u_name = findViewById(R.id.user_name);
         test_name_tv = findViewById(R.id.test_name);
         sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
