@@ -9,186 +9,125 @@
     android:keepScreenOn="true"
     android:background="@color/white">
 
-    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/gifImageView"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:src="@drawable/candela_splash"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.531"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.387"
-        tools:ignore="MissingConstraints" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="299dp"
-        android:layout_height="24dp"
-        android:fontFamily="sans-serif-black"
-        android:text="WELCOME TO"
-        android:textAlignment="center"
-        android:textColor="#2196F3"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.526"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.202" />
-
-    <ImageView
-        android:id="@+id/imageView7"
-        android:layout_width="416dp"
-        android:layout_height="235dp"
-        android:background="#FFFFFF"
-        android:backgroundTint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="@+id/textView3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.969" />
-
-    <ImageView
-        android:id="@+id/imageView8"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="103dp"
-        android:background="#FFFFFF"
-        android:backgroundTint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="@+id/textView3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.027" />
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/user_name"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="294dp"
-        android:layout_height="37dp"
-        android:background="#52009688"
-        android:ems="10"
-        android:hint=" Enter User Name"
-        android:inputType="textPersonName"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:ignore="MissingConstraints">
 
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="#000000"
-        android:textColorHint="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/textView3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.723" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="25sp"
+                android:background="@color/orange" />
 
-    <EditText
-        android:id="@+id/server_ip"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="294dp"
-        android:layout_height="37dp"
-        android:background="#52009688"
-        android:ems="10"
-        android:hint=" Enter Server IP"
-        android:inputType="textPersonName"
+            <ImageView
+                android:padding="12dp"
+                android:id="@+id/imageView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_candelalogo"
+                tools:ignore="VectorDrawableCompat" />
 
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="#000000"
-        android:textColorHint="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.854" />
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="sans-serif-black"
+                android:text="WELCOME TO"
+                android:textAlignment="center"
+                android:textColor="#2196F3"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/test_name"
-        style="@style/Widget.AppCompat.EditText"
-        android:layout_width="294dp"
-        android:layout_height="37dp"
-        android:background="#52009688"
-        android:ems="10"
-        android:hint=" Enter Test Name"
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/gifImageView"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_gravity="center"
+                android:src="@drawable/candela_splash"
+                tools:ignore="MissingConstraints" />
 
-        android:inputType="textPersonName"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="#000000"
-        android:textColorHint="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.79"
-        tools:ignore="TouchTargetSizeCheck" />
 
-    <Button
-        android:id="@+id/connect_nw_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#009688"
-        android:text="Enter Test Room"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/server_ip"
-        app:layout_constraintVertical_bias="0.367" />
+            <EditText
+                android:id="@+id/user_name"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="294dp"
+                android:layout_height="37dp"
+                android:layout_gravity="center"
+                android:layout_margin="10sp"
+                android:background="#52009688"
+                android:ems="10"
+                android:maxLength="15"
+                android:hint=" Enter User Name"
+                android:inputType="textPersonName"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textColorHint="#000000"
+                android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="15sp"
-        android:text=""
-        android:background="@color/orange"
-        android:textAlignment="center"
-        android:textSize="23sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+            <EditText
+                android:id="@+id/ip_enter_page"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="294dp"
+                android:layout_height="37dp"
+                android:layout_gravity="center"
+                android:layout_margin="10sp"
+                android:background="#52009688"
+                android:ems="10"
+                android:maxLength="15"
+                android:hint=" Enter Server IP"
+                android:inputType="textPersonName"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#000000"
+                android:textColorHint="#000000"
+                android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="match_parent"
-        android:layout_height="15sp"
-        android:text=""
-        android:background="@color/green"
-        android:textAlignment="center"
-        android:textSize="23sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+            <EditText
+                android:id="@+id/test_name"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="294dp"
+                android:layout_height="37dp"
+                android:layout_gravity="center"
+                android:layout_margin="10sp"
+                android:background="#52009688"
+                android:ems="10"
+                android:maxLength="15"
+                android:hint=" Enter Test Name"
+                android:inputType="textPersonName"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#000000"
+                android:textColorHint="#000000"
+                android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="226dp"
-        android:layout_height="64dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.056"
-        app:srcCompat="@drawable/ic_candelalogo" />
+            <Button
+                android:id="@+id/enter_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:backgroundTint="#009688"
+                android:text="Enter Test Room"
+                android:textSize="12sp" />
 
+
+            <TextView
+                android:id="@+id/textView21"
+                android:layout_width="match_parent"
+                android:layout_height="25sp"
+                android:background="@color/green" />
+
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
 

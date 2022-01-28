@@ -85,6 +85,11 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
        startup_activity.updateRealmInfo();
     }
 
+    @Override
+    public void setTestId(String id) {
+        // TODO:  Update this in UI, use as needed to record test results.
+    }
+
     /* Request Android/UI to initiate a scan.  Results will be sent back to
      * lfresource logic in the LANforgeMgr.notifyScanResults() call.
      */
@@ -317,6 +322,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.id = Build.ID;
         pi.availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         pi.totalMem = Runtime.getRuntime().totalMemory();
+
+        if (HomeFragment.instance != null) {
+            pi.wecan_user_name = HomeFragment.instance.getUserName();
+        }
 
         // CPU Info
         pi.cores = 0;
