@@ -62,4 +62,8 @@ public class navigation extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+    @Override
+    public void onBackPressed() {
+
+    }
 }
