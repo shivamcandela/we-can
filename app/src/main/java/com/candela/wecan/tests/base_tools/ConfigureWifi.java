@@ -93,19 +93,28 @@ public class ConfigureWifi {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        List<WifiConfiguration> configuredNetworks = wifiManager.getConfiguredNetworks();
-        for (WifiConfiguration conf : configuredNetworks){
-
-            wifiManager.disableNetwork(conf.networkId);
-            wifiManager.removeNetwork(conf.networkId);
-
+        List<WifiConfiguration> list1 = wifiManager.getConfiguredNetworks();
+        for( WifiConfiguration i : list1 ) {
+            if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                if (!wifiManager.isWifiEnabled()) {
+                    wifiManager.setWifiEnabled(true);
+                }
+                i.priority = 99999;
+                wifiManager.updateNetwork(i);
+                wifiManager.saveConfiguration();
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+                return;
+            }
         }
+
         WifiConfiguration wifiConfiguration = new WifiConfiguration();
 
         wifiConfiguration.SSID = String.format("\"%s\"", this.ssid);
 
-        Log.e("log", "ssid -:" + ssid + ":- password -:" + password + ":-");
-        Log.e("log", "wifiConfiguration: " + wifiConfiguration.toString());
+        Log.i("log", "ssid -:" + ssid + ":- password -:" + password + ":-");
+        Log.i("log", "wifiConfiguration: " + wifiConfiguration.toString());
 
         StringTokenizer st = new StringTokenizer(encryption, "|");
         while (st.hasMoreTokens()) {
@@ -166,7 +175,7 @@ public class ConfigureWifi {
 
         int wifiID = wifiManager.addNetwork(wifiConfiguration);
 
-        Log.e("log", "wifiID: " + wifiID);
+        Log.i("log", "wifiID: " + wifiID);
 
         this.callback();
         wifiManager.disconnect();

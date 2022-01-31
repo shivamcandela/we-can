@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class ConnectWifiStartup extends AppCompatActivity {
     private ListView wifiList;
     WifiManager wifiManager;
     private final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,24 +54,41 @@ public class ConnectWifiStartup extends AppCompatActivity {
         EditText passkey = findViewById(R.id.test_name);
         ImageButton refresh_scan = findViewById(R.id.refresh_scan);
         Button skip_conn_btn = findViewById(R.id.skip_conn_btn);
-
-        GetPhoneWifiInfo getPhoneWifiInfo = new GetPhoneWifiInfo();
-        getPhoneWifiInfo.GetWifiData(wifiManager);
-//
-        WECANManager.getTestNetwork(sharedpreferences);
-        System.out.println("iron spider: "+ wifiManager.getConnectionInfo().getSSID());
-        System.out.println("iron spider: "+ WECANManager.TEST_NETWORK_SSID);
-        if (WECANManager.TEST_NETWORK_SSID != null && (wifiManager.getConnectionInfo().getSSID()).equals("\"" + WECANManager.TEST_NETWORK_SSID + "\"")){
-            skip_conn_btn.setEnabled(true);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
-        skip_conn_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        for( WifiConfiguration i : list ) {
 
-                passkey.setText(WECANManager.TEST_NETWORK_PASSKEY);
-                openStartupActivity();
-            }
-        });
+            System.out.println("iron");
+            System.out.println(i.priority);
+        }
+//        GetPhoneWifiInfo getPhoneWifiInfo = new GetPhoneWifiInfo();
+//        getPhoneWifiInfo.GetWifiData(wifiManager);
+////
+//        WECANManager.getTestNetwork(sharedpreferences);
+//        System.out.println("iron spider: "+ wifiManager.getConnectionInfo().getSSID());
+//        System.out.println("iron spider: "+ WECANManager.TEST_NETWORK_SSID);
+//        if (WECANManager.TEST_NETWORK_SSID != null && (wifiManager.getConnectionInfo().getSSID()).equals("\"" + WECANManager.TEST_NETWORK_SSID + "\"")){
+//            skip_conn_btn.setEnabled(true);
+//        }
+//
+//        passkey.setText(WECANManager.TEST_NETWORK_PASSKEY);
+//        skip_conn_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//                openStartupActivity();
+//            }
+//        });
         refresh_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
