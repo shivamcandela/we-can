@@ -94,7 +94,12 @@ public class ConfigureWifi {
             return;
         }
         List<WifiConfiguration> list1 = wifiManager.getConfiguredNetworks();
+        int j = 10;
         for( WifiConfiguration i : list1 ) {
+            j = j++;
+            i.priority = j++;
+            wifiManager.updateNetwork(i);
+            wifiManager.saveConfiguration();
             if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
                 if (!wifiManager.isWifiEnabled()) {
                     wifiManager.setWifiEnabled(true);
