@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -49,6 +50,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
 import android.widget.Toast;
@@ -87,7 +89,7 @@ public class HomeFragment extends Fragment {
     private TextView ip_show, link_speed;
     public Boolean live_table_flag = false,scan_table_flag=false, flag;
     public static HomeFragment instance = null;
-
+    public String[] up_down_global;
     TableLayout sys_table = null;
     TableLayout live_table = null;
     TableLayout scan_table = null;
@@ -95,6 +97,9 @@ public class HomeFragment extends Fragment {
     long last_bps_time = 0;
     long last_rx_bytes = 0;
     long last_tx_bytes = 0;
+    String username = "";
+
+    public String getUserName() { return username; }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         instance = this;
@@ -112,6 +117,7 @@ public class HomeFragment extends Fragment {
             public void onChanged(@Nullable String s) {
                 Button scan_btn, system_info_btn, live_btn;
                 scan_btn = getActivity().findViewById(R.id.scan_data);
+                scan_btn.setEnabled(false);
                 system_info_btn = getActivity().findViewById(R.id.system_info_btn);
                 live_btn = getActivity().findViewById(R.id.rxtx_btn);
                 ImageView share_btn = getActivity().findViewById(R.id.share_btn);
@@ -126,29 +132,13 @@ public class HomeFragment extends Fragment {
                 ip_show = getView().findViewById(R.id.server_ip_info);
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
                 Map<String, ?> keys = sharedPreferences.getAll();
-                String username = (String) keys.get("user_name");
+                username = (String) keys.get("user_name");
                 ip_show = getView().findViewById(R.id.server_ip_info);
                 String current_ip = (String) keys.get("current-ip");
                 String current_resource = (String) keys.get("current-resource");
                 String current_realm = (String) keys.get("current-realm");
-                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip + "\nRealm: " + current_realm + "\nResource: " + current_resource);
-
-//                // Customize SpeedometerGauge
-//                SpeedometerGauge speedometer = (SpeedometerGauge) getView().findViewById(R.id.speedometer);
-//                speedometer.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-//                    @Override
-//                    public String getLabelFor(double progress, double maxProgress) {
-//                        return String.valueOf((int) Math.round(progress));
-//                    }
-//                });
-////              configure value range and ticks
-//                speedometer.setMaxSpeed(100);
-//                speedometer.setMajorTickStep(5);
-//                speedometer.setMinorTicks(5);
-////              Configure value range colors
-//                speedometer.addColoredRange(0, 30, Color.RED);
-//                speedometer.addColoredRange(30, 50, Color.YELLOW);
-//                speedometer.addColoredRange(50, 100, Color.GREEN);
+                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip
+                                + "\nRealm: " + current_realm + "\nResource: " + current_resource);
 
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);
@@ -157,11 +147,50 @@ public class HomeFragment extends Fragment {
                 last_tx_bytes = TrafficStats.getTotalTxBytes();
                 last_rx_bytes = TrafficStats.getTotalRxBytes();
 
+                SpeedometerGauge speedometerdown = (SpeedometerGauge) getActivity().findViewById(R.id.speedometerdown);
+                speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+                    @Override
+                    public String getLabelFor(double progress, double maxProgress) {
+                        return String.valueOf((int) Math.round(progress));
+                    }
+                });
+
+                SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
+                speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+                    @Override
+                    public String getLabelFor(double progress, double maxProgress) {
+                        return String.valueOf((int) Math.round(progress));
+                    }
+                });
                 Handler handler = new Handler();
                 final Runnable runnable_link = new Runnable() {
                     @Override
                     public void run() {
-                        updateBpsDisplay();
+                        String up_down[] = updateBpsDisplay();
+                        up_down_global = up_down;
+                        int downlink = Integer.parseInt(up_down[0]);
+                        int uplink = Integer.parseInt(up_down[1]);
+//              Configure upload value range colors
+                        speedometerup.setLabelTextSize(10);
+                        speedometerup.setMaxSpeed(500);
+                        speedometerup.setMajorTickStep(25);
+                        speedometerup.addColoredRange(0, 25, Color.RED);
+                        speedometerup.addColoredRange(25, 100, Color.YELLOW);
+                        speedometerup.addColoredRange(100, 500, Color.GREEN);
+//                        Set the uplink value
+                        speedometerup.setSpeed(uplink);
+
+//                      Download Starts here
+//                      Configure download value range colors
+                        speedometerdown.setLabelTextSize(10);
+                        speedometerdown.setMaxSpeed(500);
+                        speedometerdown.setMajorTickStep(25);
+                        speedometerdown.addColoredRange(0, 25, Color.RED);
+                        speedometerdown.addColoredRange(25, 100, Color.YELLOW);
+                        speedometerdown.addColoredRange(100, 500, Color.GREEN);
+//                        Set the downlink value
+                        speedometerdown.setSpeed(downlink);
+//
                         handler.postDelayed(this, 1000);
                     }
                 };
@@ -206,18 +235,15 @@ public class HomeFragment extends Fragment {
                                 int Rssi = wifiinfo.getRssi();
                                 String LinkSpeed = wifiinfo.getLinkSpeed() + " Mbps";
                                 String channel = wifiinfo.getFrequency() + " MHz";
-                                int Rx = wifiinfo.getRxLinkSpeedMbps();
-                                int Tx = wifiinfo.getTxLinkSpeedMbps();
-                                int Rx_Kbps = wifiinfo.getRxLinkSpeedMbps() * 1024;
-                                int Tx_Kbps = wifiinfo.getTxLinkSpeedMbps() * 1024;
                                 long availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
                                 long totalMem = Runtime.getRuntime().totalMemory();
                                 long usedMem = totalMem - availMem;
+                                String uplink = up_down_global[2];
+                                String downlink = up_down_global[3];
                                 String cpu_used_percent = String.format("%.2f", (usedMem / (double) totalMem) * 100);
                                 String currentDateTimeString = java.text.DateFormat.getDateTimeInstance().format(new Date());
                                 String livedata = currentDateTimeString + "," + IP + "," + SSID + "," + BSSID + "," + Rssi
-                                        + "," + LinkSpeed + "," + channel + "," + Rx_Kbps + "Kbps,"
-                                        + Tx_Kbps + "Kbps," + Rx + "Mbps," + Tx + "Mbps," + cpu_used_percent + "\n";
+                                        + "," + LinkSpeed + "," + uplink  + "," + downlink + ","+ channel + ","  + cpu_used_percent + "\n";
 
                                 if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||
                                         Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState())) {
@@ -247,7 +273,7 @@ public class HomeFragment extends Fragment {
                                         FileOutputStream stream;
                                         try {
                                             stream = new FileOutputStream(logFile);
-                                            stream.write("Date/Time,IP,SSID,BSSID,Rssi,Linkspeed,Channel,Rx_Kbps,Tx_Kbps,Rx_Mbps,Tx_Mbps,CPU_Utilization\n".getBytes());
+                                            stream.write("Date/Time,IP,SSID,BSSID,signal,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
                                             stream.close();
                                         } catch (FileNotFoundException e) {
                                             e.printStackTrace();
@@ -439,7 +465,10 @@ public class HomeFragment extends Fragment {
 //                                };
 //                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
+
                                 live_table.removeAllViews();
+                                LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+                                if (getActivity() != null) {
                                 WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                                 WifiInfo wifiinfo = wifiManager.getConnectionInfo();
                                 String IP = null;
@@ -448,10 +477,6 @@ public class HomeFragment extends Fragment {
                                 int Rssi = 0;
                                 String LinkSpeed = null;
                                 String channel = null;
-                                int Rx = 0;
-                                int Tx = 0;
-                                int Rx_Kbps = 0;
-                                int Tx_Kbps = 0;
                                 if (wifiinfo.getSupplicantState() == SupplicantState.COMPLETED) {
                                     IP = Formatter.formatIpAddress(wifiinfo.getIpAddress());
                                     SSID = wifiinfo.getSSID();
@@ -461,17 +486,6 @@ public class HomeFragment extends Fragment {
                                     if (Build.VERSION.SDK_INT >= 21) {
                                         channel = wifiinfo.getFrequency() + " MHz";
                                     }
-                                    if (Build.VERSION.SDK_INT >= 29) {
-                                        Rx = wifiinfo.getRxLinkSpeedMbps();
-                                        Tx = wifiinfo.getTxLinkSpeedMbps();
-                                    }
-                                    else {
-                                        // TODO: Deal with: wifiinfo.LINK_SPEED_UNITS;
-                                        Rx = wifiinfo.getLinkSpeed();
-                                        Tx = wifiinfo.getLinkSpeed();
-                                    }
-                                    Rx_Kbps = Rx * 1000;
-                                    Tx_Kbps = Tx * 1000;
                                 }
                                 DhcpInfo Dhcp_details = wifiManager.getDhcpInfo();
                                 String dns1 = Formatter.formatIpAddress(Dhcp_details.dns1);
@@ -490,13 +504,9 @@ public class HomeFragment extends Fragment {
                                 live_data.put("IP", String.valueOf(IP));
                                 live_data.put("SSID", SSID);
                                 live_data.put("BSSID", BSSID);
-                                live_data.put("Rssi", String.valueOf(Rssi) + " dBm");
+                                live_data.put("Signal", String.valueOf(Rssi) + " dBm");
                                 live_data.put("LinkSpeed", LinkSpeed);
                                 live_data.put("Channel", channel);
-                                live_data.put("Rx_Mbps", String.valueOf(Rx) + " Mbps");
-                                live_data.put("Tx_Mbps", String.valueOf(Tx) + " Mbps");
-                                live_data.put("Rx_Kbps", String.valueOf(Rx_Kbps) + " Kbps");
-                                live_data.put("Tx_Kbps", String.valueOf(Tx_Kbps) + " Kbps");
                                 live_data.put("CPU util", cpu_used_percent + " %");
                                 live_data.put("DNS1", dns1);
                                 live_data.put("DNS2", dns2);
@@ -504,6 +514,7 @@ public class HomeFragment extends Fragment {
                                 live_data.put("Gateway", gateway);
                                 live_data.put("Netmask", netmask);
                                 live_data.put("LeaseDuration", String.valueOf(leaseDuration) + " Sec");
+
 //                                Table Heading
                                 live_table.setPadding(10, 0, 10, 0);
                                 TableRow heading = new TableRow(getActivity());
@@ -561,13 +572,14 @@ public class HomeFragment extends Fragment {
                                     handler.removeCallbacks(this);
                                 }
                             }
+                            }
                         };
                         handler.post(r);
                     }
                 });
 
 //              Perform Click on System Info
-                system_info_btn.performClick();
+                live_btn.performClick();
 
 //              Scanning Nearest Wi-Fi
                 scan_btn.setOnClickListener(new View.OnClickListener() {
@@ -584,10 +596,12 @@ public class HomeFragment extends Fragment {
                             @Override
                             public void run() {
                                 // Scan wi-fi
-                                WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                wifiManager.setWifiEnabled(true);
-                                wifiManager.startScan();
-                                //Log.e("log", "startScan called in HomeFragment");
+                                if (getActivity() != null){
+                                    WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                    wifiManager.setWifiEnabled(true);
+                                    wifiManager.startScan();
+                                    //Log.e("log", "startScan called in HomeFragment");
+                                }
 
                                 if (scan_table_flag == true) {
                                     // NOTE:  Scans are normally limited to around one every 30 seconds, but
@@ -607,11 +621,12 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-    public void updateBpsDisplay() {
+    public String[] updateBpsDisplay() {
+
         long now = System.currentTimeMillis();
         double TimeDifference = now - last_bps_time;
         if (TimeDifference == 0) {
-            return; // no div by zero error!
+            return new String[] {"0", "0", "0", "0"}; // no div by zero error!
         }
         String Tx;
         String Rx;
@@ -670,48 +685,6 @@ public class HomeFragment extends Fragment {
         link_speed.setTextSize(15);
         link_speed.setText(Rx + "/" + Tx);
 
-        // Customize SpeedometerGauge
-        // NOTE:  Saw NPE here on slow 8.1 Android test phone.
-        SpeedometerGauge speedometerdown = (SpeedometerGauge) getView().findViewById(R.id.speedometerdown);
-        speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-            @Override
-            public String getLabelFor(double progress, double maxProgress) {
-                return String.valueOf((int) Math.round(progress));
-            }
-        });
-
-        SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
-        speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-            @Override
-            public String getLabelFor(double progress, double maxProgress) {
-                return String.valueOf((int) Math.round(progress));
-            }
-        });
-
-        speedometerup.setLabelTextSize(10);
-        speedometerup.setMaxSpeed(100);
-        speedometerup.setMajorTickStep(10);
-
-        speedometerup.addColoredRange(0, 30, Color.RED);
-        speedometerup.addColoredRange(30, 50, Color.YELLOW);
-        speedometerup.addColoredRange(50, 100, Color.GREEN);
-        String unitTx = Tx.substring(Tx.length()-4);
-        double uplink = 0;
-        if (unitTx.equals(" bps")){
-            uplink = 0;
-        }else if (unitTx.equals("Mbps")){
-            uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
-        }
-        speedometerup.setSpeed(uplink);
-//              configurAAPe value range and ticks
-        speedometerdown.setLabelTextSize(10);
-        speedometerdown.setMaxSpeed(100);
-        speedometerdown.setMajorTickStep(10);
-//        speedometerdown.setMinorTicks(5);
-//              Configure value range colors
-        speedometerdown.addColoredRange(0, 30, Color.RED);
-        speedometerdown.addColoredRange(30, 50, Color.YELLOW);
-        speedometerdown.addColoredRange(50, 100, Color.GREEN);
         String unitRx = Rx.substring(Rx.length()-4);
         double downlink = 0;
         if (unitRx.equals(" bps")){
@@ -719,7 +692,15 @@ public class HomeFragment extends Fragment {
         }else if (unitRx.equals("Mbps")){
             downlink = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
         }
-        speedometerdown.setSpeed(downlink);
+
+        String unitTx = Tx.substring(Tx.length()-4);
+        double uplink = 0;
+        if (unitTx.equals(" bps")){
+            uplink = 0;
+        }else if (unitTx.equals("Mbps")){
+            uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
+        }
+        return new String[] {String.valueOf((int) downlink), String.valueOf((int) uplink), Rx, Tx};
     }
 
     public void scanCompleted(boolean success) {
@@ -736,6 +717,28 @@ public class HomeFragment extends Fragment {
             }
         };
         handler.post(runnable);
+    }
+
+    //https://electronics.stackexchange.com/questions/83354/calculate-distance-from-rssi
+    static double getDistance(double rssi, int freq_mhz) {
+       //https://www.pasternack.com/t-calculator-fspl.aspx
+       // Values below assume a 20db txpower
+       double A;
+       if (freq_mhz < 2500)
+          A = -20;
+       else if (freq_mhz < 6000)
+          A = -27;
+       else
+          A = -29;
+
+       //double n = 2; // free space path loss
+       double n = 2.5; // Gives better results for my tests.
+
+       //RSSI (dBm) = -10n log10(d) + A
+       // RSSI - A = -10n log10(d)
+       // (RSSI - A) / -10n = log10(d)
+       // 10 ^ ((RSSI - A) / -10n) = d
+       return Math.pow(10d, (rssi - A) / (-10 * n));
     }
 
     public void _scanCompleted(boolean success) {
@@ -784,12 +787,14 @@ public class HomeFragment extends Fragment {
             long age = android.os.SystemClock.elapsedRealtime() - (sr.timestamp / 1000);
             age = age / 1000; //convert to seconds.
 
-            float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
+            //float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
+            double dist = getDistance(level, frequency);
             String dist_in_meters = String.format("%.02f", dist);
+
             data = "SSID: " + '\"' + ssid + '\"' + "\nbssid: " + bssid + "\ncenterFreq0: " +
                     centerFreq0 + "\tcenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
                     "\t\uD83D\uDCF6 " + level + "\nFrequency " + frequency + "\tage⏱ " + age +
-                    "\t\t\tdistance: " + dist_in_meters + " meters\n" + "\uD83D\uDD12 " + capability;
+                    "\t\t\tdistance: " + dist_in_meters + "m\n" + "\uD83D\uDD12 " + capability;
             scan_data.put(String.valueOf(i+1), String.valueOf(data));
         }
 
@@ -835,6 +840,3 @@ public class HomeFragment extends Fragment {
         instance = null;
     }
 }
-
-//    double dist_in_meters = Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - rssi) / 20.0d) * 1000;
-//                        System.out.println("dist_in_meters: " + dist_in_meters);

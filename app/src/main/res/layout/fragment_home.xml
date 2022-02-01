@@ -1,190 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     tools:context=".ServerConnection"
-    tools:layout_editor_absoluteX="0dp"
-    tools:layout_editor_absoluteY="140dp"
-    android:keepScreenOn="true"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
-    app:layout_scrollFlags="scroll|exitUntilCollapsed">
+    android:keepScreenOn="true">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="true"
-        android:paddingTop="20dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            tools:ignore="MissingConstraints">
 
-            <ImageView
-                android:id="@+id/imageView4"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_candelalogo"
+                    tools:ignore="VectorDrawableCompat" />
+
+                <TextView
+                    android:id="@+id/server_ip_info"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30sp"
+                    android:layout_marginRight="30sp"
+                    android:layout_gravity="center"
+                    android:textColor="#42ba96"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_candelalogo" />
+                android:orientation="vertical">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#D8000C" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/server_ip_info"
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/rxtx_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#808080"
+                        app:cornerRadius="0dp"
+                        android:text="@string/live_data" />
+
+                    <Button
+                        android:id="@+id/system_info_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#808080"
+                        app:cornerRadius="0dp"
+                        android:text="@string/sys_info" />
+
+                    <Button
+                        android:id="@+id/speedometer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#808080"
+                        app:cornerRadius="0dp"
+                        android:text="Speedometer" />
+
+                    <Button
+                        android:id="@+id/scan_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#808080"
+                        app:cornerRadius="0dp"
+                        android:text="scan" />
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="10sp"
+                android:layout_margin="5sp"
+                android:background="@color/light_gray">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="SPEED (⇵) "
+                    android:textColor="@color/light_gray_info"
+                    android:textStyle="bold"></TextView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/link_speed"
+                    android:paddingLeft="10sp"
+                    android:layout_gravity="fill_horizontal"
+                    android:text="0 Kbps/0 Kbps">
+                </TextView>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30sp"
-                android:layout_marginRight="30sp"
-                android:layout_gravity="center"
-                android:textColor="#42ba96"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_height="wrap_content">
 
+                <com.cardiomood.android.controls.gauge.SpeedometerGauge
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:id="@+id/speedometerdown" />
+
+                <com.cardiomood.android.controls.gauge.SpeedometerGauge
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:id="@+id/speedometerup" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="DOWNLOAD/mbps"
+                    android:textAlignment="center"></TextView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="UPLOAD/mbps"
+                    android:textAlignment="center"></TextView>
+            </LinearLayout>
+
+
+            <TableLayout
+                android:id="@+id/table"
+                android:layout_marginTop="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+            </TableLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="left">
+
+                <Switch
+                    android:id="@+id/save_data_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:checked="false"
+                    android:text="Save Data"
+                    android:textColor="@color/light_green">
+
+                </Switch>
+
+                <ImageView
+                    android:id="@+id/share_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@android:drawable/ic_menu_share" />
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="#D8000C" />
-    </LinearLayout>
-
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/system_info_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#808080"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:text="@string/sys_info" />
-
-            <Button
-                android:id="@+id/rxtx_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#808080"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:text="@string/live_data" />
-
-            <Button
-                android:id="@+id/scan_data"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#808080"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:text=" scan " />
-
-
-        </LinearLayout>
-    </ScrollView>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="#D8000C" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="10sp"
-        android:layout_margin="5sp"
-        android:background="@color/light_gray">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:text="UP &amp; DOWN SPEED "
-            android:textColor="@color/light_gray_info"
-            android:textStyle="bold"></TextView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/link_speed"
-            android:paddingLeft="10sp"
-            android:layout_gravity="fill_horizontal"
-            android:text="0 Kbps/0 Kbps">
-        </TextView>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.cardiomood.android.controls.gauge.SpeedometerGauge
-            android:layout_height="wrap_content"
-            android:layout_width="200dp"
-            android:layout_gravity="left"
-            android:id="@+id/speedometerdown" />
-
-        <com.cardiomood.android.controls.gauge.SpeedometerGauge
-            android:layout_height="wrap_content"
-            android:layout_width="200dp"
-            android:layout_gravity="right"
-            android:id="@+id/speedometerup" />
-    </LinearLayout>
-
-<ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TableLayout
-        android:id="@+id/table"
-        android:layout_marginTop="2dp"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1">
-    </TableLayout>
-</ScrollView>
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="left">
-
-        <Switch
-            android:id="@+id/save_data_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:checked="false"
-            android:text="Save Data"
-            android:textColor="@color/light_green">
-
-        </Switch>
-
-        <ImageView
-            android:id="@+id/share_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:srcCompat="@android:drawable/ic_menu_share" />
-
-    </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

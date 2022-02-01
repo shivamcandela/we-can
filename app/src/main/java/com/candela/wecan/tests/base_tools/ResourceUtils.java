@@ -83,6 +83,11 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
        startup_activity.updateRealmInfo();
     }
 
+    @Override
+    public void setTestId(String id) {
+        // TODO:  Update this in UI, use as needed to record test results.
+    }
+
     /* Request Android/UI to initiate a scan.  Results will be sent back to
      * lfresource logic in the LANforgeMgr.notifyScanResults() call.
      */
@@ -316,6 +321,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         pi.totalMem = Runtime.getRuntime().totalMemory();
 
+        if (HomeFragment.instance != null) {
+            pi.wecan_user_name = HomeFragment.instance.getUserName();
+        }
+
         // CPU Info
         pi.cores = 0;
         pi.processor = "";
@@ -527,14 +536,14 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     @Override
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
+//        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
         /*
             Need to structure the cc_data in a Vector format and collect usefull info from this
             {
                 "cx_time" : "" // in ms
             }
          */
-        System.out.println(configureWifi.cc_data);
+//        System.out.println(configureWifi.cc_data);
         return null;
     }
 }
