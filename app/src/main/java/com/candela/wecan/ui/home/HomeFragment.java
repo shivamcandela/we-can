@@ -4,7 +4,9 @@ import static android.net.wifi.WifiConfiguration.*;
 import static android.view.KeyEvent.KEYCODE_BACK;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -56,6 +58,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.candela.wecan.R;
+import com.candela.wecan.StartupActivity;
 import com.candela.wecan.databinding.FragmentHomeBinding;
 import com.candela.wecan.tests.base_tools.CardUtils;
 import com.candela.wecan.tests.base_tools.GetPhoneWifiInfo;
@@ -110,7 +113,6 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
 //        final TextView textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @SuppressLint({"MissingPermission", "NewApi"})
@@ -841,11 +843,39 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void setRetainInstance(boolean retain) {
+        super.setRetainInstance(retain);
+    }
+
+    @Override
+    public void setInitialSavedState(@Nullable SavedState state) {
+        super.setInitialSavedState(state);
+    }
+
+    @Override
+    public void onDestroy() {
+
+        super.onDestroy();
+    }
+
+    @Override
     public void onDestroyView() {
-        super.onDestroyView();
         binding = null;
         instance = null;
+        if (flag == true){
+//            super.getActivity().getApplicationContext()
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Save Data Enabled")
+                    .setMessage("Do you want to stop saving data to csv ?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).setNegativeButton("No", null).show();
+        }
         flag = false;
         live_table_flag = false;
+        super.onDestroyView();
     }
 }
