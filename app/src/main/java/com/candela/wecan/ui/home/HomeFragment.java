@@ -49,6 +49,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -90,17 +91,21 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private static final String FILE_NAME = "data.conf";
     private TextView ip_show, link_speed;
-    public Boolean live_table_flag = false, scan_table_flag = false, flag;
+    public static Boolean live_table_flag = false, scan_table_flag = false, flag = false;
     public static HomeFragment instance = null;
     public String[] up_down_global;
     TableLayout sys_table = null;
     TableLayout live_table = null;
     TableLayout scan_table = null;
-
+    public static Bundle saved_instance;
     long last_bps_time = 0;
     long last_rx_bytes = 0;
     long last_tx_bytes = 0;
     String username = "";
+    LayoutInflater layout_inflator;
+    ViewGroup view_group;
+    private LifecycleOwner view_owner;
+    private View view;
 
     public String getUserName() {
         return username;
@@ -108,13 +113,16 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         instance = this;
-
+        saved_instance = savedInstanceState;
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
+        layout_inflator = inflater;
+        view_group = container;
+        view_owner = getViewLifecycleOwner();
+        view = getView();
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 //        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        homeViewModel.getText().observe(view_owner, new Observer<String>() {
             @SuppressLint({"MissingPermission", "NewApi"})
             @RequiresApi(api = Build.VERSION_CODES.R)
             @Override
@@ -230,6 +238,7 @@ public class HomeFragment extends Fragment {
                         final Runnable save_data = new Runnable() {
                             @Override
                             public void run() {
+                                saved_instance = savedInstanceState;
                                 flag = switch_btn.isChecked();
 //                                    Data Saving in csv format
                                 try {
@@ -309,6 +318,7 @@ public class HomeFragment extends Fragment {
                 system_info_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        saved_instance = savedInstanceState;
                         live_table_flag = false;
                         scan_table_flag = false;
                         sys_table.removeAllViews();
@@ -690,6 +700,7 @@ public class HomeFragment extends Fragment {
             Tx = (long) (txbits) + " bps";
         }
 
+
         //System.out.println("count: " + count);
         link_speed.setTextSize(15);
         link_speed.setText(Rx + "/" + Tx);
@@ -852,6 +863,10 @@ public class HomeFragment extends Fragment {
         super.setInitialSavedState(state);
     }
 
+    public static HomeFragment getInstance() {
+        return instance;
+    }
+
     @Override
     public void onDestroy() {
 
@@ -859,21 +874,38 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onPrimaryNavigationFragmentChanged(boolean isPrimaryNavigationFragment) {
+        super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment);
+    }
+
+    @Override
     public void onDestroyView() {
-        binding = null;
-        instance = null;
+
         if (flag == true){
-//            super.getActivity().getApplicationContext()
-            new AlertDialog.Builder(getContext())
-                    .setTitle("Save Data Enabled")
-                    .setMessage("Do you want to stop saving data to csv ?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).setNegativeButton("No", null).show();
+            if (HomeFragment.flag == true){
+                Toast.makeText(getContext(), "Saving The CSV and stopping to save data!",Toast.LENGTH_LONG).show();
+//                new AlertDialog.Builder(getContext())
+//                        .setTitle("Save Data Enabled")
+//                        .setMessage("Do you want to stop saving data to csv ?")
+//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                Toast.makeText(getContext(), "Saving The CSV and stopping to save data!",Toast.LENGTH_LONG).show();
+//                                dialog.dismiss();
+//                            }
+//                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        instance.onCreateView(layout_inflator, view_group, saved_instance);
+//                        flag = true;
+//                    }
+//                }).show();
+            }
+
+
         }
+//        binding = null;
+//        instance = null;
         flag = false;
         live_table_flag = false;
         super.onDestroyView();
