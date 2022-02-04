@@ -74,6 +74,12 @@ public class ConfigureWifi {
         intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
         context.registerReceiver(broadcastReceiver, intentFilter);
     }
+    public boolean isConnectedto(String ssid){
+        if (wifiManager.getConnectionInfo().getSSID().toString().equals(ssid)){
+            return true;
+        }
+        return false;
+    }
     private void connect() {
 
         wifiManager.setWifiEnabled(false);
@@ -101,6 +107,7 @@ public class ConfigureWifi {
             wifiManager.updateNetwork(i);
             wifiManager.saveConfiguration();
             if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                this.callback();
                 if (!wifiManager.isWifiEnabled()) {
                     wifiManager.setWifiEnabled(true);
                 }
@@ -182,7 +189,7 @@ public class ConfigureWifi {
 
         Log.i("log", "wifiID: " + wifiID);
 
-        this.callback();
+
         wifiManager.disconnect();
         wifiManager.enableNetwork(wifiID, true);
         wifiManager.reconnect();

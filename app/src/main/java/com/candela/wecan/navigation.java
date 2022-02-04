@@ -1,5 +1,8 @@
 package com.candela.wecan;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
@@ -64,6 +67,16 @@ public class navigation extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-
+        new AlertDialog.Builder(this)
+                .setTitle("Closing application")
+                .setMessage("Disconnect from Server?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        StartupActivity.lf_resource.lfresource.stop();
+                        Intent myIntent = new Intent(getApplicationContext(), StartupActivity.class);
+                        startActivity(myIntent);
+                    }
+                }).setNegativeButton("No", null).show();
     }
 }

@@ -540,14 +540,9 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                handler.removeCallbacks(this);
-//                ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, wifiInfo.getSSID(), wifiInfo.password, wifiInfo);
-            }
-        },30000);
+        if (configureWifi.isConnectedto(ssid)){
+            Log.i("iron",configureWifi.cc_data.toString());
+        }
 
         /*
             Need to structure the cc_data in a Vector format and collect usefull info from this
