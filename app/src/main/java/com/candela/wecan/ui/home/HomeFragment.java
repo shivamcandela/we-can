@@ -107,6 +107,9 @@ public class HomeFragment extends Fragment {
     private LifecycleOwner view_owner;
     private View view;
     public Runnable runnable_live;
+    public static Handler handler_link;
+    public static Runnable runnable_link;
+
     public String getUserName() {
         return username;
     }
@@ -174,8 +177,8 @@ public class HomeFragment extends Fragment {
                         return String.valueOf((int) Math.round(progress));
                     }
                 });
-                Handler handler = new Handler();
-                final Runnable runnable_link = new Runnable() {
+                handler_link = new Handler();
+                runnable_link = new Runnable() {
                     @Override
                     public void run() {
                         String up_down[] = updateBpsDisplay();
@@ -203,10 +206,10 @@ public class HomeFragment extends Fragment {
 //                        Set the downlink value
                         speedometerdown.setSpeed(downlink);
 //
-                        handler.postDelayed(this, 1000);
+                        handler_link.postDelayed(this, 1000);
                     }
                 };
-                handler.post(runnable_link);
+                handler_link.post(runnable_link);
 
 //              Share Data Button
                 share_btn.setOnClickListener(new View.OnClickListener() {

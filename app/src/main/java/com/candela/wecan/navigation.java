@@ -85,7 +85,8 @@ public class navigation extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        StartupActivity.lf_resource.lfresource.stop();
+                        HomeFragment.handler_link.removeCallbacks(HomeFragment.runnable_link);
+                        StartupActivity.lf_resource.lfresource.destroy();
                         Intent myIntent = new Intent(getApplicationContext(), StartupActivity.class);
                         startActivity(myIntent);
                     }
