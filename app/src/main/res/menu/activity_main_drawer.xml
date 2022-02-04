@@ -12,9 +12,5 @@
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_baseline_app_settings_alt_24"
             android:title="@string/menu_gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_baseline_description_24"
-            android:title="@string/menu_slideshow" />
     </group>
 </menu>
