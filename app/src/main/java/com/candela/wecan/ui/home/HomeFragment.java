@@ -181,30 +181,37 @@ public class HomeFragment extends Fragment {
                 runnable_link = new Runnable() {
                     @Override
                     public void run() {
-                        String up_down[] = updateBpsDisplay();
-                        up_down_global = up_down;
-                        int downlink = Integer.parseInt(up_down[0]);
-                        int uplink = Integer.parseInt(up_down[1]);
+
+                        try {
+                            String up_down[] = updateBpsDisplay();
+                            up_down_global = up_down;
+                            int downlink = Integer.parseInt(up_down[0]);
+                            int uplink = Integer.parseInt(up_down[1]);
 //              Configure upload value range colors
-                        speedometerup.setLabelTextSize(10);
-                        speedometerup.setMaxSpeed(500);
-                        speedometerup.setMajorTickStep(25);
-                        speedometerup.addColoredRange(0, 25, Color.RED);
-                        speedometerup.addColoredRange(25, 100, Color.YELLOW);
-                        speedometerup.addColoredRange(100, 500, Color.GREEN);
+                            speedometerup.setLabelTextSize(10);
+                            speedometerup.setMaxSpeed(500);
+                            speedometerup.setMajorTickStep(25);
+                            speedometerup.addColoredRange(0, 25, Color.RED);
+                            speedometerup.addColoredRange(25, 100, Color.YELLOW);
+                            speedometerup.addColoredRange(100, 500, Color.GREEN);
 //                        Set the uplink value
-                        speedometerup.setSpeed(uplink);
+                            speedometerup.setSpeed(uplink);
 
 //                      Download Starts here
 //                      Configure download value range colors
-                        speedometerdown.setLabelTextSize(10);
-                        speedometerdown.setMaxSpeed(500);
-                        speedometerdown.setMajorTickStep(25);
-                        speedometerdown.addColoredRange(0, 25, Color.RED);
-                        speedometerdown.addColoredRange(25, 100, Color.YELLOW);
-                        speedometerdown.addColoredRange(100, 500, Color.GREEN);
+                            speedometerdown.setLabelTextSize(10);
+                            speedometerdown.setMaxSpeed(500);
+                            speedometerdown.setMajorTickStep(25);
+                            speedometerdown.addColoredRange(0, 25, Color.RED);
+                            speedometerdown.addColoredRange(25, 100, Color.YELLOW);
+                            speedometerdown.addColoredRange(100, 500, Color.GREEN);
 //                        Set the downlink value
-                        speedometerdown.setSpeed(downlink);
+                            speedometerdown.setSpeed(downlink);
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+
 //
                         handler_link.postDelayed(this, 1000);
                     }
