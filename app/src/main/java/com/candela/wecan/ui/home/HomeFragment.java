@@ -64,6 +64,7 @@ import com.candela.wecan.databinding.FragmentHomeBinding;
 import com.candela.wecan.tests.base_tools.CardUtils;
 import com.candela.wecan.tests.base_tools.GetPhoneWifiInfo;
 import com.cardiomood.android.controls.gauge.SpeedometerGauge;
+import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONObject;
 
@@ -90,7 +91,7 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
     private static final String FILE_NAME = "data.conf";
-    private TextView ip_show, link_speed;
+    private TextView link_speed;
     public static Boolean live_table_flag = false, scan_table_flag = false, flag = false;
     public static HomeFragment instance = null;
     public String[] up_down_global;
@@ -130,6 +131,11 @@ public class HomeFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.R)
             @Override
             public void onChanged(@Nullable String s) {
+                NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+                View hView = navigationView.getHeaderView(0);
+                TextView nav_user = (TextView) hView.findViewById(R.id.user);
+                TextView nav_server = (TextView) hView.findViewById(R.id.server);
+                TextView nav_resource_realm = (TextView) hView.findViewById(R.id.resource_realm);
                 Button scan_btn, system_info_btn, live_btn;
                 scan_btn = getActivity().findViewById(R.id.scan_data);
                 scan_btn.setEnabled(false);
@@ -144,16 +150,15 @@ public class HomeFragment extends Fragment {
                 live_table = (TableLayout) getView().findViewById(R.id.table);
                 scan_table = (TableLayout) getView().findViewById(R.id.table);
 
-                ip_show = getView().findViewById(R.id.server_ip_info);
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
                 Map<String, ?> keys = sharedPreferences.getAll();
                 username = (String) keys.get("user_name");
-                ip_show = getView().findViewById(R.id.server_ip_info);
                 String current_ip = (String) keys.get("current-ip");
                 String current_resource = (String) keys.get("current-resource");
                 String current_realm = (String) keys.get("current-realm");
-                ip_show.setText("User-Name: " + username + "\nServer: " + current_ip
-                        + "\nRealm: " + current_realm + "\nResource: " + current_resource);
+                nav_user.setText("User: " + username);
+                nav_server.setText("Server: "+ current_ip);
+                nav_resource_realm.setText("Realm: "+ current_realm + "\nResource: " + current_resource);
 
 //                LINK SPEED UP/DOWN
                 link_speed = getView().findViewById(R.id.link_speed);
