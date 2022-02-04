@@ -106,7 +106,7 @@ public class HomeFragment extends Fragment {
     ViewGroup view_group;
     private LifecycleOwner view_owner;
     private View view;
-
+    public Runnable runnable_live;
     public String getUserName() {
         return username;
     }
@@ -313,12 +313,13 @@ public class HomeFragment extends Fragment {
                         handler.post(save_data);
                     }
                 });
+                Handler handler_live_data = new Handler();
 
 //              Getting System Information
                 system_info_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        saved_instance = savedInstanceState;
+                        handler_live_data.removeCallbacks(runnable_live);
                         live_table_flag = false;
                         scan_table_flag = false;
                         sys_table.removeAllViews();
@@ -465,8 +466,8 @@ public class HomeFragment extends Fragment {
                     public void onClick(View v) {
                         live_table_flag = true;
                         scan_table_flag = false;
-                        Handler handler = new Handler();
-                        final Runnable r = new Runnable() {
+
+                        runnable_live = new Runnable() {
                             @Override
                             public void run() {
 //                                LocationManager locationManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
@@ -485,8 +486,6 @@ public class HomeFragment extends Fragment {
 //                                    }
 //                                };
 //                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-
                                 live_table.removeAllViews();
                                 LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
                                 if (getActivity() != null) {
@@ -513,7 +512,7 @@ public class HomeFragment extends Fragment {
                                     String dns2 = Formatter.formatIpAddress(Dhcp_details.dns2);
                                     String serverAddress = Formatter.formatIpAddress(Dhcp_details.serverAddress);
                                     String gateway = Formatter.formatIpAddress(Dhcp_details.gateway);
-                                    String netmask = Formatter.formatIpAddress(Dhcp_details.netmask);
+//                                    String netmask = Formatter.formatIpAddress(Dhcp_details.netmask);
                                     int leaseDuration = Dhcp_details.leaseDuration;
 //                                String describeContents = Formatter.formatIpAddress(Dhcp_details.describeContents());
 
@@ -533,7 +532,7 @@ public class HomeFragment extends Fragment {
                                     live_data.put("DNS2", dns2);
                                     live_data.put("DHCP Server", serverAddress);
                                     live_data.put("Gateway", gateway);
-                                    live_data.put("Netmask", netmask);
+//                                    live_data.put("Netmask", netmask);
                                     live_data.put("LeaseDuration", String.valueOf(leaseDuration) + " Sec");
 
 //                                Table Heading
@@ -588,18 +587,18 @@ public class HomeFragment extends Fragment {
                                         i = i + 1;
                                     }
                                     if (live_table_flag == true) {
-                                        handler.postDelayed(this, 1000);
+                                        handler_live_data.postDelayed(this, 1000);
                                     } else {
-                                        handler.removeCallbacks(this);
+                                        handler_live_data.removeCallbacks(this);
                                     }
                                 }
                             }
                         };
-                        handler.post(r);
+                        handler_live_data.post(runnable_live);
                     }
                 });
 
-//              Perform Click on System Info
+//              Perform Click on LiveData
                 live_btn.performClick();
 
 //              Scanning Nearest Wi-Fi
