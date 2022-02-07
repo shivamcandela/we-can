@@ -363,7 +363,7 @@ public class HomeFragment extends Fragment {
                         system_info.put("HARDWARE", Build.HARDWARE);
                         system_info.put("HOST", Build.HOST);
                         system_info.put("ID", Build.ID);
-                        system_info.put("PHONE IP", Formatter.formatIpAddress(wifiinfo.getIpAddress()));
+//                        system_info.put("PHONE IP", Formatter.formatIpAddress(wifiinfo.getIpAddress()));
 
                         Boolean AC_11 = null;
                         Boolean AX_11 = null;
