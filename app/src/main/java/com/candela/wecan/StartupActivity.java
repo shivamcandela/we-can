@@ -50,7 +50,7 @@ public class StartupActivity extends AppCompatActivity {
     static int state;
     private String ssid, passwd;
     public Context context;
-    protected LF_Resource lf_resource = null;
+    protected static LF_Resource lf_resource = null;
     public View my_view = null;
     SharedPreferences sharedpreferences = null;
 
