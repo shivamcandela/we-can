@@ -2,20 +2,34 @@ package com.candela.wecan;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.candela.wecan.tests.base_tools.CardUtils;
 import com.candela.wecan.tests.base_tools.LF_Resource;
+import com.candela.wecan.tests.base_tools.file_handler;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.Permission;
 import java.util.Map;
 
 //import candela.lfresource.lfresource;
@@ -36,7 +50,7 @@ public class StartupActivity extends AppCompatActivity {
     static int state;
     private String ssid, passwd;
     public Context context;
-    public static LF_Resource lf_resource = null;
+    protected LF_Resource lf_resource = null;
     public View my_view = null;
     SharedPreferences sharedpreferences = null;
 
@@ -75,32 +89,37 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (keys.keySet().contains(server_ip.getText().toString())){
-                    Map<String,?> keys = sharedpreferences.getAll();
-                    String ip = server_ip.getText().toString();
-                    String realm_id = (String) keys.get("realm-" + ip);
-                    String resource_id = (String) keys.get("resource-" + ip);
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putString("user_name" ,  u_name.getText().toString());
-                    editor.putString("test_name" ,  test_name_tv.getText().toString());
-                    editor.apply();
-                    editor.commit();
-                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
-                }
-                else{
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putString(server_ip.getText().toString(), "-1");
-                    editor.putString("resource-" + server_ip.getText().toString(), "-1");
-                    editor.putString("realm-" + server_ip.getText().toString(), "-1");
-                    editor.putString("user_name" ,  u_name.getText().toString());
-                    editor.putString("test_name" ,  test_name_tv.getText().toString());
-                    editor.apply();
-                    editor.commit();
-                    Map<String,?> keys = sharedpreferences.getAll();
-                    String ip = server_ip.getText().toString();
-                    String realm_id = (String) keys.get("realm-" + ip);
-                    String resource_id = (String) keys.get("resource-" + ip);
-                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
+                if (u_name.getText().toString().length() < 4 || test_name_tv.getText().toString().length() < 4) {
+                    Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+
+                    if (keys.keySet().contains(server_ip.getText().toString())) {
+                        Map<String, ?> keys = sharedpreferences.getAll();
+                        String ip = server_ip.getText().toString();
+                        String realm_id = (String) keys.get("realm-" + ip);
+                        String resource_id = (String) keys.get("resource-" + ip);
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putString("user_name", u_name.getText().toString());
+                        editor.putString("test_name", test_name_tv.getText().toString());
+                        editor.apply();
+                        editor.commit();
+                        connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
+                    } else {
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putString(server_ip.getText().toString(), "-1");
+                        editor.putString("resource-" + server_ip.getText().toString(), "-1");
+                        editor.putString("realm-" + server_ip.getText().toString(), "-1");
+                        editor.putString("user_name", u_name.getText().toString());
+                        editor.putString("test_name", test_name_tv.getText().toString());
+                        editor.apply();
+                        editor.commit();
+                        Map<String, ?> keys = sharedpreferences.getAll();
+                        String ip = server_ip.getText().toString();
+                        String realm_id = (String) keys.get("realm-" + ip);
+                        String resource_id = (String) keys.get("resource-" + ip);
+                        connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
+                    }
                 }
             }
         });
