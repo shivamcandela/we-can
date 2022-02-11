@@ -136,11 +136,12 @@ public class HomeFragment extends Fragment {
                 TextView nav_user = (TextView) hView.findViewById(R.id.user);
                 TextView nav_server = (TextView) hView.findViewById(R.id.server);
                 TextView nav_resource_realm = (TextView) hView.findViewById(R.id.resource_realm);
-                Button scan_btn, system_info_btn, live_btn;
+                Button scan_btn, system_info_btn, live_btn, speedometer_btn;
                 scan_btn = getActivity().findViewById(R.id.scan_data);
                 scan_btn.setEnabled(false);
                 system_info_btn = getActivity().findViewById(R.id.system_info_btn);
                 live_btn = getActivity().findViewById(R.id.rxtx_btn);
+                speedometer_btn = getActivity().findViewById(R.id.speedometer);
                 ImageView share_btn = getActivity().findViewById(R.id.share_btn);
 //                SWITCH BUTTON TO SAVE DATA....
                 Switch switch_btn;
@@ -338,6 +339,10 @@ public class HomeFragment extends Fragment {
                         live_table_flag = false;
                         scan_table_flag = false;
                         sys_table.removeAllViews();
+                        system_info_btn.setTextColor(Color.GREEN);
+                        live_btn.setTextColor(Color.WHITE);
+                        scan_btn.setTextColor(Color.WHITE);
+                        speedometer_btn.setTextColor(Color.WHITE);
                         Vector<StringKeyVal> wifi_capabilities = new Vector<StringKeyVal>();
                         Vector<StringKeyVal> wifi_mode = new Vector<StringKeyVal>();
                         Vector<StringKeyVal> wifi_encryption = new Vector<StringKeyVal>();
@@ -502,6 +507,10 @@ public class HomeFragment extends Fragment {
 //                                };
 //                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                                 live_table.removeAllViews();
+                                system_info_btn.setTextColor(Color.WHITE);
+                                live_btn.setTextColor(Color.GREEN);
+                                scan_btn.setTextColor(Color.WHITE);
+                                speedometer_btn.setTextColor(Color.WHITE);
                                 LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
                                 if (getActivity() != null) {
                                     WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -616,13 +625,29 @@ public class HomeFragment extends Fragment {
 //              Perform Click on LiveData
                 live_btn.performClick();
 
+//              Speedometer Click Button
+                speedometer_btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        handler_live_data.removeCallbacks(runnable_live);
+                        scan_table_flag = true;
+                        live_table_flag = false;
+                        system_info_btn.setTextColor(Color.WHITE);
+                        live_btn.setTextColor(Color.WHITE);
+                        scan_btn.setTextColor(Color.WHITE);
+                        speedometer_btn.setTextColor(Color.GREEN);
+                    }
+                });
 //              Scanning Nearest Wi-Fi
                 scan_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         scan_table_flag = true;
                         live_table_flag = false;
-
+                        system_info_btn.setTextColor(Color.WHITE);
+                        live_btn.setTextColor(Color.WHITE);
+                        scan_btn.setTextColor(Color.GREEN);
+                        speedometer_btn.setTextColor(Color.WHITE);
                         // Do initial update from any saved scan results.
                         _scanCompleted(true);
 
