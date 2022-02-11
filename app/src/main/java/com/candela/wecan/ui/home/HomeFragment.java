@@ -40,6 +40,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -136,6 +137,7 @@ public class HomeFragment extends Fragment {
                 TextView nav_user = (TextView) hView.findViewById(R.id.user);
                 TextView nav_server = (TextView) hView.findViewById(R.id.server);
                 TextView nav_resource_realm = (TextView) hView.findViewById(R.id.resource_realm);
+                LinearLayout speedometer_linear,up_down;
                 Button scan_btn, system_info_btn, live_btn, speedometer_btn;
                 scan_btn = getActivity().findViewById(R.id.scan_data);
                 scan_btn.setEnabled(false);
@@ -143,6 +145,8 @@ public class HomeFragment extends Fragment {
                 live_btn = getActivity().findViewById(R.id.rxtx_btn);
                 speedometer_btn = getActivity().findViewById(R.id.speedometer);
                 ImageView share_btn = getActivity().findViewById(R.id.share_btn);
+                speedometer_linear = getActivity().findViewById(R.id.speedometer_linear);
+                up_down = getActivity().findViewById(R.id.up_down);
 //                SWITCH BUTTON TO SAVE DATA....
                 Switch switch_btn;
                 switch_btn = getActivity().findViewById(R.id.save_data_switch);
@@ -167,62 +171,10 @@ public class HomeFragment extends Fragment {
                 last_bps_time = System.currentTimeMillis();
                 last_tx_bytes = TrafficStats.getTotalTxBytes();
                 last_rx_bytes = TrafficStats.getTotalRxBytes();
+                speedometer_linear.setVisibility(View.GONE);
+                up_down.setVisibility(View.GONE);
 
-                SpeedometerGauge speedometerdown = (SpeedometerGauge) getActivity().findViewById(R.id.speedometerdown);
-                speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-                    @Override
-                    public String getLabelFor(double progress, double maxProgress) {
-                        return String.valueOf((int) Math.round(progress));
-                    }
-                });
 
-                SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
-                speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-                    @Override
-                    public String getLabelFor(double progress, double maxProgress) {
-                        return String.valueOf((int) Math.round(progress));
-                    }
-                });
-                handler_link = new Handler();
-                runnable_link = new Runnable() {
-                    @Override
-                    public void run() {
-
-                        try {
-                            String up_down[] = updateBpsDisplay();
-                            up_down_global = up_down;
-                            int downlink = Integer.parseInt(up_down[0]);
-                            int uplink = Integer.parseInt(up_down[1]);
-//              Configure upload value range colors
-                            speedometerup.setLabelTextSize(10);
-                            speedometerup.setMaxSpeed(500);
-                            speedometerup.setMajorTickStep(25);
-                            speedometerup.addColoredRange(0, 25, Color.RED);
-                            speedometerup.addColoredRange(25, 100, Color.YELLOW);
-                            speedometerup.addColoredRange(100, 500, Color.GREEN);
-//                        Set the uplink value
-                            speedometerup.setSpeed(uplink);
-
-//                      Download Starts here
-//                      Configure download value range colors
-                            speedometerdown.setLabelTextSize(10);
-                            speedometerdown.setMaxSpeed(500);
-                            speedometerdown.setMajorTickStep(25);
-                            speedometerdown.addColoredRange(0, 25, Color.RED);
-                            speedometerdown.addColoredRange(25, 100, Color.YELLOW);
-                            speedometerdown.addColoredRange(100, 500, Color.GREEN);
-//                        Set the downlink value
-                            speedometerdown.setSpeed(downlink);
-                        }
-                        catch(Exception e){
-                            e.printStackTrace();
-                        }
-
-//
-                        handler_link.postDelayed(this, 1000);
-                    }
-                };
-                handler_link.post(runnable_link);
 
 //              Share Data Button
                 share_btn.setOnClickListener(new View.OnClickListener() {
@@ -338,6 +290,8 @@ public class HomeFragment extends Fragment {
                         handler_live_data.removeCallbacks(runnable_live);
                         live_table_flag = false;
                         scan_table_flag = false;
+                        speedometer_linear.setVisibility(View.GONE);
+                        up_down.setVisibility(View.GONE);
                         sys_table.removeAllViews();
                         system_info_btn.setTextColor(Color.GREEN);
                         live_btn.setTextColor(Color.WHITE);
@@ -486,6 +440,8 @@ public class HomeFragment extends Fragment {
                     public void onClick(View v) {
                         live_table_flag = true;
                         scan_table_flag = false;
+                        speedometer_linear.setVisibility(View.GONE);
+                        up_down.setVisibility(View.GONE);
 
                         runnable_live = new Runnable() {
                             @Override
@@ -630,12 +586,71 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         handler_live_data.removeCallbacks(runnable_live);
+                        live_table.removeAllViews();
+                        scan_table.removeAllViews();
                         scan_table_flag = true;
                         live_table_flag = false;
                         system_info_btn.setTextColor(Color.WHITE);
                         live_btn.setTextColor(Color.WHITE);
                         scan_btn.setTextColor(Color.WHITE);
                         speedometer_btn.setTextColor(Color.GREEN);
+                        speedometer_linear.setVisibility(View.VISIBLE);
+                        up_down.setVisibility(View.VISIBLE);
+                        SpeedometerGauge speedometerdown = (SpeedometerGauge) getActivity().findViewById(R.id.speedometerdown);
+                        speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+                            @Override
+                            public String getLabelFor(double progress, double maxProgress) {
+                                return String.valueOf((int) Math.round(progress));
+                            }
+                        });
+
+                        SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
+                        speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+                            @Override
+                            public String getLabelFor(double progress, double maxProgress) {
+                                return String.valueOf((int) Math.round(progress));
+                            }
+                        });
+                        handler_link = new Handler();
+                        runnable_link = new Runnable() {
+                            @Override
+                            public void run() {
+
+                                try {
+                                    String up_down[] = updateBpsDisplay();
+                                    up_down_global = up_down;
+                                    int downlink = Integer.parseInt(up_down[0]);
+                                    int uplink = Integer.parseInt(up_down[1]);
+//              Configure upload value range colors
+                                    speedometerup.setLabelTextSize(10);
+                                    speedometerup.setMaxSpeed(500);
+                                    speedometerup.setMajorTickStep(25);
+                                    speedometerup.addColoredRange(0, 25, Color.RED);
+                                    speedometerup.addColoredRange(25, 100, Color.YELLOW);
+                                    speedometerup.addColoredRange(100, 500, Color.GREEN);
+//                        Set the uplink value
+                                    speedometerup.setSpeed(uplink);
+
+//                      Download Starts here
+//                      Configure download value range colors
+                                    speedometerdown.setLabelTextSize(10);
+                                    speedometerdown.setMaxSpeed(500);
+                                    speedometerdown.setMajorTickStep(25);
+                                    speedometerdown.addColoredRange(0, 25, Color.RED);
+                                    speedometerdown.addColoredRange(25, 100, Color.YELLOW);
+                                    speedometerdown.addColoredRange(100, 500, Color.GREEN);
+//                        Set the downlink value
+                                    speedometerdown.setSpeed(downlink);
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+
+//
+                                handler_link.postDelayed(this, 1000);
+                            }
+                        };
+                        handler_link.post(runnable_link);
                     }
                 });
 //              Scanning Nearest Wi-Fi
