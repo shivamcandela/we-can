@@ -87,8 +87,9 @@ public class navigation extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         HomeFragment.handler_link.removeCallbacks(HomeFragment.runnable_link);
                         StartupActivity.lf_resource.lfresource.destroy();
-                        Intent myIntent = new Intent(getApplicationContext(), StartupActivity.class);
-                        startActivity(myIntent);
+//                        Intent myIntent = new Intent(getApplicationContext(), StartupActivity.class);
+//                        startActivity(myIntent);
+                        finish();
                     }
                 }).setNegativeButton("No", null).show();
     }
