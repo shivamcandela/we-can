@@ -5,12 +5,37 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.NETWORK_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-feature android:name="android.hardware.wifi" />
+
+    <uses-permission android:name="android.permission.NETWORK_MANAGED_PROVISIONING" />
+    <!--    <uses-permission android:name="android.permission.WAKE_LOCK" />-->
+
+    <permission android:name="android.permission.OVERRIDE_WIFI_CONFIG"
+        android:protectionLevel="signature" />
+    <permission android:name="android.permission.READ_WIFI_CREDENTIAL"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="android.permission.RECEIVE_WIFI_CREDENTIAL_CHANGE"
+        android:protectionLevel="signature|privileged" />
+
+    <permission android:name="android.permission.SCORE_NETWORKS"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="android.permission.REQUEST_NETWORK_SCORES"
+        android:protectionLevel="signature|setup" />
+    <permission android:name="android.permission.RESTART_WIFI_SUBSYSTEM"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="android.permission.NETWORK_STACK"
+        android:protectionLevel="signature" />
+    <permission android:name="android.permission.OBSERVE_NETWORK_POLICY"
+        android:protectionLevel="signature" />
+    <permission android:name="android.permission.NETWORK_STATS_PROVIDER"
+        android:protectionLevel="signature" />
     <uses-permission
         android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
@@ -23,8 +48,12 @@
     <uses-permission
         android:name="android.permission.LOCAL_MAC_ADDRESS"
         tools:ignore="ProtectedPermissions" />
-<!--    <uses-native-library-->
-<!--        android:name="WifiScoreReport" />-->
+    <permission android:name="android.permission.NETWORK_SETTINGS"
+        android:protectionLevel="signature" />
+    ?
+
+    <!--    <uses-native-library-->
+    <!--        android:name="WifiScoreReport" />-->
 
     <application
         android:allowBackup="true"
