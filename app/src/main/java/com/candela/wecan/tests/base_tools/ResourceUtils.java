@@ -550,10 +550,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                 "cx_time" : "" // in ms
             }
          */
-        System.out.println("Ironman: " + configureWifi.cc_data.get(0).split("-:-")[0]);
-        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
-        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
-        System.out.println("IronSpider: " + timestamp.toString());
+//        System.out.println("Ironman: " + configureWifi.cc_data.get(0).split("-:-")[0]);
+//        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
+//        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
+//        System.out.println("IronSpider: " + timestamp.toString());
         return null;
     }
 }
