@@ -1,705 +1,330 @@
 package com.candela.wecan.ui.home;
 
-import static android.net.wifi.WifiConfiguration.*;
-import static android.view.KeyEvent.KEYCODE_BACK;
-
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.net.DhcpInfo;
 import android.net.TrafficStats;
-import android.net.Uri;
 import android.net.wifi.ScanResult;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.hotspot2.PasspointConfiguration;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
-import android.provider.Settings;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import android.content.Context;
-import android.widget.Toast;
 
 import com.candela.wecan.R;
-import com.candela.wecan.StartupActivity;
+import com.candela.wecan.dashboard.LinkSpeedThread;
+import com.candela.wecan.dashboard.LiveData;
+import com.candela.wecan.dashboard.Speedometer;
 import com.candela.wecan.databinding.FragmentHomeBinding;
-import com.candela.wecan.tests.base_tools.CardUtils;
-import com.candela.wecan.tests.base_tools.GetPhoneWifiInfo;
+import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.cardiomood.android.controls.gauge.SpeedometerGauge;
 import com.google.android.material.navigation.NavigationView;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
-import candela.lfresource.StringKeyVal;
 import candela.lfresource.LANforgeMgr;
 
 public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
-    private static final String FILE_NAME = "data.conf";
-    private TextView link_speed;
+//    private static final String FILE_NAME = "data.conf";
+    public static TextView link_speed;
     public static Boolean live_table_flag = false, scan_table_flag = false, flag = false;
     public static HomeFragment instance = null;
-    public String[] up_down_global;
-    TableLayout sys_table = null;
-    TableLayout live_table = null;
-    TableLayout scan_table = null;
+//    public String[] up_down_global;
+    public static TableLayout sys_table = null;
+    public static TableLayout live_table = null;
+    public static TableLayout scan_table = null;
     public static Bundle saved_instance;
-    long last_bps_time = 0;
-    long last_rx_bytes = 0;
-    long last_tx_bytes = 0;
+    public static long last_bps_time = 0;
+    public static long last_rx_bytes = 0;
+    public static long last_tx_bytes = 0;
     String username = "";
     LayoutInflater layout_inflator;
     ViewGroup view_group;
     private LifecycleOwner view_owner;
     private View view;
-    public Runnable runnable_live;
+    public static Runnable runnable_live;
     public static Handler handler_link;
     public static Runnable runnable_link;
+    public static Runnable runnable_speedometer;
+    public static Handler handler_speedometer_thread;
 
+    public static Activity home_fragment_activity;
+    public static Handler handler_live_data;
+    public static LinearLayout speedometer_linear,up_down;
+    public static Button scan_btn, system_info_btn, live_btn, speedometer_btn;
+    private ImageView share_btn;
+    private Switch switch_btn;
+    public static View hView;
+    TextView nav_user;
+    TextView nav_server;
+    TextView nav_resource_realm;
+    private NavigationView navigationView;
+    private onFragmentBtnSelected listener;
+    public static SpeedometerGauge speedometerup;
+    public static SpeedometerGauge speedometerdown;
     public String getUserName() {
         return username;
     }
+    private HomeTableManager homeTableManager;
+    public static String[] up_down_data;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        instance = this;
-        saved_instance = savedInstanceState;
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        layout_inflator = inflater;
-        view_group = container;
-        view_owner = getViewLifecycleOwner();
-        view = getView();
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-//        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(view_owner, new Observer<String>() {
-            @SuppressLint({"MissingPermission", "NewApi"})
-            @RequiresApi(api = Build.VERSION_CODES.R)
-            @Override
-            public void onChanged(@Nullable String s) {
-                NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-                View hView = navigationView.getHeaderView(0);
-                TextView nav_user = (TextView) hView.findViewById(R.id.user);
-                TextView nav_server = (TextView) hView.findViewById(R.id.server);
-                TextView nav_resource_realm = (TextView) hView.findViewById(R.id.resource_realm);
-                LinearLayout speedometer_linear,up_down;
-                Button scan_btn, system_info_btn, live_btn, speedometer_btn;
-                scan_btn = getActivity().findViewById(R.id.scan_data);
-                scan_btn.setEnabled(false);
-                system_info_btn = getActivity().findViewById(R.id.system_info_btn);
-                live_btn = getActivity().findViewById(R.id.rxtx_btn);
-                speedometer_btn = getActivity().findViewById(R.id.speedometer);
-                ImageView share_btn = getActivity().findViewById(R.id.share_btn);
-                speedometer_linear = getActivity().findViewById(R.id.speedometer_linear);
-                up_down = getActivity().findViewById(R.id.up_down);
-//                SWITCH BUTTON TO SAVE DATA....
-                Switch switch_btn;
-                switch_btn = getActivity().findViewById(R.id.save_data_switch);
-//                TABLE LAYOUT FOR SHOWING TABLE DATA...
-                sys_table = (TableLayout) getView().findViewById(R.id.table);
-                live_table = (TableLayout) getView().findViewById(R.id.table);
-                scan_table = (TableLayout) getView().findViewById(R.id.table);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        handler_live_data = new Handler();
+        handler_link = new Handler();
+        handler_speedometer_thread = new Handler();
 
-                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
-                Map<String, ?> keys = sharedPreferences.getAll();
-                username = (String) keys.get("user_name");
-                String current_ip = (String) keys.get("current-ip");
-                String current_resource = (String) keys.get("current-resource");
-                String current_realm = (String) keys.get("current-realm");
-                nav_user.setText("User: " + username);
-                nav_server.setText("Server: "+ current_ip);
-                nav_resource_realm.setText("Realm: "+ current_realm + "\nResource: " + current_resource);
+        runnable_live = new LiveData();
+        runnable_speedometer =  new Speedometer();
+        runnable_link = new LinkSpeedThread();
 
-//                LINK SPEED UP/DOWN
-                link_speed = getView().findViewById(R.id.link_speed);
-
-                last_bps_time = System.currentTimeMillis();
-                last_tx_bytes = TrafficStats.getTotalTxBytes();
-                last_rx_bytes = TrafficStats.getTotalRxBytes();
-                speedometer_linear.setVisibility(View.GONE);
-                up_down.setVisibility(View.GONE);
+        home_fragment_activity = this.getActivity();
+        navigationView = view.findViewById(R.id.nav_view);
+        scan_btn = view.findViewById(R.id.scan_data);
+        system_info_btn = view.findViewById(R.id.system_info_btn);
+        live_btn = view.findViewById(R.id.rxtx_btn);
+        speedometer_btn = view.findViewById(R.id.speedometer);
+        share_btn = view.findViewById(R.id.share_btn);
+        speedometer_linear = view.findViewById(R.id.speedometer_linear);
+        up_down = view.findViewById(R.id.up_down);
+        switch_btn = view.findViewById(R.id.save_data_switch);
+        link_speed = view.findViewById(R.id.link_speed);
+        sys_table = view.findViewById(R.id.table);
+        live_table = view.findViewById(R.id.table);
+        scan_table = view.findViewById(R.id.table);
+        speedometerup = view.findViewById(R.id.speedometerup);
+        speedometerdown = view.findViewById(R.id.speedometerdown);
 
 
+        last_bps_time = System.currentTimeMillis();
+        last_tx_bytes = TrafficStats.getTotalTxBytes();
+        last_rx_bytes = TrafficStats.getTotalRxBytes();
+        speedometer_linear.setVisibility(View.GONE);
+        up_down.setVisibility(View.GONE);
+        homeTableManager = new HomeTableManager();
+        share_btn.setOnClickListener(homeTableManager);
+        switch_btn.setOnClickListener(homeTableManager);
 
-//              Share Data Button
-                share_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                        sharingIntent.setType("*/*");
-                        File dataDirectory = new File(Environment.getExternalStorageDirectory() + "/WE-CAN/LiveData/LiveData.csv");
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "WE-CAN Live Data Sharing");
-                        Uri uri;
-                        if (Build.VERSION.SDK_INT < 24) {
-                            uri = Uri.fromFile(dataDirectory);
-                        } else {
-                            uri = Uri.parse(dataDirectory.getPath());
-                        }
-//                        Uri uri = Uri.fromFile(dataDirectory);
-//                        Uri uri1 = Uri.parse(dataDirectory.getPath());;
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_STREAM, uri);
-                        startActivity(Intent.createChooser(sharingIntent, null));
-                    }
-                });
+        live_btn.setOnClickListener(homeTableManager);
 
-//              Save Data to csv
-                switch_btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        scan_btn.setOnClickListener(homeTableManager);
+        switch_btn.setOnCheckedChangeListener(homeTableManager);
 
-                        Handler handler = new Handler();
-                        final Runnable save_data = new Runnable() {
-                            @Override
-                            public void run() {
-                                saved_instance = savedInstanceState;
-                                flag = switch_btn.isChecked();
-//                                    Data Saving in csv format
-                                try {
-                                    WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                    WifiInfo wifiinfo = wifiManager.getConnectionInfo();
-                                    String IP = Formatter.formatIpAddress(wifiinfo.getIpAddress());
-                                    String SSID = wifiinfo.getSSID();
-                                    String BSSID = wifiinfo.getBSSID();
-                                    int Rssi = wifiinfo.getRssi();
-                                    String LinkSpeed = wifiinfo.getLinkSpeed() + " Mbps";
-                                    String channel = wifiinfo.getFrequency() + " MHz";
-                                    long availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                                    long totalMem = Runtime.getRuntime().totalMemory();
-                                    long usedMem = totalMem - availMem;
-                                    String uplink = up_down_global[2];
-                                    String downlink = up_down_global[3];
-                                    String cpu_used_percent = String.format("%.2f", (usedMem / (double) totalMem) * 100);
-                                    String currentDateTimeString = java.text.DateFormat.getDateTimeInstance().format(new Date());
-                                    String livedata = currentDateTimeString + "," + IP + "," + SSID + "," + BSSID + "," + Rssi
-                                            + "," + LinkSpeed + "," + uplink + "," + downlink + "," + channel + "," + cpu_used_percent + "\n";
-
-                                    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||
-                                            Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState())) {
-                                        //                                  Getting file as Test Name
-                                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
-                                        Map<String, ?> keys = sharedPreferences.getAll();
-                                        String test_name = (String) keys.get("test_name");
-                                        File appDirectory = new File(String.valueOf(Environment.getExternalStorageDirectory()) + "/WE-CAN");
-                                        File logDirectory = new File(appDirectory + "/LiveData/");
-                                        File logFile = new File(logDirectory, test_name + ".csv");
-                                        File file = new File(String.valueOf(logFile));
-                                        if (!logDirectory.exists()) {
-                                            logDirectory.mkdirs();
-                                            System.out.println("logDirectory:  " + logDirectory);
-                                        }
-                                        if (file.exists()) {
-                                            try {
-                                                FileOutputStream stream = new FileOutputStream(logFile, true);
-                                                stream.write(livedata.getBytes());
-                                                stream.close();
-                                            } catch (FileNotFoundException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        } else {
-                                            FileOutputStream stream;
-                                            try {
-                                                stream = new FileOutputStream(logFile);
-                                                stream.write("Date/Time,IP,SSID,BSSID,signal,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
-                                                stream.close();
-                                            } catch (FileNotFoundException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                    //Calling Runable at time interval
-                                }
-                                catch (Exception e){
-                                    System.out.println(e);
-                                }
-
-                                if (flag) {
-                                    handler.postDelayed(this, 1000);
-                                } else {
-                                    handler.removeCallbacks(this);
-                                }
-                            }
-                        };
-                        handler.post(save_data);
-                    }
-                });
-                Handler handler_live_data = new Handler();
-
-//              Getting System Information
-                system_info_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        handler_live_data.removeCallbacks(runnable_live);
-                        live_table_flag = false;
-                        scan_table_flag = false;
-                        speedometer_linear.setVisibility(View.GONE);
-                        up_down.setVisibility(View.GONE);
-                        sys_table.removeAllViews();
-                        system_info_btn.setTextColor(Color.GREEN);
-                        live_btn.setTextColor(Color.WHITE);
-                        scan_btn.setTextColor(Color.WHITE);
-                        speedometer_btn.setTextColor(Color.WHITE);
-                        Vector<StringKeyVal> wifi_capabilities = new Vector<StringKeyVal>();
-                        Vector<StringKeyVal> wifi_mode = new Vector<StringKeyVal>();
-                        Vector<StringKeyVal> wifi_encryption = new Vector<StringKeyVal>();
-
-                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("userdata", Context.MODE_PRIVATE);
-                        Map<String, ?> keys = sharedPreferences.getAll();
-                        String password = (String) keys.get("current-passwd");
-
-                        Map<String, String> system_info = new HashMap<String, String>();
-                        WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                        WifiInfo wifiinfo = wifiManager.getConnectionInfo();
-
-
-                        system_info.put("MANUFACTURER", Build.MANUFACTURER);
-                        system_info.put("MODEL", Build.MODEL);
-                        system_info.put("PRODUCT", Build.PRODUCT);
-                        system_info.put("RELEASE", Build.VERSION.RELEASE);
-                        system_info.put("INCREMENTAL", Build.VERSION.INCREMENTAL);
-                        system_info.put("SDK No.", String.valueOf(Build.VERSION.SDK_INT));
-                        system_info.put("BOARD", Build.BOARD);
-                        system_info.put("BRAND", Build.BRAND);
-                        system_info.put("CPU_ABI", Build.CPU_ABI);
-                        system_info.put("HARDWARE", Build.HARDWARE);
-                        system_info.put("HOST", Build.HOST);
-                        system_info.put("ID", Build.ID);
-//                        system_info.put("PHONE IP", Formatter.formatIpAddress(wifiinfo.getIpAddress()));
-
-                        Boolean AC_11 = null;
-                        Boolean AX_11 = null;
-                        Boolean N_11 = null;
-                        Boolean legacy = null;
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            AC_11 = wifiManager.isWifiStandardSupported(ScanResult
-                                    .WIFI_STANDARD_11AC);
-                        } else {
-                            AC_11 = false;
-                        }
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            AX_11 = wifiManager.isWifiStandardSupported(ScanResult
-                                    .WIFI_STANDARD_11AX);
-                        } else {
-                            AX_11 = false;
-                        }
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            N_11 = wifiManager.isWifiStandardSupported(ScanResult
-                                    .WIFI_STANDARD_11N);
-                        } else {
-                            N_11 = false;
-                        }
-
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            legacy = wifiManager.isWifiStandardSupported(ScanResult
-                                    .WIFI_STANDARD_LEGACY);
-                        } else {
-                            legacy = false;
-                        }
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            wifi_capabilities.add(new StringKeyVal("5G", String.valueOf((wifiManager.is5GHzBandSupported()))));
-                        } else {
-                            wifi_capabilities.add(new StringKeyVal("5G", String.valueOf(true)));
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            wifi_capabilities.add(new StringKeyVal("6G", String.valueOf((wifiManager.is6GHzBandSupported()))));
-                        } else {
-                            wifi_capabilities.add(new StringKeyVal("6G", String.valueOf(true)));
-                        }
-
-                        if (Build.VERSION.SDK_INT >= 31) {
-                            // This was added in API 31, I guess before then 2.4 was always supported.
-                            wifi_capabilities.add(new StringKeyVal("2G", String.valueOf((wifiManager.is24GHzBandSupported())))); // This line gives an error
-                        } else {
-                            wifi_capabilities.add(new StringKeyVal("2G", String.valueOf(true)));
-                        }
-
-                        wifi_mode.add(new StringKeyVal("11-AC", String.valueOf(AC_11)));
-                        wifi_mode.add(new StringKeyVal("11-AX", String.valueOf(AX_11)));
-                        wifi_mode.add(new StringKeyVal("11-N", String.valueOf(N_11)));
-                        wifi_mode.add(new StringKeyVal("LEGACY", String.valueOf(legacy)));
-
-                        sys_table.setPadding(10, 0, 10, 0);
-                        TableRow heading = new TableRow(getActivity());
-                        heading.setBackgroundColor(Color.rgb(120, 156, 175));
-                        TextView sl_head = new TextView(getActivity());
-                        sl_head.setText(" SL. ");
-                        sl_head.setTextColor(Color.BLACK);
-                        sl_head.setGravity(Gravity.CENTER);
-                        heading.addView(sl_head);
-                        TextView key_head = new TextView(getActivity());
-                        key_head.setText(" KEY ");
-                        key_head.setTextColor(Color.BLACK);
-                        key_head.setGravity(Gravity.CENTER);
-                        heading.addView(key_head);
-                        TextView val_head = new TextView(getActivity());
-                        val_head.setText(" VALUE ");
-                        val_head.setTextColor(Color.BLACK);
-                        val_head.setGravity(Gravity.CENTER);
-                        heading.addView(val_head);
-                        sys_table.addView(heading);
-
-                        int i = 1;
-                        for (Map.Entry<String, String> entry : system_info.entrySet()) {
-                            TableRow tbrow = new TableRow(getActivity());
-                            if (i % 2 == 0) {
-                                tbrow.setBackgroundColor(Color.rgb(211, 211, 211));
-                            } else {
-                                tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
-                            }
-
-                            TextView sl_view = new TextView(getActivity());
-                            sl_view.setText(String.valueOf(i) + ".");
-                            sl_view.setTextSize(15);
-                            sl_view.setTextColor(Color.BLACK);
-                            sl_view.setGravity(Gravity.CENTER);
-                            tbrow.addView(sl_view);
-                            TextView key_view = new TextView(getActivity());
-                            key_view.setText(entry.getKey());
-                            key_view.setTextSize(15);
-                            key_view.setTextColor(Color.BLACK);
-                            key_view.setGravity(Gravity.CENTER);
-                            tbrow.addView(key_view);
-                            TextView val_view = new TextView(getActivity());
-                            val_view.setText(entry.getValue());
-                            val_view.setTextSize(15);
-                            val_view.setTextColor(Color.BLACK);
-                            val_view.setGravity(Gravity.CENTER);
-                            tbrow.addView(val_view);
-                            sys_table.addView(tbrow);
-                            i = i + 1;
-                        }
-                    }
-                });
-
-//              live Data showing continuously on click Live Data Button
-                live_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        live_table_flag = true;
-                        scan_table_flag = false;
-                        speedometer_linear.setVisibility(View.GONE);
-                        up_down.setVisibility(View.GONE);
-
-                        runnable_live = new Runnable() {
-                            @Override
-                            public void run() {
-//                                LocationManager locationManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-//                                LocationListener locationListener = new LocationListener() {
-//                                    public double latitude;
-//                                    public double longitude;
-//                                    @Override
-//                                    public void onLocationChanged(Location location) {
-//                                         TODO Auto-generated method stub
-//                                        latitude = location.getLatitude();
-//                                        longitude = location.getLongitude();
-//                                        System.out.println("latitude :" +latitude + "\nlongitude: "+longitude);
-//                                        double speed = location.getSpeed(); //spedd in meter/minute
-//                                        speed = (speed*3600)/1000;      // speed in km/minute
-//                                        System.out.println("speed in Km: "+speed);
-//                                    }
-//                                };
-//                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                                live_table.removeAllViews();
-                                system_info_btn.setTextColor(Color.WHITE);
-                                live_btn.setTextColor(Color.GREEN);
-                                scan_btn.setTextColor(Color.WHITE);
-                                speedometer_btn.setTextColor(Color.WHITE);
-                                LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-                                if (getActivity() != null) {
-                                    WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                    WifiInfo wifiinfo = wifiManager.getConnectionInfo();
-                                    String IP = null;
-                                    String SSID = null;
-                                    String BSSID = null;
-                                    int Rssi = 0;
-                                    String LinkSpeed = null;
-                                    String channel = null;
-                                    if (wifiinfo.getSupplicantState() == SupplicantState.COMPLETED) {
-                                        IP = Formatter.formatIpAddress(wifiinfo.getIpAddress());
-                                        SSID = wifiinfo.getSSID();
-                                        BSSID = wifiinfo.getBSSID();
-                                        Rssi = wifiinfo.getRssi();
-                                        LinkSpeed = wifiinfo.getLinkSpeed() + " Mbps";
-                                        if (Build.VERSION.SDK_INT >= 21) {
-                                            channel = wifiinfo.getFrequency() + " MHz";
-                                        }
-                                    }
-                                    DhcpInfo Dhcp_details = wifiManager.getDhcpInfo();
-                                    String dns1 = Formatter.formatIpAddress(Dhcp_details.dns1);
-                                    String dns2 = Formatter.formatIpAddress(Dhcp_details.dns2);
-                                    String serverAddress = Formatter.formatIpAddress(Dhcp_details.serverAddress);
-                                    String gateway = Formatter.formatIpAddress(Dhcp_details.gateway);
-//                                    String netmask = Formatter.formatIpAddress(Dhcp_details.netmask);
-                                    int leaseDuration = Dhcp_details.leaseDuration;
-//                                String describeContents = Formatter.formatIpAddress(Dhcp_details.describeContents());
-
-                                    long availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                                    long totalMem = Runtime.getRuntime().totalMemory();
-                                    long usedMem = totalMem - availMem;
-                                    String cpu_used_percent = String.format("%.2f", (usedMem / (double) totalMem) * 100);
-                                    Map<String, String> live_data = new LinkedHashMap<String, String>();
-                                    live_data.put("IP", String.valueOf(IP));
-                                    live_data.put("SSID", SSID);
-                                    live_data.put("BSSID", BSSID);
-                                    live_data.put("Signal", String.valueOf(Rssi) + " dBm");
-                                    live_data.put("LinkSpeed", LinkSpeed);
-                                    live_data.put("Channel", channel);
-                                    live_data.put("CPU util", cpu_used_percent + " %");
-                                    live_data.put("DNS1", dns1);
-                                    live_data.put("DNS2", dns2);
-                                    live_data.put("DHCP Server", serverAddress);
-                                    live_data.put("Gateway", gateway);
-//                                    live_data.put("Netmask", netmask);
-                                    live_data.put("LeaseDuration", String.valueOf(leaseDuration) + " Sec");
-
-//                                Table Heading
-                                    live_table.setPadding(10, 0, 10, 0);
-                                    TableRow heading = new TableRow(getActivity());
-                                    heading.setBackgroundColor(Color.rgb(120, 156, 175));
-                                    TextView sl_head = new TextView(getActivity());
-                                    sl_head.setText(" SL. ");
-                                    sl_head.setTextColor(Color.BLACK);
-                                    sl_head.setGravity(Gravity.CENTER);
-                                    heading.addView(sl_head);
-                                    TextView key_head = new TextView(getActivity());
-                                    key_head.setText(" KEY ");
-                                    key_head.setTextColor(Color.BLACK);
-                                    key_head.setGravity(Gravity.CENTER);
-                                    heading.addView(key_head);
-                                    TextView val_head = new TextView(getActivity());
-                                    val_head.setText(" VALUE ");
-                                    val_head.setTextColor(Color.BLACK);
-                                    val_head.setGravity(Gravity.CENTER);
-                                    heading.addView(val_head);
-                                    live_table.addView(heading);
-
-                                    int i = 1;
-                                    for (Map.Entry<String, String> entry : live_data.entrySet()) {
-                                        TableRow tbrow = new TableRow(getActivity());
-                                        if (i % 2 == 0) {
-                                            tbrow.setBackgroundColor(Color.rgb(211, 211, 211));
-                                        } else {
-                                            tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
-                                        }
-
-                                        TextView sl_view = new TextView(getActivity());
-                                        sl_view.setText(String.valueOf(i) + ".");
-                                        sl_view.setTextSize(15);
-                                        sl_view.setTextColor(Color.BLACK);
-                                        sl_view.setGravity(Gravity.CENTER);
-                                        tbrow.addView(sl_view);
-                                        TextView key_view = new TextView(getActivity());
-                                        key_view.setText(entry.getKey());
-                                        key_view.setTextSize(15);
-                                        key_view.setTextColor(Color.BLACK);
-                                        key_view.setGravity(Gravity.CENTER);
-                                        tbrow.addView(key_view);
-                                        TextView val_view = new TextView(getActivity());
-                                        val_view.setText(entry.getValue());
-                                        val_view.setTextSize(15);
-                                        val_view.setTextColor(Color.BLACK);
-                                        val_view.setGravity(Gravity.CENTER);
-                                        tbrow.addView(val_view);
-                                        live_table.addView(tbrow);
-                                        i = i + 1;
-                                    }
-                                    if (live_table_flag == true) {
-                                        handler_live_data.postDelayed(this, 1000);
-                                    } else {
-                                        handler_live_data.removeCallbacks(this);
-                                    }
-                                }
-                            }
-                        };
-                        handler_live_data.post(runnable_live);
-                    }
-                });
-
-//              Perform Click on LiveData
-                live_btn.performClick();
-
-//              Speedometer Click Button
-                speedometer_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        handler_live_data.removeCallbacks(runnable_live);
-                        live_table.removeAllViews();
-                        scan_table.removeAllViews();
-                        scan_table_flag = true;
-                        live_table_flag = false;
-                        system_info_btn.setTextColor(Color.WHITE);
-                        live_btn.setTextColor(Color.WHITE);
-                        scan_btn.setTextColor(Color.WHITE);
-                        speedometer_btn.setTextColor(Color.GREEN);
-                        speedometer_linear.setVisibility(View.VISIBLE);
-                        up_down.setVisibility(View.VISIBLE);
-                        SpeedometerGauge speedometerdown = (SpeedometerGauge) getActivity().findViewById(R.id.speedometerdown);
-                        speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-                            @Override
-                            public String getLabelFor(double progress, double maxProgress) {
-                                return String.valueOf((int) Math.round(progress));
-                            }
-                        });
-
-                        SpeedometerGauge speedometerup = (SpeedometerGauge) getView().findViewById(R.id.speedometerup);
-                        speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
-                            @Override
-                            public String getLabelFor(double progress, double maxProgress) {
-                                return String.valueOf((int) Math.round(progress));
-                            }
-                        });
-                        handler_link = new Handler();
-                        runnable_link = new Runnable() {
-                            @Override
-                            public void run() {
-
-                                try {
-                                    String up_down[] = updateBpsDisplay();
-                                    up_down_global = up_down;
-                                    int downlink = Integer.parseInt(up_down[0]);
-                                    int uplink = Integer.parseInt(up_down[1]);
-//              Configure upload value range colors
-                                    speedometerup.setLabelTextSize(10);
-                                    speedometerup.setMaxSpeed(500);
-                                    speedometerup.setMajorTickStep(25);
-                                    speedometerup.addColoredRange(0, 25, Color.RED);
-                                    speedometerup.addColoredRange(25, 100, Color.YELLOW);
-                                    speedometerup.addColoredRange(100, 500, Color.GREEN);
-//                        Set the uplink value
-                                    speedometerup.setSpeed(uplink);
-
-//                      Download Starts here
-//                      Configure download value range colors
-                                    speedometerdown.setLabelTextSize(10);
-                                    speedometerdown.setMaxSpeed(500);
-                                    speedometerdown.setMajorTickStep(25);
-                                    speedometerdown.addColoredRange(0, 25, Color.RED);
-                                    speedometerdown.addColoredRange(25, 100, Color.YELLOW);
-                                    speedometerdown.addColoredRange(100, 500, Color.GREEN);
-//                        Set the downlink value
-                                    speedometerdown.setSpeed(downlink);
-                                }
-                                catch(Exception e){
-                                    e.printStackTrace();
-                                }
-
+        system_info_btn.setEnabled(false);
+        speedometer_btn.setEnabled(false);
 //
-                                handler_link.postDelayed(this, 1000);
-                            }
-                        };
-                        handler_link.post(runnable_link);
-                    }
-                });
-//              Scanning Nearest Wi-Fi
-                scan_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        scan_table_flag = true;
-                        live_table_flag = false;
-                        system_info_btn.setTextColor(Color.WHITE);
-                        live_btn.setTextColor(Color.WHITE);
-                        scan_btn.setTextColor(Color.GREEN);
-                        speedometer_btn.setTextColor(Color.WHITE);
-                        // Do initial update from any saved scan results.
-                        _scanCompleted(true);
-
-                        Handler handler = new Handler();
-                        final Runnable runnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                // Scan wi-fi
-                                if (getActivity() != null) {
-                                    WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                    wifiManager.setWifiEnabled(true);
-                                    wifiManager.startScan();
-                                    //Log.e("log", "startScan called in HomeFragment");
-                                }
-
-                                if (scan_table_flag == true) {
-                                    // NOTE:  Scans are normally limited to around one every 30 seconds, but
-                                    // there is a developer option in Android 10 to allow it to run faster.
-                                    // Request poll every 10 seconds.
-                                    handler.postDelayed(this, 10000);
-                                } else {
-                                    handler.removeCallbacks(this);
-                                }
-                            }
-                        };
-                        handler.post(runnable);
-                    }
-                });
+        handler_link.post(runnable_link);
+        live_btn.performClick();
+        Handler handler_ready_state = new Handler();
+        Runnable runnable_ready_state = new Runnable() {
+            @Override
+            public void run() {
+                speedometer_btn.setEnabled(true);
+                system_info_btn.setEnabled(true);
+                speedometer_btn.setOnClickListener(homeTableManager);
+                system_info_btn.setOnClickListener(homeTableManager);
+                Toast.makeText(getContext(), "WECAN is Connected to LANforge Server", Toast.LENGTH_LONG).show();
             }
-        });
-        return root;
+        };
+        handler_ready_state.postDelayed(runnable_ready_state, 1000);
+        return view;
     }
 
-    public String[] updateBpsDisplay() {
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof onFragmentBtnSelected){
+            listener = (onFragmentBtnSelected) context;
+        }
+        else {
+            throw new ClassCastException(context.toString() + "must Implement Listener");
+        }
+        super.onAttach(context);
+    }
+
+
+    public interface onFragmentBtnSelected{
+        public void onButtonSelected();
+    }
+
+//    public void scanCompleted(boolean success) {
+//        //Log.e("log", "HomeFragment::scanCompleted: " + success + " scan-table-flag: " + scan_table_flag);
+//
+//        if (!scan_table_flag)
+//            return;
+//
+//        Handler handler = new Handler();
+//        final Runnable runnable = new Runnable() {
+//            public void run() {
+//                _scanCompleted(success);
+//                handler.removeCallbacks(this);
+//            }
+//        };
+//        handler.post(runnable);
+//    }
+
+    //https://electronics.stackexchange.com/questions/83354/calculate-distance-from-rssi
+    static double getDistance(double rssi, int freq_mhz) {
+        //https://www.pasternack.com/t-calculator-fspl.aspx
+        // Values below assume a 20db txpower
+        double A;
+        if (freq_mhz < 2500)
+            A = -20;
+        else if (freq_mhz < 6000)
+            A = -27;
+        else
+            A = -29;
+
+        //double n = 2; // free space path loss
+        double n = 2.5; // Gives better results for my tests.
+
+        //RSSI (dBm) = -10n log10(d) + A
+        // RSSI - A = -10n log10(d)
+        // (RSSI - A) / -10n = log10(d)
+        // 10 ^ ((RSSI - A) / -10n) = d
+        return Math.pow(10d, (rssi - A) / (-10 * n));
+    }
+
+//    public void _scanCompleted(boolean success) {
+//        scan_table.removeAllViews();
+//        WifiManager wifiManager = (WifiManager) view.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+//        String data = "";
+//        String conneted_bssid = wifiManager.getConnectionInfo().getBSSID();
+//
+//        Map<String, String> scan_data = new LinkedHashMap<String, String>();
+//        List<ScanResult> scan_result = wifiManager.getScanResults();
+//        for (int i = 0; i < scan_result.size(); i++) {
+//            ScanResult sr = scan_result.get(i);
+//            //Log.e("log", "scan-result[" + i + "]: " + sr.toString() + "\n");
+//
+//            // The IEs do not implement toString() in useful manner, so we would have to parse
+//            // the binary info if we cared to report this.  Ignore for now.
+//            //if (sr.getInformationElements() != null) {
+//            //   for (ScanResult.InformationElement ie : sr.getInformationElements()) {
+//            //      Log.e("log", " IE: " + ie.toString() + "\n");
+//            //   }
+//            //}
+//
+//            String ssid = sr.SSID; //Get the SSID
+//            if (ssid.equals(null) || ssid.equals("")) {
+//                ssid = "*hidden*";
+//                System.out.println("SSID::= " + ssid);
+//            }
+//
+//            String bssid = sr.BSSID; //Get the BSSID
+//            String capability = sr.capabilities; //Get Wi-Fi capabilities
+//            int centerFreq0 = 0;
+//            int centerFreq1 = 0;
+//            int channelWidth = 0;
+//            if (Build.VERSION.SDK_INT >= 23) {
+//                centerFreq0 = sr.centerFreq0; //Get centerFreq0
+//                centerFreq1 = sr.centerFreq1; //Get centerFreq1
+//                channelWidth = sr.channelWidth; //Get channelWidth
+//            }
+//            int level = sr.level; //Get level/rssi
+//            int frequency = sr.frequency; //Get frequency
+//            if (conneted_bssid.equals(bssid)) {
+//                ssid += "(connected)";
+//            }
+//            // timestamp is usec since boot.
+//            //java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime();
+//            long age = android.os.SystemClock.elapsedRealtime() - (sr.timestamp / 1000);
+//            age = age / 1000; //convert to seconds.
+//
+//            //float dist = (float) Math.pow(10.0d, (27.55d - 40d * Math.log10(frequency) + 6.7d - level) / 20.0d) * 1000;
+//            double dist = getDistance(level, frequency);
+//            String dist_in_meters = String.format("%.02f", dist);
+//
+//            data = "SSID: " + '\"' + ssid + '\"' + "\nbssid: " + bssid + "\ncenterFreq0: " +
+//                    centerFreq0 + "\tcenterFreq1: " + centerFreq1 + "\nchannelWidth: " + channelWidth +
+//                    "\t\uD83D\uDCF6 " + level + "\nFrequency " + frequency + "\tage⏱ " + age +
+//                    "\t\t\tdistance: " + dist_in_meters + "m\n" + "\uD83D\uDD12 " + capability;
+//            scan_data.put(String.valueOf(i + 1), data);
+//        }
+//
+//        scan_table.setPadding(10, 0, 10, 0);
+//        TableRow heading = new TableRow(view);
+//        heading.setBackgroundColor(Color.rgb(120, 156, 175));
+//
+//        TextView val_head = new TextView(view);
+//        val_head.setText("LIVE WI-FI SCAN");
+//        val_head.setTextColor(Color.BLACK);
+//        val_head.setGravity(Gravity.LEFT);
+//        heading.addView(val_head);
+//        scan_table.addView(heading);
+//
+//        int i = 1;
+//        for (Map.Entry<String, String> entry : scan_data.entrySet()) {
+//            TableRow tbrow = new TableRow(view);
+//            if (i % 2 == 0) {
+//                tbrow.setBackgroundColor(Color.rgb(220, 220, 220));
+//            } else {
+//                tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
+//            }
+//
+//            TextView val_view = new TextView(view);
+//            String scan_value = entry.getValue();
+//            if (scan_value.contains("(connected)")) {
+//                tbrow.setBackgroundColor(Color.rgb(100, 192, 102));
+//            }
+//            val_view.setText(scan_value);
+//            val_view.setTextSize(15);
+//            val_view.setTextColor(Color.BLACK);
+//            val_view.setGravity(Gravity.LEFT);
+//            tbrow.addView(val_view);
+//            scan_table.addView(tbrow);
+//            i = i + 1;
+//        }
+//    }
+
+    @Override
+    public void setRetainInstance(boolean retain) {
+        super.setRetainInstance(retain);
+    }
+
+    @Override
+    public void setInitialSavedState(@Nullable SavedState state) {
+        super.setInitialSavedState(state);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onPrimaryNavigationFragmentChanged(boolean isPrimaryNavigationFragment) {
+        super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment);
+    }
+
+    public static String[] updateBpsDisplay() {
 
         long now = System.currentTimeMillis();
-        double TimeDifference = now - last_bps_time;
+        double TimeDifference = now - HomeFragment.last_bps_time;
         if (TimeDifference == 0) {
             return new String[]{"0", "0", "0", "0"}; // no div by zero error!
         }
@@ -714,14 +339,14 @@ public class HomeFragment extends Fragment {
                 TrafficStats.getMobileRxBytes(), TrafficStats.getMobileRxPackets(),
                 TrafficStats.getMobileTxBytes(), TrafficStats.getMobileTxPackets());
 
-        double rxDiff = rx_bytes - last_rx_bytes;
-        double txDiff = tx_bytes - last_tx_bytes;
+        double rxDiff = rx_bytes - HomeFragment.last_rx_bytes;
+        double txDiff = tx_bytes - HomeFragment.last_tx_bytes;
         double txbits = ((txDiff) * 1000 / TimeDifference) * 8;
         double rxbits = ((rxDiff) * 1000 / TimeDifference) * 8;
 
-        last_rx_bytes = rx_bytes;
-        last_tx_bytes = tx_bytes;
-        last_bps_time = now;
+        HomeFragment.last_rx_bytes = rx_bytes;
+        HomeFragment.last_tx_bytes = tx_bytes;
+        HomeFragment.last_bps_time = now;
 
         // TODO:  More efficient to test for high numbers first and only assing Rx/Tx string once
         if (rxbits >= 1000) {
@@ -756,8 +381,8 @@ public class HomeFragment extends Fragment {
 
 
         //System.out.println("count: " + count);
-        link_speed.setTextSize(15);
-        link_speed.setText(Rx + "/" + Tx);
+        HomeFragment.link_speed.setTextSize(15);
+        HomeFragment.link_speed.setText(Rx + "/" + Tx);
 
         String unitRx = Rx.substring(Rx.length() - 4);
         double downlink = 0;
@@ -791,28 +416,6 @@ public class HomeFragment extends Fragment {
             }
         };
         handler.post(runnable);
-    }
-
-    //https://electronics.stackexchange.com/questions/83354/calculate-distance-from-rssi
-    static double getDistance(double rssi, int freq_mhz) {
-        //https://www.pasternack.com/t-calculator-fspl.aspx
-        // Values below assume a 20db txpower
-        double A;
-        if (freq_mhz < 2500)
-            A = -20;
-        else if (freq_mhz < 6000)
-            A = -27;
-        else
-            A = -29;
-
-        //double n = 2; // free space path loss
-        double n = 2.5; // Gives better results for my tests.
-
-        //RSSI (dBm) = -10n log10(d) + A
-        // RSSI - A = -10n log10(d)
-        // (RSSI - A) / -10n = log10(d)
-        // 10 ^ ((RSSI - A) / -10n) = d
-        return Math.pow(10d, (rssi - A) / (-10 * n));
     }
 
     public void _scanCompleted(boolean success) {
@@ -907,61 +510,4 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    @Override
-    public void setRetainInstance(boolean retain) {
-        super.setRetainInstance(retain);
-    }
-
-    @Override
-    public void setInitialSavedState(@Nullable SavedState state) {
-        super.setInitialSavedState(state);
-    }
-
-    public static HomeFragment getInstance() {
-        return instance;
-    }
-
-    @Override
-    public void onDestroy() {
-
-        super.onDestroy();
-    }
-
-    @Override
-    public void onPrimaryNavigationFragmentChanged(boolean isPrimaryNavigationFragment) {
-        super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment);
-    }
-
-    @Override
-    public void onDestroyView() {
-
-        if (flag == true){
-            if (HomeFragment.flag == true){
-                Toast.makeText(getContext(), "Saving The CSV and stopping to save data!",Toast.LENGTH_LONG).show();
-//                new AlertDialog.Builder(getContext())
-//                        .setTitle("Save Data Enabled")
-//                        .setMessage("Do you want to stop saving data to csv ?")
-//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                Toast.makeText(getContext(), "Saving The CSV and stopping to save data!",Toast.LENGTH_LONG).show();
-//                                dialog.dismiss();
-//                            }
-//                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        instance.onCreateView(layout_inflator, view_group, saved_instance);
-//                        flag = true;
-//                    }
-//                }).show();
-            }
-
-
-        }
-//        binding = null;
-//        instance = null;
-        flag = false;
-        live_table_flag = false;
-        super.onDestroyView();
-    }
 }

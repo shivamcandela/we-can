@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.candela.wecan.tests.base_tools.CardUtils;
+import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.candela.wecan.tests.base_tools.LF_Resource;
 import com.candela.wecan.tests.base_tools.file_handler;
 
@@ -79,12 +80,14 @@ public class StartupActivity extends AppCompatActivity {
                 android.Manifest.permission.ACCESS_NETWORK_STATE,
                 android.Manifest.permission.CHANGE_WIFI_STATE,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CHANGE_WIFI_MULTICAST_STATE,
         };
         if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
 //        Intent myIntent = new Intent(this, ClientConnectivityConfiguration.class);
 //        startActivity(myIntent);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -179,7 +182,6 @@ public class StartupActivity extends AppCompatActivity {
         Log.e("log", "notifyCxChanged, state: " + state);
 
         if (lf_resource.getConnState()) {
-            Toast.makeText(my_view.getContext(), "Connected to LANforge Server", Toast.LENGTH_SHORT).show();
             updateRealmInfo();
             // CardUtils cardUtils = new CardUtils(getApplicationContext());
             openServerConnection();

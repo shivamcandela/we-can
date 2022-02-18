@@ -38,7 +38,6 @@ public class ConfigureWifi {
         this.intentFilter = new IntentFilter();
         this.cc_data = new ArrayList<>();
         this.CC_Status = 0;
-        this.callback();
         this.connect();
     }
     public void callback(){
@@ -84,8 +83,8 @@ public class ConfigureWifi {
     private void connect() {
 
         wifiManager.setWifiEnabled(false);
-        Log.e("ssid", this.ssid);
-        Log.e("pass", this.password);
+        Log.e("ssid-IRON", this.ssid);
+        Log.e("pass-IRON", this.password);
         wifiManager.setWifiEnabled(true);
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
@@ -109,14 +108,11 @@ public class ConfigureWifi {
             wifiManager.updateNetwork(i);
             wifiManager.saveConfiguration();
             if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
-                this.callback();
-                if (!wifiManager.isWifiEnabled()) {
-                    wifiManager.setWifiEnabled(true);
-                }
-                i.priority = 99999;
+                i.priority = 9999;
                 wifiManager.updateNetwork(i);
                 wifiManager.saveConfiguration();
                 wifiManager.disconnect();
+                this.callback();
                 wifiManager.setWifiEnabled(true);
                 wifiManager.enableNetwork(i.networkId, true);
                 wifiManager.reconnect();
@@ -204,6 +200,7 @@ public class ConfigureWifi {
             System.out.println(i.SSID);
             if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
                 wifiManager.disconnect();
+//                this.callback();
                 wifiManager.setWifiEnabled(true);
                 wifiManager.enableNetwork(i.networkId, true);
                 wifiManager.reconnect();
