@@ -23,7 +23,6 @@ import java.util.Map;
 public class LiveData implements Runnable{
     @Override
     public void run() {
-        Log.e("LiveData Thread running","");
         HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
         if (HomeFragment.live_table_flag == false){
             HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);

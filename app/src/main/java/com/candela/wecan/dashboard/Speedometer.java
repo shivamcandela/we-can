@@ -9,7 +9,6 @@ import com.candela.wecan.ui.home.HomeFragment;
 public class Speedometer implements Runnable{
     @Override
     public void run() {
-        Log.e("Speedometer Thread running","");
 
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
         try {

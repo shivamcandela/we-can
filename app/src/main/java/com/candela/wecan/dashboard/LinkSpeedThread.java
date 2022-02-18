@@ -7,8 +7,6 @@ import com.candela.wecan.ui.home.HomeFragment;
 public class LinkSpeedThread implements Runnable{
     @Override
     public void run() {
-        Log.e("LinkSpeedThread running","");
-
         try{
             HomeFragment.up_down_data = HomeFragment.updateBpsDisplay();
         }

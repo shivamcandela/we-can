@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -129,6 +130,9 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     public void openServerConnection () {
+        if (navigation.active){
+            return;
+        }
        Intent myIntent = new Intent(this, navigation.class);
        startActivity(myIntent);
     }
