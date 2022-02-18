@@ -539,10 +539,11 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        Log.i("FLASH is sending config", ssid);
         ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
-        if (configureWifi.isConnectedto(ssid)){
-            Log.i("iron",configureWifi.cc_data.toString());
-        }
+//        if (configureWifi.isConnectedto(ssid)){
+//            Log.i("iron",configureWifi.cc_data.toString());
+//        }
 
         /*
             Need to structure the cc_data in a Vector format and collect usefull info from this
@@ -550,10 +551,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                 "cx_time" : "" // in ms
             }
          */
-        System.out.println("Ironman: " + configureWifi.cc_data.get(0).split("-:-")[0]);
-        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
-        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
-        System.out.println("IronSpider: " + timestamp.toString());
+//        System.out.println("Ironman: " + configureWifi.cc_data.get(0).split("-:-")[0]);
+//        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
+//        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
+//        System.out.println("IronSpider: " + timestamp.toString());
         return null;
     }
 }
