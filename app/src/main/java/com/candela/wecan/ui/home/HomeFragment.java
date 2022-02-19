@@ -34,6 +34,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.candela.wecan.R;
 import com.candela.wecan.dashboard.LinkSpeedThread;
 import com.candela.wecan.dashboard.LiveData;
+import com.candela.wecan.dashboard.SaveData;
 import com.candela.wecan.dashboard.Speedometer;
 import com.candela.wecan.databinding.FragmentHomeBinding;
 import com.candela.wecan.tests.base_tools.HomeTableManager;
@@ -86,6 +87,10 @@ public class HomeFragment extends Fragment {
     private onFragmentBtnSelected listener;
     public static SpeedometerGauge speedometerup;
     public static SpeedometerGauge speedometerdown;
+    public static Handler handler_save_data;
+    public static Runnable runnable_save_data;
+
+
     public String getUserName() {
         return username;
     }
@@ -97,6 +102,9 @@ public class HomeFragment extends Fragment {
         handler_live_data = new Handler();
         handler_link = new Handler();
         handler_speedometer_thread = new Handler();
+
+        handler_save_data = new Handler();
+        runnable_save_data = new SaveData();
 
         runnable_live = new LiveData();
         runnable_speedometer =  new Speedometer();

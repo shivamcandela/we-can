@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.candela.wecan.R;
+import com.candela.wecan.navigation;
 import com.candela.wecan.ui.home.HomeFragment;
 import com.cardiomood.android.controls.gauge.SpeedometerGauge;
 
@@ -66,6 +67,9 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
             case R.id.rxtx_btn:
                 LiveBtnListener();
                 break;
+            case R.id.save_data_switch:
+                //
+                break;
 
     }
 
@@ -73,7 +77,6 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 }
     /* Share Button OnClick Listener */
     private void ShareButtonListener() {
-        Log.e("Handler_iron", "ShareButtonListener");
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("*/*");
         File dataDirectory = new File(Environment.getExternalStorageDirectory() + "/WE-CAN/LiveData/LiveData.csv");
@@ -92,7 +95,6 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     /* Sys Info Tab OnClick Listener */
     private void SystemInfoListener() {
-        Log.e("Handler_iron", "SystemInfoListener");
         HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
         HomeFragment.live_table_flag = false;
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
@@ -243,7 +245,6 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     /* Live Data Tab OnClick Listener */
     private void LiveBtnListener(){
-        Log.e("Handler_iron", "LiveBtnListener");
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
         if (HomeFragment.handler_speedometer_thread != null) {
             HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
@@ -259,7 +260,6 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     /* Speedometer Tab OnClick Listener */
     private void Speedometer(){
-        Log.e("Handler_iron", "Speedometer");
         HomeFragment.live_table_flag = false;
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
         HomeFragment.live_table.removeAllViews();
@@ -291,80 +291,19 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+        if (isChecked){
+            HomeFragment.handler_save_data.post(HomeFragment.runnable_save_data);
+        }
+        else{
+            HomeFragment.handler_save_data.removeCallbacks(HomeFragment.runnable_save_data);
+        }
         Handler handler = new Handler();
         final Runnable save_data = new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void run() {
-                flag = buttonView.isChecked();
-//                                    Data Saving in csv format
-                try {
-                    WifiManager wifiManager = (WifiManager) getApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                    WifiInfo wifiinfo = wifiManager.getConnectionInfo();
-                    String IP = Formatter.formatIpAddress(wifiinfo.getIpAddress());
-                    String SSID = wifiinfo.getSSID();
-                    String BSSID = wifiinfo.getBSSID();
-                    int Rssi = wifiinfo.getRssi();
-                    String LinkSpeed = wifiinfo.getLinkSpeed() + " Mbps";
-                    String channel = wifiinfo.getFrequency() + " MHz";
-                    long availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                    long totalMem = Runtime.getRuntime().totalMemory();
-                    long usedMem = totalMem - availMem;
-                    String uplink = up_down_global[2];
-                    String downlink = up_down_global[3];
-                    String cpu_used_percent = String.format("%.2f", (usedMem / (double) totalMem) * 100);
-                    String currentDateTimeString = java.text.DateFormat.getDateTimeInstance().format(new Date());
-                    String livedata = currentDateTimeString + "," + IP + "," + SSID + "," + BSSID + "," + Rssi
-                            + "," + LinkSpeed + "," + uplink + "," + downlink + "," + channel + "," + cpu_used_percent + "\n";
 
-                    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||
-                            Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState())) {
-                        //                                  Getting file as Test Name
-                        SharedPreferences sharedPreferences = HomeFragment.home_fragment_activity.getSharedPreferences("userdata", Context.MODE_PRIVATE);
-                        Map<String, ?> keys = sharedPreferences.getAll();
-                        String test_name = (String) keys.get("test_name");
-                        File appDirectory = new File(String.valueOf(Environment.getExternalStorageDirectory()) + "/WE-CAN");
-                        File logDirectory = new File(appDirectory + "/LiveData/");
-                        File logFile = new File(logDirectory, test_name + ".csv");
-                        File file = new File(String.valueOf(logFile));
-                        if (!logDirectory.exists()) {
-                            logDirectory.mkdirs();
-                            System.out.println("logDirectory:  " + logDirectory);
-                        }
-                        if (file.exists()) {
-                            try {
-                                FileOutputStream stream = new FileOutputStream(logFile, true);
-                                stream.write(livedata.getBytes());
-                                stream.close();
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            FileOutputStream stream;
-                            try {
-                                stream = new FileOutputStream(logFile);
-                                stream.write("Date/Time,IP,SSID,BSSID,signal,Linkspeed,Uplink,Downlink,Channel,CPU_Utilization\n".getBytes());
-                                stream.close();
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    //Calling Runable at time interval
-                }
-                catch (Exception e){
-                    System.out.println(e);
-                }
-
-                if (flag) {
-                    handler.postDelayed(this, 1000);
-                } else {
-                    handler.removeCallbacks(this);
-                }
             }
         };
         handler.post(save_data);

@@ -103,7 +103,6 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         // off for local testing (under Developer Options > Networking > Wi-Fi scan throttling).
 
         boolean success = wifiManager.startScan();
-        Log.e("log", "wifiManager.startScan result: " + success + "\n");
         if (!success) {
            // scan failure handling
            scanFailure();
@@ -124,7 +123,6 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
        Vector<String> srs = new Vector();
 
        // Tell HomeFragment
-       Log.e("log", "ResourceUtils::notifyScanResults, home-frag: " + (HomeFragment.instance != null));
        if (HomeFragment.instance != null) {
           HomeFragment.instance.scanCompleted(succeeded);
        }
@@ -539,7 +537,6 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        Log.i("FLASH is sending config", ssid);
         ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
 //        if (configureWifi.isConnectedto(ssid)){
 //            Log.i("iron",configureWifi.cc_data.toString());

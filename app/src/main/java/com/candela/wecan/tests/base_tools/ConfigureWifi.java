@@ -83,8 +83,6 @@ public class ConfigureWifi {
     private void connect() {
 
         wifiManager.setWifiEnabled(false);
-        Log.e("ssid-IRON", this.ssid);
-        Log.e("pass-IRON", this.password);
         wifiManager.setWifiEnabled(true);
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);

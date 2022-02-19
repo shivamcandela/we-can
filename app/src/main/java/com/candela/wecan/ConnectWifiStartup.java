@@ -66,8 +66,6 @@ public class ConnectWifiStartup extends AppCompatActivity {
         }
         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
         for( WifiConfiguration i : list ) {
-
-            System.out.println("iron");
             System.out.println(i.priority);
         }
 //        GetPhoneWifiInfo getPhoneWifiInfo = new GetPhoneWifiInfo();

@@ -7,9 +7,12 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +24,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.candela.wecan.dashboard.SaveData;
 import com.candela.wecan.ui.home.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -36,7 +40,9 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
     TextView nav_user;
     TextView nav_server;
     TextView nav_resource_realm;String username = "";
+    public static Context context;
     public static boolean active=false;
+
 
     @SuppressLint({"RestrictedApi", "ResourceType"})
     @Override
@@ -46,6 +52,7 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
         setContentView(R.layout.activity_navigation);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        context = getApplicationContext();
 
 
         SharedPreferences sharedPreferences = getSharedPreferences("userdata", Context.MODE_PRIVATE);
@@ -105,7 +112,6 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Log.e("getch","0");
         drawer.closeDrawer(GravityCompat.START);
         if (item.getItemId() == R.id.home){
             fragmentmanager = getSupportFragmentManager();
