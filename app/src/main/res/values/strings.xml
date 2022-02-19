@@ -2,7 +2,7 @@
 <resources>
     <string name="open">open</string>
     <string name="close">close</string>
-    <string name="app_name">WE-CAN</string>
+    <string name="app_name">LANforge WECAN</string>
     <string name="title_activity_login">Login Activity</string>
     <string name="menu_home">menu_home</string>
     <string name="action_settings">action_settings</string>
@@ -19,4 +19,5 @@
     <string name="login_failed">login_failed</string>
     <string name="invalid_username">invalid_username</string>
     <string name="invalid_password">invalid_password</string>
+    <string name="Home">Home</string>
 </resources>
