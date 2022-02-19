@@ -120,6 +120,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="DOWNLOAD/mbps"
+                    android:textColor="@color/black"
                     android:textAlignment="center"></TextView>
 
                 <TextView
@@ -127,6 +128,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="UPLOAD/mbps"
+                    android:textColor="@color/black"
                     android:textAlignment="center"></TextView>
             </LinearLayout>
 
