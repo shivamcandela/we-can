@@ -1,5 +1,6 @@
 package com.candela.wecan;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -23,6 +25,8 @@ import com.candela.wecan.tests.base_tools.CardUtils;
 import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.candela.wecan.tests.base_tools.LF_Resource;
 import com.candela.wecan.tests.base_tools.file_handler;
+import com.candela.wecan.tools.GetNetworkCapabilities;
+import com.candela.wecan.tools.NetworkSniffTask;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -56,6 +60,7 @@ public class StartupActivity extends AppCompatActivity {
     public View my_view = null;
     SharedPreferences sharedpreferences = null;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +91,7 @@ public class StartupActivity extends AppCompatActivity {
         if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
+        //        networkSniffTask.execute();
 //        Intent myIntent = new Intent(this, ClientConnectivityConfiguration.class);
 //        startActivity(myIntent);
 

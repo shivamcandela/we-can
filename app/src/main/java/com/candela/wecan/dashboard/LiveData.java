@@ -13,14 +13,17 @@ import android.view.Gravity;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.candela.wecan.tools.GetNetworkCapabilities;
 import com.candela.wecan.ui.home.HomeFragment;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LiveData implements Runnable{
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void run() {
         HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
@@ -32,6 +35,7 @@ public class LiveData implements Runnable{
         HomeFragment.live_btn.setTextColor(Color.GREEN);
         HomeFragment.scan_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
+        GetNetworkCapabilities networkSniffTask = new GetNetworkCapabilities(HomeFragment.home_fragment_activity.getApplicationContext());
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(HomeFragment.home_fragment_activity);
         if (HomeFragment.home_fragment_activity != null && HomeFragment.live_table_flag != false) {
             HomeFragment.live_btn.setTextColor(Color.GREEN);
@@ -79,6 +83,20 @@ public class LiveData implements Runnable{
             live_data.put("DHCP Server", serverAddress);
             live_data.put("Gateway", gateway);
             live_data.put("LeaseDuration", leaseDuration + " Sec");
+            if (networkSniffTask.isWifiNetworkCongested()){
+                live_data.put("WIFI Congested","NO");
+            }
+            if (!networkSniffTask.isWifiNetworkCongested()){
+                live_data.put("WIFI Congested","YES");
+            }
+            if(networkSniffTask.isCellularNetworkCongested()) {
+                live_data.put("Cellular Congested","NO");
+
+            }
+            if(!networkSniffTask.isCellularNetworkCongested()) {
+                live_data.put("Cellular Congested","YES");
+
+            }
 
             HomeFragment.live_table.setPadding(10, 0, 10, 0);
             TableRow heading = new TableRow(HomeFragment.home_fragment_activity);

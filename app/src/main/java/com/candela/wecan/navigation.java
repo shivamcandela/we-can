@@ -7,12 +7,9 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,7 +21,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.candela.wecan.dashboard.SaveData;
 import com.candela.wecan.ui.home.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -39,10 +35,13 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
     private DrawerLayout drawer;
     TextView nav_user;
     TextView nav_server;
-    TextView nav_resource_realm;String username = "";
+    TextView nav_resource_realm;
+    public static String username = "";
     public static Context context;
     public static boolean active=false;
-
+    public static String getUserName() {
+        return username;
+    }
 
     @SuppressLint({"RestrictedApi", "ResourceType"})
     @Override

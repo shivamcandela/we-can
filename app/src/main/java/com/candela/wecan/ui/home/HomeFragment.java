@@ -91,9 +91,7 @@ public class HomeFragment extends Fragment {
     public static Runnable runnable_save_data;
 
 
-    public String getUserName() {
-        return username;
-    }
+
     private HomeTableManager homeTableManager;
     public static String[] up_down_data;
 
