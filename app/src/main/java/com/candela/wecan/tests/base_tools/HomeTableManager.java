@@ -114,7 +114,8 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         Map<String, ?> keys = sharedPreferences.getAll();
         String password = (String) keys.get("current-passwd");
 
-        Map<String, String> system_info = new HashMap<String, String>();
+//        Map<String, String> system_info = new HashMap<String, String>();
+        Map<String, String> system_info = new LinkedHashMap<String, String>();
         WifiManager wifiManager = (WifiManager) HomeFragment.home_fragment_activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiinfo = wifiManager.getConnectionInfo();
 
@@ -122,15 +123,16 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         system_info.put("MANUFACTURER", Build.MANUFACTURER);
         system_info.put("MODEL", Build.MODEL);
         system_info.put("PRODUCT", Build.PRODUCT);
-        system_info.put("RELEASE", Build.VERSION.RELEASE);
+        system_info.put("HOST", Build.HOST);
+        system_info.put("ID", Build.ID);
         system_info.put("INCREMENTAL", Build.VERSION.INCREMENTAL);
+        system_info.put("RELEASE", Build.VERSION.RELEASE);
         system_info.put("SDK No.", String.valueOf(Build.VERSION.SDK_INT));
         system_info.put("BOARD", Build.BOARD);
         system_info.put("BRAND", Build.BRAND);
         system_info.put("CPU_ABI", Build.CPU_ABI);
         system_info.put("HARDWARE", Build.HARDWARE);
-        system_info.put("HOST", Build.HOST);
-        system_info.put("ID", Build.ID);
+
 //                        system_info.put("PHONE IP", Formatter.formatIpAddress(wifiinfo.getIpAddress()));
 
         Boolean AC_11 = null;
@@ -191,25 +193,6 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         wifi_mode.add(new StringKeyVal("LEGACY", String.valueOf(legacy)));
 
         HomeFragment.sys_table.setPadding(10, 0, 10, 0);
-        TableRow heading = new TableRow(HomeFragment.home_fragment_activity);
-        heading.setBackgroundColor(Color.rgb(120, 156, 175));
-        TextView sl_head = new TextView(HomeFragment.home_fragment_activity);
-        sl_head.setText(" SL. ");
-        sl_head.setTextColor(Color.BLACK);
-        sl_head.setGravity(Gravity.CENTER);
-        heading.addView(sl_head);
-        TextView key_head = new TextView(HomeFragment.home_fragment_activity);
-        key_head.setText(" KEY ");
-        key_head.setTextColor(Color.BLACK);
-        key_head.setGravity(Gravity.CENTER);
-        heading.addView(key_head);
-        TextView val_head = new TextView(HomeFragment.home_fragment_activity);
-        val_head.setText(" VALUE ");
-        val_head.setTextColor(Color.BLACK);
-        val_head.setGravity(Gravity.CENTER);
-        heading.addView(val_head);
-        HomeFragment.sys_table.addView(heading);
-
         int i = 1;
         for (Map.Entry<String, String> entry : system_info.entrySet()) {
             TableRow tbrow = new TableRow(HomeFragment.home_fragment_activity);
@@ -218,24 +201,19 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
             } else {
                 tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
             }
-
-            TextView sl_view = new TextView(HomeFragment.home_fragment_activity);
-            sl_view.setText(String.valueOf(i) + ".");
-            sl_view.setTextSize(15);
-            sl_view.setTextColor(Color.BLACK);
-            sl_view.setGravity(Gravity.CENTER);
-            tbrow.addView(sl_view);
             TextView key_view = new TextView(HomeFragment.home_fragment_activity);
             key_view.setText(entry.getKey());
             key_view.setTextSize(15);
             key_view.setTextColor(Color.BLACK);
-            key_view.setGravity(Gravity.CENTER);
+            key_view.setGravity(Gravity.LEFT);
+            key_view.setPadding(10,10,10, 0);
             tbrow.addView(key_view);
             TextView val_view = new TextView(HomeFragment.home_fragment_activity);
             val_view.setText(entry.getValue());
             val_view.setTextSize(15);
             val_view.setTextColor(Color.BLACK);
-            val_view.setGravity(Gravity.CENTER);
+            val_view.setGravity(Gravity.RIGHT);
+            val_view.setPadding(10,10,10, 0);
             tbrow.addView(val_view);
             HomeFragment.sys_table.addView(tbrow);
             i = i + 1;
