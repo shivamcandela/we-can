@@ -93,7 +93,8 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (u_name.getText().toString().length() < 4 || test_name_tv.getText().toString().length() < 4) {
+                if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
+                        test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
                     Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
