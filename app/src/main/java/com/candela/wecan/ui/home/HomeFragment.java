@@ -40,6 +40,7 @@ import com.candela.wecan.databinding.FragmentHomeBinding;
 import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.cardiomood.android.controls.gauge.SpeedometerGauge;
 import com.google.android.material.navigation.NavigationView;
+import com.jjoe64.graphview.GraphView;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +59,7 @@ public class HomeFragment extends Fragment {
     public static TableLayout sys_table = null;
     public static TableLayout live_table = null;
     public static TableLayout scan_table = null;
+    public static GraphView graph = null;
     public static Bundle saved_instance;
     public static long last_bps_time = 0;
     public static long last_rx_bytes = 0;
@@ -89,6 +91,7 @@ public class HomeFragment extends Fragment {
     public static SpeedometerGauge speedometerdown;
     public static Handler handler_save_data;
     public static Runnable runnable_save_data;
+    public static LinearLayout legend;
 
 
     public String getUserName() {
@@ -126,6 +129,8 @@ public class HomeFragment extends Fragment {
         scan_table = view.findViewById(R.id.table);
         speedometerup = view.findViewById(R.id.speedometerup);
         speedometerdown = view.findViewById(R.id.speedometerdown);
+        graph = (GraphView) view.findViewById(R.id.graph);
+        legend = view.findViewById(R.id.legend);
 
 
         last_bps_time = System.currentTimeMillis();
@@ -133,6 +138,8 @@ public class HomeFragment extends Fragment {
         last_rx_bytes = TrafficStats.getTotalRxBytes();
         speedometer_linear.setVisibility(View.GONE);
         up_down.setVisibility(View.GONE);
+        graph.setVisibility(View.GONE);
+        legend.setVisibility(View.GONE);
         homeTableManager = new HomeTableManager();
         share_btn.setOnClickListener(homeTableManager);
         switch_btn.setOnClickListener(homeTableManager);

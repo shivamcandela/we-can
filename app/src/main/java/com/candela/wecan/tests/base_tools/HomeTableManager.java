@@ -100,6 +100,8 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
         HomeFragment.scan_table_flag = false;
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
+        HomeFragment.graph.setVisibility(View.GONE);
+        HomeFragment.legend.setVisibility(View.GONE);
         HomeFragment.up_down.setVisibility(View.GONE);
         HomeFragment.sys_table.removeAllViews();
         HomeFragment.system_info_btn.setTextColor(Color.GREEN);
@@ -224,6 +226,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
     /* Live Data Tab OnClick Listener */
     private void LiveBtnListener(){
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
+        HomeFragment.graph.setVisibility(View.GONE);
         if (HomeFragment.handler_speedometer_thread != null) {
             HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
         }
@@ -249,6 +252,8 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.speedometer_btn.setTextColor(Color.GREEN);
         HomeFragment.speedometer_linear.setVisibility(View.VISIBLE);
         HomeFragment.up_down.setVisibility(View.VISIBLE);
+        HomeFragment.graph.setVisibility(View.VISIBLE);
+        HomeFragment.legend.setVisibility(View.VISIBLE);
 
         HomeFragment.speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
             @Override

@@ -26,7 +26,7 @@
         <entry key="app/src/main/res/layout/activity_test.xml" value="0.2109375" />
         <entry key="app/src/main/res/layout/app_bar_navigation.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/layout/content_navigation.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.17" />
         <entry key="app/src/main/res/layout/fragment_logcat.xml" value="0.215625" />
         <entry key="app/src/main/res/layout/fragment_slideshow.xml" value="0.22" />
