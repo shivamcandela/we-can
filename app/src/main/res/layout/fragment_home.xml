@@ -191,12 +191,10 @@
             <!-- we add graph view to display -->
             <com.jjoe64.graphview.GraphView
                 android:id="@+id/graph"
-                android:stretchColumns="1"
-                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:padding="10sp"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                app:seriesType="line"
-                app:seriesTitle="Chart"
+                android:layout_height="250sp"
                 android:title="Bit rate in mbps"/>
 
 

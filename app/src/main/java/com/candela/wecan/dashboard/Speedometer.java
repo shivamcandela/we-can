@@ -8,7 +8,10 @@ import android.util.Log;
 
 import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.candela.wecan.ui.home.HomeFragment;
+import com.jjoe64.graphview.DefaultLabelFormatter;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.LegendRenderer;
+import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -101,14 +104,18 @@ public class Speedometer implements Runnable{
 //            HomeFragment.graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
 //            HomeFragment.graph.getLegendRenderer().setVisible(false);
             counter.incrementAndGet();
-
-
-
             HomeFragment.graph.getViewport().scrollToEnd();
             HomeFragment.graph.getViewport().setScalable(true); // enabling horizontal zooming and scrolling
 
 //            HomeFragment.graph.takeSnapshotAndShare(HomeFragment.home_fragment_activity, "exampleGraph", "GraphViewSnapshot");
 //            Bitmap bitmap = HomeFragment.graph.takeSnapshot();
+
+            GridLabelRenderer gridLabel = HomeFragment.graph.getGridLabelRenderer();
+            gridLabel.setHorizontalAxisTitleColor(Color.BLUE);
+            gridLabel.setVerticalAxisTitleColor(Color.BLUE);
+//            gridLabel.setHorizontalAxisTitle("Time in seconds");
+//            gridLabel.setVerticalAxisTitle("Traffic in Mbps");
+            HomeFragment.graph.setTitle("Traffic status (X-axis in Mbps Y-axis in Sec)");
         }
         catch(Exception e){
             e.printStackTrace();
