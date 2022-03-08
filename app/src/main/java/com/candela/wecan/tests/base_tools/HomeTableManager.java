@@ -227,6 +227,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
     private void LiveBtnListener(){
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
         HomeFragment.graph.setVisibility(View.GONE);
+        HomeFragment.legend.setVisibility(View.GONE);
         if (HomeFragment.handler_speedometer_thread != null) {
             HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
         }
