@@ -158,13 +158,13 @@ public class HomeFragment extends Fragment {
 
         system_info_btn.setEnabled(false);
         speedometer_btn.setEnabled(false);
-        AddFab = (FloatingActionButton) view.findViewById(R.id.add_fab);
-        computerFab = (FloatingActionButton) view.findViewById(R.id.computer_fab);
-        shareFab = (FloatingActionButton) view.findViewById(R.id.share_fab);
-        wifiFab = (FloatingActionButton) view.findViewById(R.id.wifi_fab);
-
-        FabButton fbtn = new FabButton();
-        AddFab.setOnClickListener(fbtn);
+//        AddFab = (FloatingActionButton) view.findViewById(R.id.add_fab);
+//        computerFab = (FloatingActionButton) view.findViewById(R.id.computer_fab);
+//        shareFab = (FloatingActionButton) view.findViewById(R.id.share_fab);
+//        wifiFab = (FloatingActionButton) view.findViewById(R.id.wifi_fab);
+//
+//        FabButton fbtn = new FabButton();
+//        AddFab.setOnClickListener(fbtn);
 //        computerFab.setVisibility(View.GONE);
 //        shareFab.setVisibility(View.GONE);
 //        wifiFab.setVisibility(View.GONE);
