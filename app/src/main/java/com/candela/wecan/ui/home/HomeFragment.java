@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
     public static Activity home_fragment_activity;
     public static Handler handler_live_data;
     public static LinearLayout speedometer_linear,up_down;
-    public static Button scan_btn, system_info_btn, live_btn, speedometer_btn;
+    public static Button scan_btn, system_info_btn, live_btn, speedometer_btn,chart_btn;
     private ImageView share_btn;
     private Switch switch_btn;
     public static View hView;
@@ -136,6 +136,7 @@ public class HomeFragment extends Fragment {
         scan_table = view.findViewById(R.id.table);
         speedometerup = view.findViewById(R.id.speedometerup);
         speedometerdown = view.findViewById(R.id.speedometerdown);
+        chart_btn = view.findViewById(R.id.chart_btn);
         graph = (GraphView) view.findViewById(R.id.graph);
         legend = view.findViewById(R.id.legend);
 
@@ -155,6 +156,7 @@ public class HomeFragment extends Fragment {
 
         scan_btn.setOnClickListener(homeTableManager);
         switch_btn.setOnCheckedChangeListener(homeTableManager);
+        chart_btn.setOnClickListener(homeTableManager);
 
         system_info_btn.setEnabled(false);
         speedometer_btn.setEnabled(false);

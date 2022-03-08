@@ -67,6 +67,9 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
             case R.id.rxtx_btn:
                 LiveBtnListener();
                 break;
+            case R.id.chart_btn:
+                Charts();
+                break;
             case R.id.save_data_switch:
                 //
                 break;
@@ -108,6 +111,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.live_btn.setTextColor(Color.WHITE);
         HomeFragment.scan_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
+        HomeFragment.chart_btn.setTextColor(Color.WHITE);
         Vector<StringKeyVal> wifi_capabilities = new Vector<StringKeyVal>();
         Vector<StringKeyVal> wifi_mode = new Vector<StringKeyVal>();
         Vector<StringKeyVal> wifi_encryption = new Vector<StringKeyVal>();
@@ -225,6 +229,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     /* Live Data Tab OnClick Listener */
     private void LiveBtnListener(){
+        HomeFragment.chart_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
         HomeFragment.graph.setVisibility(View.GONE);
         HomeFragment.legend.setVisibility(View.GONE);
@@ -253,8 +258,42 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.speedometer_btn.setTextColor(Color.GREEN);
         HomeFragment.speedometer_linear.setVisibility(View.VISIBLE);
         HomeFragment.up_down.setVisibility(View.VISIBLE);
+        HomeFragment.graph.setVisibility(View.GONE);
+        HomeFragment.legend.setVisibility(View.GONE);
+        HomeFragment.chart_btn.setTextColor(Color.WHITE);
+
+        HomeFragment.speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+            @Override
+            public String getLabelFor(double progress, double maxProgress) {
+                return String.valueOf((int) Math.round(progress));
+            }
+        });
+
+        HomeFragment.speedometerdown.setLabelConverter(new SpeedometerGauge.LabelConverter() {
+            @Override
+            public String getLabelFor(double progress, double maxProgress) {
+                return String.valueOf((int) Math.round(progress));
+            }
+        });
+        HomeFragment.handler_speedometer_thread.post(HomeFragment.runnable_speedometer);
+
+    }
+
+    private void Charts(){
+        HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
+        HomeFragment.live_table_flag = false;
+        HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
+        HomeFragment.scan_table_flag = false;
+        HomeFragment.speedometer_linear.setVisibility(View.GONE);
         HomeFragment.graph.setVisibility(View.VISIBLE);
         HomeFragment.legend.setVisibility(View.VISIBLE);
+        HomeFragment.up_down.setVisibility(View.VISIBLE);
+        HomeFragment.sys_table.removeAllViews();
+        HomeFragment.system_info_btn.setTextColor(Color.WHITE);
+        HomeFragment.live_btn.setTextColor(Color.WHITE);
+        HomeFragment.scan_btn.setTextColor(Color.WHITE);
+        HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
+        HomeFragment.chart_btn.setTextColor(Color.GREEN);
 
         HomeFragment.speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
             @Override

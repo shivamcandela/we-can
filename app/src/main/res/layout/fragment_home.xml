@@ -97,6 +97,14 @@
                         android:text="Speedometer" />
 
                     <Button
+                        android:id="@+id/chart_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#808080"
+                        app:cornerRadius="0dp"
+                        android:text="charts" />
+
+                    <Button
                         android:id="@+id/scan_data"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
