@@ -6,6 +6,7 @@
         <entry key="../../../../../layout/custom_preview.xml" value="0.3484375" />
         <entry key="../../Android/Sdk/platforms/android-31/data/res/layout/simple_spinner_dropdown_item.xml" value="0.2453125" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.23177083333333334" />
+        <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.371875" />
         <entry key="app/src/main/res/drawable/ic_baseline_app_settings_alt_24.xml" value="0.3859375" />
         <entry key="app/src/main/res/drawable/ic_baseline_description_24.xml" value="0.3859375" />
         <entry key="app/src/main/res/drawable/ic_baseline_info_24.xml" value="0.3859375" />
@@ -27,7 +28,7 @@
         <entry key="app/src/main/res/layout/app_bar_navigation.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/layout/content_navigation.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.17" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/fragment_logcat.xml" value="0.215625" />
         <entry key="app/src/main/res/layout/fragment_slideshow.xml" value="0.22" />
         <entry key="app/src/main/res/layout/nav_header_navigation.xml" value="0.21302083333333333" />

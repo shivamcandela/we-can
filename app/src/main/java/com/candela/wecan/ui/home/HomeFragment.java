@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,6 +33,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.candela.wecan.R;
+import com.candela.wecan.dashboard.FabButton;
 import com.candela.wecan.dashboard.LinkSpeedThread;
 import com.candela.wecan.dashboard.LiveData;
 import com.candela.wecan.dashboard.SaveData;
@@ -39,7 +41,9 @@ import com.candela.wecan.dashboard.Speedometer;
 import com.candela.wecan.databinding.FragmentHomeBinding;
 import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.cardiomood.android.controls.gauge.SpeedometerGauge;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.jjoe64.graphview.GraphView;
 
 import java.util.LinkedHashMap;
@@ -100,6 +104,9 @@ public class HomeFragment extends Fragment {
     private HomeTableManager homeTableManager;
     public static String[] up_down_data;
 
+    public static FloatingActionButton AddFab, computerFab, shareFab, wifiFab;
+    public static Boolean isAllFabsVisible;
+
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         handler_live_data = new Handler();
@@ -151,6 +158,53 @@ public class HomeFragment extends Fragment {
 
         system_info_btn.setEnabled(false);
         speedometer_btn.setEnabled(false);
+        AddFab = (FloatingActionButton) view.findViewById(R.id.add_fab);
+        computerFab = (FloatingActionButton) view.findViewById(R.id.computer_fab);
+        shareFab = (FloatingActionButton) view.findViewById(R.id.share_fab);
+        wifiFab = (FloatingActionButton) view.findViewById(R.id.wifi_fab);
+
+        FabButton fbtn = new FabButton();
+        AddFab.setOnClickListener(fbtn);
+//        computerFab.setVisibility(View.GONE);
+//        shareFab.setVisibility(View.GONE);
+//        wifiFab.setVisibility(View.GONE);
+//        AddFab.bringToFront();
+//        isAllFabsVisible = false;
+//        Float translationY = 100f;
+//        OvershootInterpolator interpolator = new OvershootInterpolator();
+//        AddFab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!isAllFabsVisible) {
+//
+//                    AddFab.animate().setInterpolator(interpolator).rotation(45f).setDuration(300).start();
+//
+//                    computerFab.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start();
+//                    shareFab.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start();
+//                    wifiFab.animate().translationY(0f).alpha(1f).setInterpolator(interpolator).setDuration(300).start();
+//
+//                    computerFab.setVisibility(View.VISIBLE);
+//                    shareFab.setVisibility(View.VISIBLE);
+//                    wifiFab.setVisibility(View.VISIBLE);
+//
+//
+//                    isAllFabsVisible = true;
+//                } else {
+//
+//                    AddFab.animate().setInterpolator(interpolator).rotation(0f).setDuration(300).start();
+//
+//                    computerFab.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start();
+//                    shareFab.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start();
+//                    wifiFab.animate().translationY(translationY).alpha(0f).setInterpolator(interpolator).setDuration(300).start();
+//
+//                    computerFab.setVisibility(View.GONE);
+//                    shareFab.setVisibility(View.GONE);
+//                    wifiFab.setVisibility(View.GONE);
+//
+//                    isAllFabsVisible = false;
+//                }
+//            }
+//        });
 //
         handler_link.post(runnable_link);
         live_btn.performClick();
