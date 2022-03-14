@@ -277,10 +277,10 @@
             </LinearLayout>
 
 
-            <WebView
-                android:id="@+id/webview"
-                android:layout_width="match_parent"
-                android:layout_height="187dp" />
+<!--            <WebView-->
+<!--                android:id="@+id/webview"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="187dp" />-->
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
