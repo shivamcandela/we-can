@@ -61,7 +61,6 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
         String current_ip = (String) keys.get("current-ip");
         String current_resource = (String) keys.get("current-resource");
         String current_realm = (String) keys.get("current-realm");
-        Log.e("check_box", username);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);

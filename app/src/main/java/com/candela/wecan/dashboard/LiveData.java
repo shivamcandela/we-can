@@ -98,28 +98,8 @@ public class LiveData implements Runnable{
 
             }
 
-            HomeFragment.live_table.setPadding(10, 0, 10, 0);
             TableRow heading = new TableRow(HomeFragment.home_fragment_activity);
             heading.setBackgroundColor(Color.rgb(120, 156, 175));
-            TextView sl_head = new TextView(HomeFragment.home_fragment_activity);
-            sl_head.setText(" SL. ");
-            sl_head.setTextColor(Color.BLACK);
-            sl_head.setGravity(Gravity.CENTER);
-            heading.addView(sl_head);
-            TextView key_head = new TextView(HomeFragment.home_fragment_activity);
-            key_head.setText(" KEY ");
-            key_head.setTextColor(Color.BLACK);
-            key_head.setGravity(Gravity.CENTER);
-            heading.addView(key_head);
-            TextView val_head = new TextView(HomeFragment.home_fragment_activity);
-            val_head.setText(" VALUE ");
-            val_head.setTextColor(Color.BLACK);
-            val_head.setGravity(Gravity.CENTER);
-            heading.addView(val_head);
-            if (HomeFragment.live_table_flag) {
-                HomeFragment.live_btn.setTextColor(Color.GREEN);
-                HomeFragment.live_table.addView(heading);
-            }
 
             int i = 1;
             for (Map.Entry<String, String> entry : live_data.entrySet()) {
@@ -129,24 +109,19 @@ public class LiveData implements Runnable{
                 } else {
                     tbrow.setBackgroundColor(Color.rgb(192, 192, 192));
                 }
-
-                TextView sl_view = new TextView(HomeFragment.home_fragment_activity);
-                sl_view.setText(i + ".");
-                sl_view.setTextSize(15);
-                sl_view.setTextColor(Color.BLACK);
-                sl_view.setGravity(Gravity.CENTER);
-                tbrow.addView(sl_view);
                 TextView key_view = new TextView(HomeFragment.home_fragment_activity);
                 key_view.setText(entry.getKey());
                 key_view.setTextSize(15);
                 key_view.setTextColor(Color.BLACK);
-                key_view.setGravity(Gravity.CENTER);
+                key_view.setGravity(Gravity.LEFT);
+                key_view.setPadding(10,10,10, 0);
                 tbrow.addView(key_view);
                 TextView val_view = new TextView(HomeFragment.home_fragment_activity);
                 val_view.setText(entry.getValue());
                 val_view.setTextSize(15);
                 val_view.setTextColor(Color.BLACK);
-                val_view.setGravity(Gravity.CENTER);
+                val_view.setGravity(Gravity.RIGHT);
+                val_view.setPadding(10,10,10, 0);
                 tbrow.addView(val_view);
                 if (HomeFragment.live_table_flag) {
                     HomeFragment.live_btn.setTextColor(Color.GREEN);

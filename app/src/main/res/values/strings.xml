@@ -6,7 +6,7 @@
     <string name="title_activity_login">Login Activity</string>
     <string name="menu_home">menu_home</string>
     <string name="action_settings">action_settings</string>
-    <string name="menu_gallery">menu_gallery</string>
+    <string name="menu_gallery">Setting</string>
     <string name="menu_slideshow">menu_slideshow</string>
     <string name="prompt_password">prompt_password</string>
     <string name="action_sign_in_short">action_sign_in_short</string>

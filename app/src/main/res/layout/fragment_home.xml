@@ -8,6 +8,51 @@
     tools:context=".ServerConnection"
     android:keepScreenOn="true">
 
+
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/wifi_fab"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="10sp"-->
+<!--        android:src="@drawable/ic_server"-->
+<!--        app:backgroundTint="@color/light_gray"-->
+<!--        app:fabSize="mini"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/computer_fab"-->
+<!--        app:layout_constraintEnd_toEndOf="parent" />-->
+
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/computer_fab"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:src="@drawable/ic_server"-->
+<!--        app:backgroundTint="@color/light_gray"-->
+<!--        app:fabSize="mini"-->
+<!--        android:layout_margin="10sp"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/share_fab"-->
+<!--        app:layout_constraintEnd_toEndOf="parent" />-->
+
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/share_fab"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:src="@drawable/ic_baseline_share_24"-->
+<!--        app:backgroundTint="@color/light_gray"-->
+<!--        app:fabSize="mini"-->
+<!--        android:layout_margin="10sp"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/add_fab"-->
+<!--        app:layout_constraintEnd_toEndOf="parent" />-->
+
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/add_fab"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:src="@drawable/ic_baseline_add_24"-->
+<!--        app:backgroundTint="@color/light_gray"-->
+<!--        app:fabSize="normal"-->
+<!--        android:layout_margin="5sp"/>-->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -50,6 +95,14 @@
                         android:backgroundTint="#808080"
                         app:cornerRadius="0dp"
                         android:text="Speedometer" />
+
+                    <Button
+                        android:id="@+id/chart_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#808080"
+                        app:cornerRadius="0dp"
+                        android:text="charts" />
 
                     <Button
                         android:id="@+id/scan_data"
@@ -137,9 +190,65 @@
                 android:id="@+id/table"
                 android:layout_marginTop="2dp"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
+                android:stretchColumns="1"
                 android:layout_weight="1">
             </TableLayout>
+
+            <LinearLayout
+                android:id="@+id/legend"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5sp"
+                android:layout_weight="3">
+
+                <TextView
+                    android:layout_width="15sp"
+                    android:layout_height="15sp"
+                    android:layout_margin="5sp"
+                    android:background="@color/green"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5sp"
+                    android:text="Upload"/>
+
+                <TextView
+                    android:layout_width="15sp"
+                    android:layout_height="15sp"
+                    android:layout_margin="5sp"
+                    android:background="@color/red"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5sp"
+                    android:text="Download"/>
+
+                <TextView
+                    android:id="@+id/down_legend"
+                    android:layout_width="15sp"
+                    android:layout_height="15sp"
+                    android:layout_margin="5sp"
+                    android:background="@color/blue_info"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5sp"
+                    android:text="Total"/>
+
+            </LinearLayout>
+
+            <!-- we add graph view to display -->
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/graph"
+                android:layout_gravity="center"
+                android:padding="10sp"
+                android:layout_width="match_parent"
+                android:layout_height="250sp"
+                android:title="Bit rate in mbps"/>
 
 
             <LinearLayout
@@ -164,7 +273,14 @@
                     android:layout_height="match_parent"
                     app:srcCompat="@android:drawable/ic_menu_share" />
 
+
             </LinearLayout>
+
+
+            <WebView
+                android:id="@+id/webview"
+                android:layout_width="match_parent"
+                android:layout_height="187dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

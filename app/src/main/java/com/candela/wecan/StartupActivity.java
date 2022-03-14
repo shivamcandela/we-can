@@ -3,26 +3,20 @@ package com.candela.wecan;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.candela.wecan.tests.base_tools.CardUtils;
-import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.candela.wecan.tests.base_tools.LF_Resource;
 import com.candela.wecan.tests.base_tools.file_handler;
 import com.candela.wecan.tools.GetNetworkCapabilities;
@@ -36,6 +30,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.Permission;
+
+
+
 import java.util.Map;
 
 //import candela.lfresource.lfresource;
@@ -99,7 +96,8 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (u_name.getText().toString().length() < 4 || test_name_tv.getText().toString().length() < 4) {
+                if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
+                        test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
                     Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
