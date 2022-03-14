@@ -1,4 +1,4 @@
-package com.candela.wecan.tests.base_tools;
+package com.candela.wecan.dashboard;
 
 import android.content.Context;
 import android.content.Intent;
@@ -98,6 +98,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     /* Sys Info Tab OnClick Listener */
     private void SystemInfoListener() {
+        HomeFragment.handler_graph.removeCallbacks(HomeFragment.runnable_graph);
         HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
         HomeFragment.live_table_flag = false;
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
@@ -229,6 +230,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     /* Live Data Tab OnClick Listener */
     private void LiveBtnListener(){
+        HomeFragment.handler_graph.removeCallbacks(HomeFragment.runnable_graph);
         HomeFragment.chart_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
         HomeFragment.graph.setVisibility(View.GONE);
@@ -247,6 +249,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
 
     /* Speedometer Tab OnClick Listener */
     private void Speedometer(){
+        HomeFragment.handler_graph.removeCallbacks(HomeFragment.runnable_graph);
         HomeFragment.live_table_flag = false;
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
         HomeFragment.live_table.removeAllViews();
@@ -280,6 +283,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
     }
 
     private void Charts(){
+        HomeFragment.handler_graph.removeCallbacks(HomeFragment.runnable_graph);
         HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
         HomeFragment.live_table_flag = false;
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
@@ -308,7 +312,7 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
                 return String.valueOf((int) Math.round(progress));
             }
         });
-        HomeFragment.handler_speedometer_thread.post(HomeFragment.runnable_speedometer);
+        HomeFragment.handler_graph.post(HomeFragment.runnable_graph);
 
     }
 

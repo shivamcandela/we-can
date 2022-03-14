@@ -21,7 +21,6 @@ public class GetPhoneWifiInfo {
     public static String GetDeviceInfo() {
         String device_model = Build.MANUFACTURER;
 //        String device_model = Build.;
-        Log.e("device model", device_model);
         return device_model;
     }
 
@@ -50,10 +49,8 @@ public class GetPhoneWifiInfo {
             List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
 
             for (NetworkInterface nif : all) {
-                Log.e("gopi", nif.toString());
-                Log.e("bahu", nif.toString());
+
                 if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
-                Log.e("jasus", nif.toString());
                 byte[] macBytes = nif.getHardwareAddress();
                 if (macBytes == null) {
                     return "";

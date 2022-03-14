@@ -1,7 +1,5 @@
 package com.candela.wecan.dashboard;
 
-import static com.candela.wecan.tests.base_tools.HomeTableManager.up_down_global;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
@@ -9,7 +7,6 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.text.format.Formatter;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;

@@ -2,7 +2,6 @@ package com.candela.wecan.ui.home;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.TrafficStats;
 import android.net.wifi.ScanResult;
@@ -15,7 +14,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,26 +22,23 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.candela.wecan.R;
-import com.candela.wecan.dashboard.FabButton;
+import com.candela.wecan.dashboard.HomeTableManager;
 import com.candela.wecan.dashboard.LinkSpeedThread;
 import com.candela.wecan.dashboard.LiveData;
+import com.candela.wecan.dashboard.RealTimeChart;
 import com.candela.wecan.dashboard.SaveData;
 import com.candela.wecan.dashboard.Speedometer;
 import com.candela.wecan.databinding.FragmentHomeBinding;
-import com.candela.wecan.tests.base_tools.HomeTableManager;
 import com.cardiomood.android.controls.gauge.SpeedometerGauge;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.jjoe64.graphview.GraphView;
 
 import java.util.LinkedHashMap;
@@ -53,7 +48,6 @@ import java.util.Map;
 import candela.lfresource.LANforgeMgr;
 
 public class HomeFragment extends Fragment {
-    private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
 //    private static final String FILE_NAME = "data.conf";
     public static TextView link_speed;
@@ -64,15 +58,10 @@ public class HomeFragment extends Fragment {
     public static TableLayout live_table = null;
     public static TableLayout scan_table = null;
     public static GraphView graph = null;
-    public static Bundle saved_instance;
     public static long last_bps_time = 0;
     public static long last_rx_bytes = 0;
     public static long last_tx_bytes = 0;
     String username = "";
-    LayoutInflater layout_inflator;
-    ViewGroup view_group;
-    private LifecycleOwner view_owner;
-    private View view;
     public static Runnable runnable_live;
     public static Handler handler_link;
     public static Runnable runnable_link;
@@ -86,7 +75,6 @@ public class HomeFragment extends Fragment {
     private ImageView share_btn;
     private Switch switch_btn;
     public static View hView;
-    TextView nav_user;
     TextView nav_server;
     TextView nav_resource_realm;
     private NavigationView navigationView;
@@ -96,6 +84,8 @@ public class HomeFragment extends Fragment {
     public static Handler handler_save_data;
     public static Runnable runnable_save_data;
     public static LinearLayout legend;
+    public static Handler handler_graph;
+    public static RealTimeChart runnable_graph;
 
 
     public String getUserName() {
@@ -107,11 +97,13 @@ public class HomeFragment extends Fragment {
     public static FloatingActionButton AddFab, computerFab, shareFab, wifiFab;
     public static Boolean isAllFabsVisible;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         handler_live_data = new Handler();
         handler_link = new Handler();
         handler_speedometer_thread = new Handler();
+        handler_graph = new Handler();
 
         handler_save_data = new Handler();
         runnable_save_data = new SaveData();
@@ -119,6 +111,7 @@ public class HomeFragment extends Fragment {
         runnable_live = new LiveData();
         runnable_speedometer =  new Speedometer();
         runnable_link = new LinkSpeedThread();
+        runnable_graph = new RealTimeChart();
 
         home_fragment_activity = this.getActivity();
         navigationView = view.findViewById(R.id.nav_view);
@@ -139,7 +132,6 @@ public class HomeFragment extends Fragment {
         chart_btn = view.findViewById(R.id.chart_btn);
         graph = (GraphView) view.findViewById(R.id.graph);
         legend = view.findViewById(R.id.legend);
-
 
         last_bps_time = System.currentTimeMillis();
         last_tx_bytes = TrafficStats.getTotalTxBytes();
@@ -236,7 +228,6 @@ public class HomeFragment extends Fragment {
         }
         super.onAttach(context);
     }
-
 
     public interface onFragmentBtnSelected{
         public void onButtonSelected();
@@ -462,6 +453,10 @@ public class HomeFragment extends Fragment {
         } else if (unitRx.equals("Mbps")) {
             downlink = Double.parseDouble(Rx.substring(0, Rx.length() - 4));
         }
+        else if (unitRx.equals("Kbps")){
+            downlink = Double.parseDouble(Rx.substring(0, Rx.length() - 6));
+            downlink = downlink *0.001;
+        }
 
         String unitTx = Tx.substring(Tx.length() - 4);
         double uplink = 0;
@@ -470,7 +465,11 @@ public class HomeFragment extends Fragment {
         } else if (unitTx.equals("Mbps")) {
             uplink = Double.parseDouble(Tx.substring(0, Tx.length() - 4));
         }
-        return new String[]{String.valueOf((int) downlink), String.valueOf((int) uplink), Rx, Tx};
+        else if (unitRx.equals("Kbps")){
+            uplink = Double.parseDouble(Rx.substring(0, Rx.length() - 6));
+            uplink = uplink *0.001;
+        }
+        return new String[]{String.valueOf((double) downlink), String.valueOf((double) uplink), Rx, Tx};
     }
 
     public void scanCompleted(boolean success) {
