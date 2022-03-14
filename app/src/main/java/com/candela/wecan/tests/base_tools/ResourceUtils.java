@@ -49,6 +49,7 @@ import candela.lfresource.PlatformInfo;
 import candela.lfresource.LANforgeMgr;
 import candela.lfresource.Stdlib;
 import com.candela.wecan.StartupActivity;
+import com.candela.wecan.navigation;
 import com.candela.wecan.ui.home.HomeFragment;
 
 public class ResourceUtils extends AppCompatActivity implements AndroidUI{
@@ -322,7 +323,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.totalMem = Runtime.getRuntime().totalMemory();
 
         if (HomeFragment.instance != null) {
-            pi.wecan_user_name = HomeFragment.instance.getUserName();
+            pi.wecan_user_name = navigation.getUserName();
         }
 
         // CPU Info

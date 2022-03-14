@@ -88,9 +88,7 @@ public class HomeFragment extends Fragment {
     public static RealTimeChart runnable_graph;
 
 
-    public String getUserName() {
-        return username;
-    }
+
     private HomeTableManager homeTableManager;
     public static String[] up_down_data;
 
