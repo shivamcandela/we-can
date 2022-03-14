@@ -20,18 +20,31 @@
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:src="@drawable/ic_candelalogo" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black_overlay"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/nav_header_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+        android:id="@+id/user"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black_overlay"
-        android:text="@string/nav_header_subtitle" />
+        android:textColor="@color/black_overlay" />
+
+    <TextView
+        android:id="@+id/server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black_overlay" />
+
+    <TextView
+        android:id="@+id/resource_realm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black_overlay" />
+
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:paddingTop="@dimen/nav_header_vertical_spacing"-->
+<!--        android:text="support@candelatech.com"-->
+<!--        android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
+<!--        android:textColor="@color/black_overlay" />-->
 </LinearLayout>

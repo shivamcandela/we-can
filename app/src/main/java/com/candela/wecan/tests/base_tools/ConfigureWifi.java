@@ -38,7 +38,6 @@ public class ConfigureWifi {
         this.intentFilter = new IntentFilter();
         this.cc_data = new ArrayList<>();
         this.CC_Status = 0;
-        this.callback();
         this.connect();
     }
     public void callback(){
@@ -52,8 +51,11 @@ public class ConfigureWifi {
                 WifiInfo wifiInfo = wifi.getConnectionInfo();
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 Log.i("device status", timestamp.toString() + " " + wifiInfo.toString());
-                cc_data.add(timestamp.toString() + " " + wifiInfo.toString());
-                if (wifiInfo.getSupplicantState().toString() == "COMPLETED" && wifi_name == wifiInfo.getSSID()){
+                cc_data.add(timestamp.toString() + "-:-" + wifiInfo.toString());
+                if (wifiInfo.getSupplicantState().toString().equals("DISCONNECTED") && ("\"" + wifi_name + "\"").equals(wifiInfo.getSSID())){
+
+                }
+                if (wifiInfo.getSupplicantState().toString().equals("COMPLETED") && ("\"" + wifi_name + "\"").equals(wifiInfo.getSSID())){
                     CC_Status = 1;
                     context.unregisterReceiver(this);
                 }
@@ -72,10 +74,16 @@ public class ConfigureWifi {
         intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
         context.registerReceiver(broadcastReceiver, intentFilter);
     }
+    public boolean isConnectedto(String ssid){
+        if (wifiManager.getConnectionInfo().getSSID().toString().equals(ssid)){
+            return true;
+        }
+        return false;
+    }
     private void connect() {
+
         wifiManager.setWifiEnabled(false);
-        Log.e("ssid", this.ssid);
-        Log.e("pass", this.password);
+        wifiManager.setWifiEnabled(true);
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
@@ -90,19 +98,32 @@ public class ConfigureWifi {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        List<WifiConfiguration> configuredNetworks = wifiManager.getConfiguredNetworks();
-        for (WifiConfiguration conf : configuredNetworks){
-
-            wifiManager.disableNetwork(conf.networkId);
-            wifiManager.removeNetwork(conf.networkId);
-
+        List<WifiConfiguration> list1 = wifiManager.getConfiguredNetworks();
+        int j = 10;
+        for( WifiConfiguration i : list1 ) {
+            j = j++;
+            i.priority = j++;
+            wifiManager.updateNetwork(i);
+            wifiManager.saveConfiguration();
+            if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                i.priority = 9999;
+                wifiManager.updateNetwork(i);
+                wifiManager.saveConfiguration();
+                wifiManager.disconnect();
+                this.callback();
+                wifiManager.setWifiEnabled(true);
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+                return;
+            }
         }
+
         WifiConfiguration wifiConfiguration = new WifiConfiguration();
 
         wifiConfiguration.SSID = String.format("\"%s\"", this.ssid);
 
-        Log.e("log", "ssid -:" + ssid + ":- password -:" + password + ":-");
-        Log.e("log", "wifiConfiguration: " + wifiConfiguration.toString());
+        Log.i("log", "ssid -:" + ssid + ":- password -:" + password + ":-");
+        Log.i("log", "wifiConfiguration: " + wifiConfiguration.toString());
 
         StringTokenizer st = new StringTokenizer(encryption, "|");
         while (st.hasMoreTokens()) {
@@ -163,24 +184,27 @@ public class ConfigureWifi {
 
         int wifiID = wifiManager.addNetwork(wifiConfiguration);
 
-        Log.e("log", "wifiID: " + wifiID);
+        Log.i("log", "wifiID: " + wifiID);
+
 
         wifiManager.disconnect();
         wifiManager.enableNetwork(wifiID, true);
         wifiManager.reconnect();
 
-//        wifiManager.setWifiEnabled(true);
+        wifiManager.setWifiEnabled(true);
 //        wifiConfiguration.
-//        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-//        for( WifiConfiguration i : list ) {
-//            System.out.println(i.SSID);
-//            if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
-//                wifiManager.disconnect();
-//                wifiManager.enableNetwork(i.networkId, true);
-//                wifiManager.reconnect();
-//                break;
-//            }
-//        }
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        for( WifiConfiguration i : list ) {
+            System.out.println(i.SSID);
+            if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                wifiManager.disconnect();
+//                this.callback();
+                wifiManager.setWifiEnabled(true);
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+                break;
+            }
+        }
 
 //        wifiID = wifiManager.addNetwork(wifiConfiguration);
 //        wifiManager.disconnect();

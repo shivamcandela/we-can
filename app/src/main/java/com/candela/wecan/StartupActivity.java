@@ -1,26 +1,26 @@
 package com.candela.wecan;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.candela.wecan.tests.base_tools.CardUtils;
 import com.candela.wecan.tests.base_tools.LF_Resource;
 import com.candela.wecan.tests.base_tools.file_handler;
+import com.candela.wecan.tools.GetNetworkCapabilities;
+import com.candela.wecan.tools.NetworkSniffTask;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.Permission;
+
+
+
 import java.util.Map;
 
 //import candela.lfresource.lfresource;
@@ -50,10 +53,11 @@ public class StartupActivity extends AppCompatActivity {
     static int state;
     private String ssid, passwd;
     public Context context;
-    protected LF_Resource lf_resource = null;
+    protected static LF_Resource lf_resource = null;
     public View my_view = null;
     SharedPreferences sharedpreferences = null;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,48 +83,60 @@ public class StartupActivity extends AppCompatActivity {
                 android.Manifest.permission.ACCESS_NETWORK_STATE,
                 android.Manifest.permission.CHANGE_WIFI_STATE,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CHANGE_WIFI_MULTICAST_STATE,
         };
         if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
+        //        networkSniffTask.execute();
 //        Intent myIntent = new Intent(this, ClientConnectivityConfiguration.class);
 //        startActivity(myIntent);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (keys.keySet().contains(server_ip.getText().toString())){
-                    Map<String,?> keys = sharedpreferences.getAll();
-                    String ip = server_ip.getText().toString();
-                    String realm_id = (String) keys.get("realm-" + ip);
-                    String resource_id = (String) keys.get("resource-" + ip);
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putString("user_name" ,  u_name.getText().toString());
-                    editor.putString("test_name" ,  test_name_tv.getText().toString());
-                    editor.apply();
-                    editor.commit();
-                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
-                }
-                else{
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putString(server_ip.getText().toString(), "-1");
-                    editor.putString("resource-" + server_ip.getText().toString(), "-1");
-                    editor.putString("realm-" + server_ip.getText().toString(), "-1");
-                    editor.putString("user_name" ,  u_name.getText().toString());
-                    editor.putString("test_name" ,  test_name_tv.getText().toString());
-                    editor.apply();
-                    editor.commit();
-                    Map<String,?> keys = sharedpreferences.getAll();
-                    String ip = server_ip.getText().toString();
-                    String realm_id = (String) keys.get("realm-" + ip);
-                    String resource_id = (String) keys.get("resource-" + ip);
-                    connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
+                if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
+                        test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
+                    Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+
+                    if (keys.keySet().contains(server_ip.getText().toString())) {
+                        Map<String, ?> keys = sharedpreferences.getAll();
+                        String ip = server_ip.getText().toString();
+                        String realm_id = (String) keys.get("realm-" + ip);
+                        String resource_id = (String) keys.get("resource-" + ip);
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putString("user_name", u_name.getText().toString());
+                        editor.putString("test_name", test_name_tv.getText().toString());
+                        editor.apply();
+                        editor.commit();
+                        connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
+                    } else {
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putString(server_ip.getText().toString(), "-1");
+                        editor.putString("resource-" + server_ip.getText().toString(), "-1");
+                        editor.putString("realm-" + server_ip.getText().toString(), "-1");
+                        editor.putString("user_name", u_name.getText().toString());
+                        editor.putString("test_name", test_name_tv.getText().toString());
+                        editor.apply();
+                        editor.commit();
+                        Map<String, ?> keys = sharedpreferences.getAll();
+                        String ip = server_ip.getText().toString();
+                        String realm_id = (String) keys.get("realm-" + ip);
+                        String resource_id = (String) keys.get("resource-" + ip);
+                        connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
+                    }
                 }
             }
         });
     }
 
     public void openServerConnection () {
+        if (navigation.active){
+            return;
+        }
        Intent myIntent = new Intent(this, navigation.class);
        startActivity(myIntent);
     }
@@ -174,7 +190,6 @@ public class StartupActivity extends AppCompatActivity {
         Log.e("log", "notifyCxChanged, state: " + state);
 
         if (lf_resource.getConnState()) {
-            Toast.makeText(my_view.getContext(), "Connected to LANforge Server", Toast.LENGTH_SHORT).show();
             updateRealmInfo();
             // CardUtils cardUtils = new CardUtils(getApplicationContext());
             openServerConnection();

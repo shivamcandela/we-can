@@ -98,9 +98,8 @@ public class ClientConnectivityConfiguration extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onClick(View view) {
-//                System.out.println(.setWifiEnabled(true));
                 wifiManager.startScan();
-                //Log.e("log", "CCC start-btn onClick: startScan");
+
 
 
                 String wifi_name = spinner.getSelectedItem().toString();
@@ -140,7 +139,6 @@ public class ClientConnectivityConfiguration extends AppCompatActivity {
             } else {
                 Toast.makeText(ClientConnectivityConfiguration.this, "location turned on", Toast.LENGTH_SHORT).show();
                 wifiManager.startScan();
-                //Log.e("log", "CCC getWifi A: startScan");
             }
         } else {
             Toast.makeText(ClientConnectivityConfiguration.this, "scanning", Toast.LENGTH_SHORT).show();
