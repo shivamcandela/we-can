@@ -496,7 +496,7 @@ public class HomeFragment extends Fragment {
         List<ScanResult> scan_result = wifiManager.getScanResults();
         for (int i = 0; i < scan_result.size(); i++) {
             ScanResult sr = scan_result.get(i);
-            //Log.e("log", "scan-result[" + i + "]: " + sr.toString() + "\n");
+            Log.e("log", "scan-result[" + i + "]: " + sr.toString() + "\n");
 
             // The IEs do not implement toString() in useful manner, so we would have to parse
             // the binary info if we cared to report this.  Ignore for now.
