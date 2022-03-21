@@ -90,7 +90,7 @@ public class RealTimeChart implements Runnable{
         gridLabel.setVerticalAxisTitleColor(Color.BLUE);
 //            gridLabel.setHorizontalAxisTitle("Time in seconds");
 //            gridLabel.setVerticalAxisTitle("Traffic in Mbps");
-        HomeFragment.graph.setTitle("Traffic status (X-axis in Mbps Y-axis in Sec)");
+        HomeFragment.graph.setTitle("Traffic status (Y-axis in Mbps X-axis in Sec)");
         HomeFragment.handler_graph.postDelayed(HomeFragment.runnable_graph, 1000);
     }
 }
