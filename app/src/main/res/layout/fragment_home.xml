@@ -111,6 +111,15 @@
                         android:backgroundTint="#808080"
                         app:cornerRadius="0dp"
                         android:text="scan" />
+
+                    <Button
+                        android:id="@+id/webpage_test_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="#808080"
+                        android:text="Webpage Test"
+                        app:cornerRadius="0dp" />
                 </LinearLayout>
 
             </HorizontalScrollView>
