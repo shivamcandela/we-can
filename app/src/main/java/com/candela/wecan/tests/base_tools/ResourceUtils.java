@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.io.RandomAccessFile;
+import java.util.concurrent.TimeUnit;
 
 import candela.lfresource.AndroidUI;
 import candela.lfresource.PlatformInfo;
@@ -57,7 +58,7 @@ import com.candela.wecan.ui.home.HomeFragment;
 public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public static Context context;
     protected StartupActivity startup_activity;
-
+    public static WebBrowser webBrowser;
     public ResourceUtils(StartupActivity activity, Context context){
         this.context = context;
         startup_activity = activity;
@@ -614,7 +615,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                             public void run() {
                                 HomeFragment.webpage_test_btn.performClick();
                                 try {
-                                    WebBrowser webBrowser = new WebBrowser("https://www.google.com");
+                                    webBrowser = new WebBrowser("https://www.cnn.com");
 
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
@@ -630,6 +631,20 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
             };
         };
         thread.start();
+        while (true){
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(webBrowser.CALL_BACKS.size());
+            System.out.println(webBrowser.RUNNING);
+            if (webBrowser.RUNNING == false){
+                break;
+            }
+        }
+//        new
+        System.out.println("total-bytes-debug: " + webBrowser.totalBytes);
         return 0;
     }
 }

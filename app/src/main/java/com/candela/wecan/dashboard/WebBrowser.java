@@ -50,6 +50,7 @@ public class WebBrowser extends WebViewClient{
     public static ArrayList<Timestamp> timestamps;
     public long initial_bytes = 0;
     public long current_bytes = 0;
+    public long totalBytes = 0;
 
     public WebBrowser(String URL) throws InterruptedException {
         this.URL = URL;
@@ -74,28 +75,32 @@ public class WebBrowser extends WebViewClient{
     }
 
     private void waitForCompletion() throws InterruptedException {
-        final int[] size_previous = {CALL_BACKS.size()};
-
+        int[] size_previous = {CALL_BACKS.size()};
         Handler handler = new Handler();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 int size_next = CALL_BACKS.size();
-                System.out.println("RUNNING TEST");
+                System.out.println("SHIVAM RUNNING TEST");
                 System.out.println(String.valueOf(size_previous[0]) + String.valueOf(size_next));
                 if (FINISHED){
                     if (size_previous[0] == size_next){
+                        System.out.println("SHIVAM FINISHED TEST");
                         RUNNING = false;
                     }
+                    else {
+                        handler.postDelayed(this, 1000);
+                    }
+                }
+
+                if (size_previous[0] != size_next){
+                    handler.postDelayed(this, 1000);
                 }
                 size_previous[0] = size_next;
-                if (size_previous[0] != size_next){
-                    handler.postDelayed(this, 2000);
-                }
 
             }
         };
-        handler.postDelayed(runnable, 2000);
+        handler.postDelayed(runnable, 1000);
     }
 
     @Override
@@ -139,7 +144,7 @@ public class WebBrowser extends WebViewClient{
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(timestamp);
         current_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
-        long totalBytes = current_bytes - initial_bytes;
+        totalBytes = current_bytes - initial_bytes;
         System.out.println(totalBytes);
         CALL_BACKS.add(url);
 
