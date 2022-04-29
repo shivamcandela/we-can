@@ -360,6 +360,8 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
         HomeFragment.chart_btn.setTextColor(Color.WHITE);
         HomeFragment.webpage_test_btn.setTextColor(Color.GREEN);
+        HomeFragment.live_btn.setTextColor(Color.WHITE);
+        HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
         HomeFragment.graph.setVisibility(View.GONE);
         HomeFragment.legend.setVisibility(View.GONE);
@@ -371,9 +373,9 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         if (HomeFragment.live_table_flag == false){
             HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
         }
-        HomeFragment.handler_webpage_test.post(HomeFragment.runnable_webpage_test);
+//        HomeFragment.handler_webpage_test.post(HomeFragment.runnable_webpage_test);
         HomeFragment.webpage_view.setVisibility(View.VISIBLE);
-        HomeFragment.webpage_view.loadUrl("https://www.google.com");
+//        HomeFragment.webpage_view.loadUrl("https://www.google.com");
 //        HomeFragment.live_table_flag = true;
 //        HomeFragment.scan_table_flag = false;
 //        HomeFragment.up_down.setVisibility(View.GONE);

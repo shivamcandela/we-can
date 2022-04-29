@@ -263,7 +263,7 @@
             <WebView
                 android:id="@+id/webpage_view"
                 android:layout_width="match_parent"
-                android:layout_height="488dp" />
+                android:layout_height="603dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

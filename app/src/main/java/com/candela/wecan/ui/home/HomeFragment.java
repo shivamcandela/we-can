@@ -1,7 +1,9 @@
 package com.candela.wecan.ui.home;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.TrafficStats;
 import android.net.wifi.ScanResult;
@@ -69,8 +71,8 @@ public class HomeFragment extends Fragment {
     public static Runnable runnable_link;
     public static Runnable runnable_speedometer;
     public static Handler handler_speedometer_thread;
-    public static Runnable runnable_webpage_test;
-    public static Handler handler_webpage_test;
+//    public static Runnable runnable_webpage_test;
+//    public static Handler handler_webpage_test;
 
     public static Activity home_fragment_activity;
     public static Handler handler_live_data;
@@ -95,12 +97,12 @@ public class HomeFragment extends Fragment {
 
     private HomeTableManager homeTableManager;
     public static String[] up_down_data;
-
+    public static ActivityManager actvityManager;
     public static FloatingActionButton AddFab, computerFab, shareFab, wifiFab;
     public static Boolean isAllFabsVisible;
     public static Button webpage_test_btn;
     public static WebView webpage_view;
-
+    public static PackageManager pkgmgr;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -108,15 +110,17 @@ public class HomeFragment extends Fragment {
         handler_link = new Handler();
         handler_speedometer_thread = new Handler();
         handler_graph = new Handler();
-        handler_webpage_test = new Handler();
+//        handler_webpage_test = new Handler();
         handler_save_data = new Handler();
+        actvityManager = (ActivityManager) getActivity().getApplicationContext().getSystemService( Context.ACTIVITY_SERVICE );
+        pkgmgr = getActivity().getApplicationContext().getPackageManager();
 
         runnable_save_data = new SaveData();
         runnable_live = new LiveData();
         runnable_speedometer =  new Speedometer();
         runnable_link = new LinkSpeedThread();
         runnable_graph = new RealTimeChart();
-        runnable_webpage_test = new WebBrowser();
+//        runnable_webpage_test = new WebBrowser();
 
         home_fragment_activity = this.getActivity();
         navigationView = view.findViewById(R.id.nav_view);
@@ -222,6 +226,7 @@ public class HomeFragment extends Fragment {
             }
         };
         handler_ready_state.postDelayed(runnable_ready_state, 1000);
+
         return view;
     }
 

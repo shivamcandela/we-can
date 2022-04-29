@@ -36,6 +36,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -49,6 +50,7 @@ import candela.lfresource.PlatformInfo;
 import candela.lfresource.LANforgeMgr;
 import candela.lfresource.Stdlib;
 import com.candela.wecan.StartupActivity;
+import com.candela.wecan.dashboard.WebBrowser;
 import com.candela.wecan.navigation;
 import com.candela.wecan.ui.home.HomeFragment;
 
@@ -536,13 +538,49 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
-        
+
         if (ssid.equals("DEFAULT")){
             return null;
         }
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    synchronized (this) {
+                        wait(1000);
+
+                        runOnUiThread(new Runnable() {
+                            @RequiresApi(api = Build.VERSION_CODES.P)
+                            @Override
+                            public void run() {
+                                HomeFragment.webpage_test_btn.performClick();
+                                try {
+                                    WebBrowser webBrowser = new WebBrowser("https://www.google.com");
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            };
+        };
+        thread.start();
+//        try {
+//            thread.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
+        System.out.println("SHIVAM-WEBPAGE DONE");
+//        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+//        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
 //        if (configureWifi.isConnectedto(ssid)){
 //            Log.i("iron",configureWifi.cc_data.toString());
 //        }
@@ -558,6 +596,41 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 //        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
 //        System.out.println("IronSpider: " + timestamp.toString());
         return null;
+    }
+
+    @Override
+    public int RunWebBrowserTest(String s) {
+        System.out.println("Shivam Thakur: " + s);
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    synchronized (this) {
+                        wait(1000);
+
+                        runOnUiThread(new Runnable() {
+                            @RequiresApi(api = Build.VERSION_CODES.P)
+                            @Override
+                            public void run() {
+                                HomeFragment.webpage_test_btn.performClick();
+                                try {
+                                    WebBrowser webBrowser = new WebBrowser("https://www.google.com");
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            };
+        };
+        thread.start();
+        return 0;
     }
 }
 
