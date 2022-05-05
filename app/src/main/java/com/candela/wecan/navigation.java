@@ -36,7 +36,7 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
     TextView nav_user;
     TextView nav_server;
     TextView nav_resource_realm;
-    public static String username = "";
+    public static String username = null;
     public static Context context;
     public static boolean active=false;
     public static String getUserName() {

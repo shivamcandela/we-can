@@ -33,7 +33,7 @@ public class LiveData implements Runnable{
         HomeFragment.live_table.removeAllViews();
         HomeFragment.system_info_btn.setTextColor(Color.WHITE);
         HomeFragment.live_btn.setTextColor(Color.GREEN);
-        HomeFragment.scan_btn.setTextColor(Color.WHITE);
+//        HomeFragment.scan_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
         GetNetworkCapabilities networkSniffTask = new GetNetworkCapabilities(HomeFragment.home_fragment_activity.getApplicationContext());
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(HomeFragment.home_fragment_activity);

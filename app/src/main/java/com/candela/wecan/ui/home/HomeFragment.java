@@ -1,7 +1,9 @@
 package com.candela.wecan.ui.home;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.TrafficStats;
 import android.net.wifi.ScanResult;
@@ -14,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +38,7 @@ import com.candela.wecan.dashboard.LiveData;
 import com.candela.wecan.dashboard.RealTimeChart;
 import com.candela.wecan.dashboard.SaveData;
 import com.candela.wecan.dashboard.Speedometer;
+import com.candela.wecan.dashboard.WebBrowser;
 import com.candela.wecan.databinding.FragmentHomeBinding;
 import com.cardiomood.android.controls.gauge.SpeedometerGauge;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -67,6 +71,8 @@ public class HomeFragment extends Fragment {
     public static Runnable runnable_link;
     public static Runnable runnable_speedometer;
     public static Handler handler_speedometer_thread;
+//    public static Runnable runnable_webpage_test;
+//    public static Handler handler_webpage_test;
 
     public static Activity home_fragment_activity;
     public static Handler handler_live_data;
@@ -91,10 +97,12 @@ public class HomeFragment extends Fragment {
 
     private HomeTableManager homeTableManager;
     public static String[] up_down_data;
-
+    public static ActivityManager actvityManager;
     public static FloatingActionButton AddFab, computerFab, shareFab, wifiFab;
     public static Boolean isAllFabsVisible;
-
+    public static Button webpage_test_btn;
+    public static WebView webpage_view;
+    public static PackageManager pkgmgr;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -102,18 +110,21 @@ public class HomeFragment extends Fragment {
         handler_link = new Handler();
         handler_speedometer_thread = new Handler();
         handler_graph = new Handler();
-
+//        handler_webpage_test = new Handler();
         handler_save_data = new Handler();
-        runnable_save_data = new SaveData();
+        actvityManager = (ActivityManager) getActivity().getApplicationContext().getSystemService( Context.ACTIVITY_SERVICE );
+        pkgmgr = getActivity().getApplicationContext().getPackageManager();
 
+        runnable_save_data = new SaveData();
         runnable_live = new LiveData();
         runnable_speedometer =  new Speedometer();
         runnable_link = new LinkSpeedThread();
         runnable_graph = new RealTimeChart();
+//        runnable_webpage_test = new WebBrowser();
 
         home_fragment_activity = this.getActivity();
         navigationView = view.findViewById(R.id.nav_view);
-        scan_btn = view.findViewById(R.id.scan_data);
+//        scan_btn = view.findViewById(R.id.scan_data);
         system_info_btn = view.findViewById(R.id.system_info_btn);
         live_btn = view.findViewById(R.id.rxtx_btn);
         speedometer_btn = view.findViewById(R.id.speedometer);
@@ -130,6 +141,8 @@ public class HomeFragment extends Fragment {
         chart_btn = view.findViewById(R.id.chart_btn);
         graph = (GraphView) view.findViewById(R.id.graph);
         legend = view.findViewById(R.id.legend);
+        webpage_test_btn = view.findViewById(R.id.webpage_test_btn);
+        webpage_view = view.findViewById(R.id.webpage_view);
 
         last_bps_time = System.currentTimeMillis();
         last_tx_bytes = TrafficStats.getTotalTxBytes();
@@ -144,9 +157,10 @@ public class HomeFragment extends Fragment {
 
         live_btn.setOnClickListener(homeTableManager);
 
-        scan_btn.setOnClickListener(homeTableManager);
+//        scan_btn.setOnClickListener(homeTableManager);
         switch_btn.setOnCheckedChangeListener(homeTableManager);
         chart_btn.setOnClickListener(homeTableManager);
+        webpage_test_btn.setOnClickListener(homeTableManager);
 
         system_info_btn.setEnabled(false);
         speedometer_btn.setEnabled(false);
@@ -212,6 +226,7 @@ public class HomeFragment extends Fragment {
             }
         };
         handler_ready_state.postDelayed(runnable_ready_state, 1000);
+
         return view;
     }
 

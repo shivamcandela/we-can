@@ -104,13 +104,22 @@
                         app:cornerRadius="0dp"
                         android:text="charts" />
 
+<!--                    <Button-->
+<!--                        android:id="@+id/scan_data"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:backgroundTint="#808080"-->
+<!--                        app:cornerRadius="0dp"-->
+<!--                        android:text="scan" />-->
+
                     <Button
-                        android:id="@+id/scan_data"
+                        android:id="@+id/webpage_test_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:backgroundTint="#808080"
-                        app:cornerRadius="0dp"
-                        android:text="scan" />
+                        android:text="Webpage Test"
+                        app:cornerRadius="0dp" />
                 </LinearLayout>
 
             </HorizontalScrollView>
@@ -251,6 +260,11 @@
                 android:title="Bit rate in mbps"/>
 
 
+            <WebView
+                android:id="@+id/webpage_view"
+                android:layout_width="match_parent"
+                android:layout_height="603dp" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -277,10 +291,11 @@
             </LinearLayout>
 
 
-<!--            <WebView-->
+            <!--            <WebView-->
 <!--                android:id="@+id/webview"-->
 <!--                android:layout_width="match_parent"-->
 <!--                android:layout_height="187dp" />-->
         </LinearLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

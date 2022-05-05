@@ -70,6 +70,9 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
             case R.id.chart_btn:
                 Charts();
                 break;
+            case R.id.webpage_test_btn:
+                Webpage();
+                break;
             case R.id.save_data_switch:
                 //
                 break;
@@ -110,13 +113,14 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.sys_table.removeAllViews();
         HomeFragment.system_info_btn.setTextColor(Color.GREEN);
         HomeFragment.live_btn.setTextColor(Color.WHITE);
-        HomeFragment.scan_btn.setTextColor(Color.WHITE);
+//        HomeFragment.scan_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
         HomeFragment.chart_btn.setTextColor(Color.WHITE);
         Vector<StringKeyVal> wifi_capabilities = new Vector<StringKeyVal>();
         Vector<StringKeyVal> wifi_mode = new Vector<StringKeyVal>();
         Vector<StringKeyVal> wifi_encryption = new Vector<StringKeyVal>();
-
+        HomeFragment.webpage_view.setVisibility(View.INVISIBLE);
+        HomeFragment.webpage_view.setEnabled(false);
         SharedPreferences sharedPreferences = HomeFragment.home_fragment_activity.getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String, ?> keys = sharedPreferences.getAll();
         String password = (String) keys.get("current-passwd");
@@ -232,9 +236,12 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
     private void LiveBtnListener(){
         HomeFragment.handler_graph.removeCallbacks(HomeFragment.runnable_graph);
         HomeFragment.chart_btn.setTextColor(Color.WHITE);
+        HomeFragment.webpage_test_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_linear.setVisibility(View.GONE);
         HomeFragment.graph.setVisibility(View.GONE);
         HomeFragment.legend.setVisibility(View.GONE);
+        HomeFragment.webpage_view.setVisibility(View.INVISIBLE);
+        HomeFragment.webpage_view.setEnabled(false);
         if (HomeFragment.handler_speedometer_thread != null) {
             HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
         }
@@ -257,14 +264,16 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.scan_table_flag = true;
         HomeFragment.system_info_btn.setTextColor(Color.WHITE);
         HomeFragment.live_btn.setTextColor(Color.WHITE);
-        HomeFragment.scan_btn.setTextColor(Color.WHITE);
+        HomeFragment.webpage_test_btn.setTextColor(Color.WHITE);
+//        HomeFragment.scan_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_btn.setTextColor(Color.GREEN);
         HomeFragment.speedometer_linear.setVisibility(View.VISIBLE);
         HomeFragment.up_down.setVisibility(View.VISIBLE);
         HomeFragment.graph.setVisibility(View.GONE);
         HomeFragment.legend.setVisibility(View.GONE);
         HomeFragment.chart_btn.setTextColor(Color.WHITE);
-
+        HomeFragment.webpage_view.setVisibility(View.INVISIBLE);
+        HomeFragment.webpage_view.setEnabled(false);
         HomeFragment.speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
             @Override
             public String getLabelFor(double progress, double maxProgress) {
@@ -294,11 +303,14 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         HomeFragment.up_down.setVisibility(View.VISIBLE);
         HomeFragment.sys_table.removeAllViews();
         HomeFragment.system_info_btn.setTextColor(Color.WHITE);
+        HomeFragment.webpage_test_btn.setTextColor(Color.WHITE);
         HomeFragment.live_btn.setTextColor(Color.WHITE);
-        HomeFragment.scan_btn.setTextColor(Color.WHITE);
+//        HomeFragment.scan_btn.setTextColor(Color.WHITE);
         HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
         HomeFragment.chart_btn.setTextColor(Color.GREEN);
-
+        HomeFragment.webpage_view.setVisibility(View.INVISIBLE);
+        HomeFragment.webpage_view.setEnabled(false);
+        HomeFragment.webpage_view.setActivated(false);
         HomeFragment.speedometerup.setLabelConverter(new SpeedometerGauge.LabelConverter() {
             @Override
             public String getLabelFor(double progress, double maxProgress) {
@@ -341,7 +353,34 @@ public class HomeTableManager extends AppCompatActivity implements View.OnClickL
         super.onPointerCaptureChanged(hasCapture);
     }
 
-
+    private void Webpage(){
+        HomeFragment.handler_graph.removeCallbacks(HomeFragment.runnable_graph);
+        HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
+        HomeFragment.live_table_flag = false;
+        HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
+        HomeFragment.chart_btn.setTextColor(Color.WHITE);
+        HomeFragment.webpage_test_btn.setTextColor(Color.GREEN);
+        HomeFragment.live_btn.setTextColor(Color.WHITE);
+        HomeFragment.speedometer_btn.setTextColor(Color.WHITE);
+        HomeFragment.speedometer_linear.setVisibility(View.GONE);
+        HomeFragment.graph.setVisibility(View.GONE);
+        HomeFragment.legend.setVisibility(View.GONE);
+        HomeFragment.live_table.removeAllViews();
+        HomeFragment.scan_table.removeAllViews();
+        if (HomeFragment.handler_speedometer_thread != null) {
+            HomeFragment.handler_speedometer_thread.removeCallbacks(HomeFragment.runnable_speedometer);
+        }
+        if (HomeFragment.live_table_flag == false){
+            HomeFragment.handler_live_data.removeCallbacks(HomeFragment.runnable_live);
+        }
+//        HomeFragment.handler_webpage_test.post(HomeFragment.runnable_webpage_test);
+        HomeFragment.webpage_view.setVisibility(View.VISIBLE);
+//        HomeFragment.webpage_view.loadUrl("https://www.google.com");
+//        HomeFragment.live_table_flag = true;
+//        HomeFragment.scan_table_flag = false;
+//        HomeFragment.up_down.setVisibility(View.GONE);
+//        HomeFragment.handler_live_data.post(HomeFragment.runnable_live);
+    }
 
 }
 
