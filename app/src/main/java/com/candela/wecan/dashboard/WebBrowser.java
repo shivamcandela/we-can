@@ -1,5 +1,6 @@
 package com.candela.wecan.dashboard;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -46,11 +47,15 @@ public class WebBrowser extends WebViewClient{
     public static String URL;
     public boolean FINISHED=false;
     public boolean RUNNING=true;
+    public boolean ERRORS=false;
     public List CALL_BACKS;
     public static ArrayList<Timestamp> timestamps;
     public long initial_bytes = 0;
     public long current_bytes = 0;
     public long totalBytes = 0;
+    public static Timestamp START_TIME;
+    public static Timestamp END_TIME;
+    public static boolean timeout;
 
     public WebBrowser(String URL) throws InterruptedException {
         this.URL = URL;
@@ -108,8 +113,25 @@ public class WebBrowser extends WebViewClient{
         super.onPageStarted(view, url, favicon);
         System.out.println("Page Load Started");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        START_TIME = timestamp;
         initial_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
+        System.out.println(initial_bytes);
         System.out.println(timestamp);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                timeout = true;
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(timeout) {
+                    System.out.println("Timeout");
+                }
+            }
+        }).start();
     }
 
 
@@ -118,13 +140,24 @@ public class WebBrowser extends WebViewClient{
         super.onPageFinished(view, url);
         System.out.println("Page Load Finished");
         FINISHED = true;
+        timeout = false;
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(timestamp);
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
+        ERRORS = true;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println(timestamp);
+        END_TIME = timestamp;
+        current_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
+        System.out.println(current_bytes);
+        totalBytes = current_bytes - initial_bytes;
+        System.out.println("Page Load Received Error");
+        System.out.println("" + String.valueOf(error.getErrorCode()) +  String.valueOf(error.getDescription().toString()));
     }
 
     @Override
@@ -143,6 +176,7 @@ public class WebBrowser extends WebViewClient{
         System.out.println("Loading Resource");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(timestamp);
+        END_TIME = timestamp;
         current_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
         totalBytes = current_bytes - initial_bytes;
         System.out.println(totalBytes);
