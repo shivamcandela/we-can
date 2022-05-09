@@ -37,6 +37,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import java.util.StringTokenizer;
@@ -321,11 +322,14 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.id = Build.ID;
         pi.availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         pi.totalMem = Runtime.getRuntime().totalMemory();
-
+//        Hashtable table = StartupActivity.getLFResourceCredentials();
+//        pi.wecan_user_name = table.get("user_name").toString();
         if (HomeFragment.instance != null) {
             pi.wecan_user_name = navigation.getUserName();
         }
-
+        Log.e("TAG: IRON DOME", navigation.getUserName());
+        System.out.println(HomeFragment.instance != null);
+        System.out.println(pi.wecan_user_name);
         // CPU Info
         pi.cores = 0;
         pi.processor = "";

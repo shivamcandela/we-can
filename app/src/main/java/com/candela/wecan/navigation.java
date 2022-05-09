@@ -58,9 +58,9 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
         Map<String, ?> keys = sharedPreferences.getAll();
         username = (String) keys.get("user_name");
 
-        String current_ip = (String) keys.get("current-ip");
-        String current_resource = (String) keys.get("current-resource");
-        String current_realm = (String) keys.get("current-realm");
+        String current_ip = (String) keys.get("current_ip");
+        String current_resource = (String) keys.get("current_resource");
+        String current_realm = (String) keys.get("current_realm");
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
