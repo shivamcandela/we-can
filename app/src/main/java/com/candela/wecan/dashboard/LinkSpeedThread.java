@@ -9,7 +9,7 @@ public class LinkSpeedThread implements Runnable{
     public void run() {
         try{
             HomeFragment.up_down_data = HomeFragment.updateBpsDisplay();
-            Log.e("link_speed", HomeFragment.up_down_data[0]);
+//            Log.e("link_speed", HomeFragment.up_down_data[0]);
         }
         catch (Exception e){
             e.printStackTrace();

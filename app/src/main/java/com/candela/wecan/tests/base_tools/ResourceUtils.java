@@ -6,20 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Handler;
-import android.os.HardwarePropertiesManager;
-import android.os.Parcel;
-import android.telephony.CellIdentity;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
-import android.telephony.CellSignalStrength;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthWcdma;
@@ -27,18 +20,15 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Enumeration;
+
 import java.util.List;
 import java.util.Vector;
 import java.util.StringTokenizer;
@@ -48,17 +38,17 @@ import candela.lfresource.AndroidUI;
 import candela.lfresource.L4EndpTxThread;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.StringKeyVal;
-import candela.lfresource.PlatformInfo;
 import candela.lfresource.LANforgeMgr;
 import candela.lfresource.Stdlib;
 import com.candela.wecan.StartupActivity;
+import com.candela.wecan.dashboard.WebBrowser;
 import com.candela.wecan.navigation;
 import com.candela.wecan.ui.home.HomeFragment;
 
 public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public static Context context;
     protected StartupActivity startup_activity;
-
+    public static WebBrowser webBrowser;
     public ResourceUtils(StartupActivity activity, Context context){
         this.context = context;
         startup_activity = activity;
@@ -543,9 +533,49 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
+
+        if (ssid.equals("DEFAULT")){
+            return null;
+        }
+//        Thread thread = new Thread(){
+//            @Override
+//            public void run() {
+//                try {
+//                    synchronized (this) {
+//                        wait(1000);
+//
+//                        runOnUiThread(new Runnable() {
+//                            @RequiresApi(api = Build.VERSION_CODES.P)
+//                            @Override
+//                            public void run() {
+//                                HomeFragment.webpage_test_btn.performClick();
+//                                try {
+//                                    WebBrowser webBrowser = new WebBrowser("https://www.google.com");
+//
+//                                } catch (InterruptedException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        });
+//
+//                    }
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            };
+//        };
+//        thread.start();
+////        try {
+////            thread.join();
+////        } catch (InterruptedException e) {
+////            e.printStackTrace();
+////        }
+//
+//        System.out.println("SHIVAM-WEBPAGE DONE");
+//        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+//        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
 //        if (configureWifi.isConnectedto(ssid)){
 //            Log.i("iron",configureWifi.cc_data.toString());
 //        }
@@ -565,7 +595,82 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public Vector<StringKeyVal> RunWebBrowserTest(String s, L4EndpTxThread l4EndpTxThread) {
-        return null;
+        System.out.println("Shivam Thakur: " + s);
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    synchronized (this) {
+                        wait(1000);
+
+                        runOnUiThread(new Runnable() {
+                            @RequiresApi(api = Build.VERSION_CODES.P)
+                            @Override
+                            public void run() {
+                                HomeFragment.webpage_test_btn.performClick();
+                                HomeFragment.webpage_view.clearCache(true);
+                                HomeFragment.webpage_view.clearView();
+                                try {
+                                    webBrowser = new WebBrowser(s);
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            };
+        };
+        thread.start();
+        while (true){
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(webBrowser.CALL_BACKS.size());
+            System.out.println(webBrowser.RUNNING);
+            if (webBrowser.RUNNING == false || webBrowser.FINISHED ){
+                break;
+            }
+            if (webBrowser.ERRORS){
+                break;
+            }
+        }
+//        new
+        System.out.println("total-bytes-debug: " + webBrowser.totalBytes);
+//        l4_browser_data
+        Vector<StringKeyVal> l4_browser_data = new Vector<StringKeyVal>();
+        l4_browser_data.add(new StringKeyVal("bytes-rd",String.valueOf(webBrowser.totalBytes)));
+        l4_browser_data.add(new StringKeyVal("START_TIME",webBrowser.START_TIME.toString()));
+        l4_browser_data.add(new StringKeyVal("END_TIME",webBrowser.END_TIME.toString()));
+        if (webBrowser.ERRORS){
+            l4_browser_data.add(new StringKeyVal("ERROR",String.valueOf(1)));
+        }
+        else {
+            l4_browser_data.add(new StringKeyVal("ERROR",String.valueOf(0)));
+        }
+        for (StringKeyVal kv: l4_browser_data) {
+            switch (kv.key) {
+                case "bytes-rd":
+                    System.out.println("shivam-debug-data: " + Integer.valueOf(kv.val));
+                    break;
+                case "START_TIME":
+                    System.out.println("shivam-debug-data: " + kv.val);
+                    break;
+                case "END_TIME":
+                    System.out.println("shivam-debug-data: " +kv.val);
+                    break;
+            }
+        }
+
+
+        return l4_browser_data;
     }
 }
 

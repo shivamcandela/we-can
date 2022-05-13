@@ -32,10 +32,12 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
     private FragmentTransaction fragmentTransaction;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private DrawerLayout drawer;
+
     public static TextView nav_user;
     public static TextView nav_server;
     public static TextView nav_resource_realm;
     public static String username = "";
+
     public static Context context;
     public static boolean active=false;
     public static String getUserName() {
