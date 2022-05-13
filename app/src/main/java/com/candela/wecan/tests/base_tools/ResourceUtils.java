@@ -17,6 +17,8 @@ import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,13 +26,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Enumeration;
+
 import java.util.List;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.io.RandomAccessFile;
 
 import candela.lfresource.AndroidUI;
+import candela.lfresource.L4EndpTxThread;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.StringKeyVal;
 import candela.lfresource.LANforgeMgr;
@@ -142,6 +147,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     }
 
     public void notifyManagerConnectException(Exception e) {
+        Toast.makeText(getApplicationContext(), "Exception is Connecting to LANforge Manager!", Toast.LENGTH_LONG).show();
         // TODO:  Notify user that there was issue connecting to the LANforge Mgr.
         // For instance, here is stack trace of when we cannot reach it:
         /*
@@ -309,11 +315,14 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.id = Build.ID;
         pi.availMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         pi.totalMem = Runtime.getRuntime().totalMemory();
+//        Hashtable table = StartupActivity.getLFResourceCredentials();
+//        pi.wecan_user_name = table.get("user_name").toString();
 
-        if (navigation.username != null) {
-            pi.wecan_user_name = navigation.getUserName();
-        }
+        pi.wecan_user_name = navigation.getUserName();
 
+        Log.e("TAG: IRON DOME", navigation.getUserName());
+        System.out.println(HomeFragment.instance != null);
+        System.out.println(pi.wecan_user_name);
         // CPU Info
         pi.cores = 0;
         pi.processor = "";
@@ -585,7 +594,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     }
 
     @Override
-    public Vector<StringKeyVal> RunWebBrowserTest(String s) {
+    public Vector<StringKeyVal> RunWebBrowserTest(String s, L4EndpTxThread l4EndpTxThread) {
         System.out.println("Shivam Thakur: " + s);
         Thread thread = new Thread(){
             @Override

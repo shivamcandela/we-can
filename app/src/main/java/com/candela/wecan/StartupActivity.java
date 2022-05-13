@@ -1,9 +1,5 @@
 package com.candela.wecan;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -17,22 +13,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.candela.wecan.tests.base_tools.LF_Resource;
-import com.candela.wecan.tests.base_tools.file_handler;
-import com.candela.wecan.tools.GetNetworkCapabilities;
-import com.candela.wecan.tools.NetworkSniffTask;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.security.Permission;
-
-
-
+import java.util.Hashtable;
 import java.util.Map;
 
 //import candela.lfresource.lfresource;
@@ -55,7 +42,8 @@ public class StartupActivity extends AppCompatActivity {
     public Context context;
     protected static LF_Resource lf_resource = null;
     public View my_view = null;
-    SharedPreferences sharedpreferences = null;
+    public static SharedPreferences sharedpreferences = null;
+    public static boolean active=false;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -69,9 +57,9 @@ public class StartupActivity extends AppCompatActivity {
         test_name_tv = findViewById(R.id.test_name);
         sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String,?> keys = sharedpreferences.getAll();
-        String last_ip = (String) keys.get("last");
-        String user_name = (String) keys.get("user_name");
-        String test_name = (String) keys.get("test_name");
+        String last_ip = (String) keys.get("current_ip");
+        String user_name = (String) keys.get("current_username");
+        String test_name = (String) keys.get("current_testname");
         server_ip.setText(last_ip);
         u_name.setText(user_name);
         test_name_tv.setText(test_name);
@@ -95,38 +83,37 @@ public class StartupActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                button.setEnabled(false);
+                // Condition for minimum character limits
                 if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
                         test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
                     Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
+                    button.setEnabled(true);
                     return;
-                } else {
+                }
 
-                    if (keys.keySet().contains(server_ip.getText().toString())) {
-                        Map<String, ?> keys = sharedpreferences.getAll();
-                        String ip = server_ip.getText().toString();
-                        String realm_id = (String) keys.get("realm-" + ip);
-                        String resource_id = (String) keys.get("resource-" + ip);
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-                        editor.putString("user_name", u_name.getText().toString());
-                        editor.putString("test_name", test_name_tv.getText().toString());
-                        editor.apply();
-                        editor.commit();
-                        connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
-                    } else {
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-                        editor.putString(server_ip.getText().toString(), "-1");
-                        editor.putString("resource-" + server_ip.getText().toString(), "-1");
-                        editor.putString("realm-" + server_ip.getText().toString(), "-1");
-                        editor.putString("user_name", u_name.getText().toString());
-                        editor.putString("test_name", test_name_tv.getText().toString());
-                        editor.apply();
-                        editor.commit();
-                        Map<String, ?> keys = sharedpreferences.getAll();
-                        String ip = server_ip.getText().toString();
-                        String realm_id = (String) keys.get("realm-" + ip);
-                        String resource_id = (String) keys.get("resource-" + ip);
-                        connect_server(server_ip.getText().toString(), resource_id, realm_id, view);
+                // If everything is good, then do the logic
+                else {
+                    // u_name.getText()
+                    // server_ip.getText()
+
+
+                    // If server is already registered
+                    Hashtable data = getLFResourceCredentials();
+                    if (data.containsKey("server_ip-" + server_ip.getText())){
+                        connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
+                                data.get("resource_id-" + server_ip.getText()).toString(),
+                                data.get("realm_id-" + server_ip.getText()).toString(), view);
+
+                    }
+                    // Registering server details if it is not registered already
+                    else{
+                        setLFResourceCredentials(server_ip.getText().toString(),
+                                "-1",
+                                "-1",
+                                u_name.getText().toString(),
+                                test_name_tv.getText().toString());
+                        connect_server(server_ip.getText().toString(), "-1", "-1", view);
                     }
                 }
             }
@@ -171,18 +158,19 @@ public class StartupActivity extends AppCompatActivity {
        String new_realm_id = lf_resource.getRealm();
        String ip = lf_resource.getRemoteHost();
        SharedPreferences.Editor editor = sharedpreferences.edit();
-
-       editor.putString(ip, "-1");
-       editor.putString("last", ip);
-       editor.putString("resource-" + ip, new_resource_id);
-       editor.putString("realm-" + ip, new_realm_id);
-
-       editor.putString("current-ip", ip);
-       editor.putString("current-resource", new_resource_id);
-       editor.putString("current-realm", new_realm_id);
-
+       Log.e("shivam-iron", new_resource_id);
+       editor.putString("server_ip-" + ip, ip);
+       editor.putString("resource_id-" + ip, new_resource_id);
+       editor.putString("realm_id-" + ip, new_realm_id);
+       editor.putString("user_name-" + ip, u_name.getText().toString());
+       editor.putString("current_ip", ip);
+       editor.putString("current_username", u_name.getText().toString());
+       editor.putString("current_resource", new_resource_id);
+       editor.putString("current_realm", new_realm_id);
+        editor.putString("current_testname", test_name_tv.getText().toString());
        editor.apply();
        editor.commit();
+       navigation.setRealmInfoTextUI();
     }
 
     public void _notifyCxChanged() {
@@ -195,6 +183,13 @@ public class StartupActivity extends AppCompatActivity {
             openServerConnection();
         }
         else {
+            if (StartupActivity.active){
+                return;
+            }
+            Toast.makeText(getApplicationContext(), "Disconnected from Server, Closing the View", Toast.LENGTH_LONG).show();
+            Intent myIntent = new Intent(this, StartupActivity.class);
+            startActivity(myIntent);
+            button.setEnabled(true);
             // TODO: How to switch back to first view so user can reconnect if they want?
         }
     }
@@ -211,5 +206,40 @@ public class StartupActivity extends AppCompatActivity {
         return true;
     }
 
+    // Get locally stored sharedpreferences that stays even if app is closed
+    public static Hashtable getLFResourceCredentials(){
+        Hashtable<String, String> data = new Hashtable<String, String>();
+        Map<String, ?> keys = sharedpreferences.getAll();
+        if (keys.keySet().size() > 0) {
+            for (String key : keys.keySet()) {
+                data.put(key, keys.get(key).toString());
+            }
+        }
+        return data;
+    }
+
+    // Set the sharedpreference for locally stored data
+    public int setLFResourceCredentials(String server_ip, String realm, String resource_id, String username, String test_name){
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("server_ip-" + server_ip, server_ip);
+        editor.putString("resource_id-" + server_ip, resource_id);
+        editor.putString("realm_id-" + server_ip ,realm);
+        editor.putString("user_name-" + server_ip, username);
+        editor.putString("test_name-" + server_ip, test_name);
+        editor.apply();
+        editor.commit();
+        return -1;
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        active = false;
+    }
 
 }
