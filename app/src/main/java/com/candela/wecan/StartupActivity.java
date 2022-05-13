@@ -4,9 +4,16 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.location.GpsStatus;
+import android.location.LocationManager;
+import android.location.LocationRequest;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,6 +51,8 @@ public class StartupActivity extends AppCompatActivity {
     public View my_view = null;
     public static SharedPreferences sharedpreferences = null;
     public static boolean active=false;
+    private LocationManager locationManager;
+    private boolean GpsStatus;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -76,6 +85,7 @@ public class StartupActivity extends AppCompatActivity {
         if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
+        CheckGpsStatus();
         //        networkSniffTask.execute();
 //        Intent myIntent = new Intent(this, ClientConnectivityConfiguration.class);
 //        startActivity(myIntent);
@@ -240,6 +250,47 @@ public class StartupActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         active = false;
+    }
+
+
+
+    private void turnGPSOff(){
+        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+        if(provider.contains("gps")){ //if gps is enabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            sendBroadcast(poke);
+        }
+    }
+
+    public void CheckGpsStatus(){
+        locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        assert locationManager != null;
+
+        GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if(GpsStatus == true) {
+//            textview.setText("GPS Is Enabled");
+        } else {
+            Toast.makeText(getApplicationContext(), "Please Enable GPS!", Toast.LENGTH_LONG).show();
+            Intent intent1 = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent1);
+//            textview.setText("GPS Is Disabled");
+        }
+    }
+    public void turnGPSOn(){
+        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+        if(!provider.contains("gps")){
+            //if gps is disabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            sendBroadcast(poke);
+        }
     }
 
 }
