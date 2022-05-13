@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -33,9 +32,9 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
     private FragmentTransaction fragmentTransaction;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private DrawerLayout drawer;
-    TextView nav_user;
-    TextView nav_server;
-    TextView nav_resource_realm;
+    public static TextView nav_user;
+    public static TextView nav_server;
+    public static TextView nav_resource_realm;
     public static String username = "";
     public static Context context;
     public static boolean active=false;
@@ -56,7 +55,7 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
 
         SharedPreferences sharedPreferences = getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String, ?> keys = sharedPreferences.getAll();
-        username = (String) keys.get("user_name");
+        username = (String) keys.get("current_username");
 
         String current_ip = (String) keys.get("current_ip");
         String current_resource = (String) keys.get("current_resource");
@@ -88,6 +87,23 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
 
     }
 
+    public static void setRealmInfoTextUI(){
+        try {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("userdata", Context.MODE_PRIVATE);
+            Map<String, ?> keys = sharedPreferences.getAll();
+            username = (String) keys.get("current_username");
+
+            String current_ip = (String) keys.get("current_ip");
+            String current_resource = (String) keys.get("current_resource");
+            String current_realm = (String) keys.get("current_realm");
+            nav_user.setText("User: " + username);
+            nav_server.setText("Server: " + current_ip);
+            nav_resource_realm.setText("Realm: " + current_realm + "\nResource: " + current_resource);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onBackPressed() {

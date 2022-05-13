@@ -25,6 +25,7 @@ import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -44,6 +45,7 @@ import java.util.StringTokenizer;
 import java.io.RandomAccessFile;
 
 import candela.lfresource.AndroidUI;
+import candela.lfresource.L4EndpTxThread;
 import candela.lfresource.PlatformInfo;
 import candela.lfresource.StringKeyVal;
 import candela.lfresource.PlatformInfo;
@@ -155,6 +157,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     }
 
     public void notifyManagerConnectException(Exception e) {
+        Toast.makeText(getApplicationContext(), "Exception is Connecting to LANforge Manager!", Toast.LENGTH_LONG).show();
         // TODO:  Notify user that there was issue connecting to the LANforge Mgr.
         // For instance, here is stack trace of when we cannot reach it:
         /*
@@ -324,9 +327,9 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         pi.totalMem = Runtime.getRuntime().totalMemory();
 //        Hashtable table = StartupActivity.getLFResourceCredentials();
 //        pi.wecan_user_name = table.get("user_name").toString();
-        if (HomeFragment.instance != null) {
-            pi.wecan_user_name = navigation.getUserName();
-        }
+
+        pi.wecan_user_name = navigation.getUserName();
+
         Log.e("TAG: IRON DOME", navigation.getUserName());
         System.out.println(HomeFragment.instance != null);
         System.out.println(pi.wecan_user_name);
@@ -557,6 +560,11 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 //        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
 //        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
 //        System.out.println("IronSpider: " + timestamp.toString());
+        return null;
+    }
+
+    @Override
+    public Vector<StringKeyVal> RunWebBrowserTest(String s, L4EndpTxThread l4EndpTxThread) {
         return null;
     }
 }
