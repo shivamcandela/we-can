@@ -44,21 +44,26 @@ import java.util.logging.Logger;
 
 public class WebBrowser extends WebViewClient{
 
-    public static String URL;
-    public boolean FINISHED=false;
-    public boolean RUNNING=true;
-    public boolean ERRORS=false;
-    public List CALL_BACKS;
-    public static ArrayList<Timestamp> timestamps;
+    public static boolean STOP=false;
+    public static int totalUrls = 0;
+    public boolean RUNNING=false;
+    public static Timestamp START_TIME;
+    public static Timestamp END_TIME;
     public long initial_bytes = 0;
     public long current_bytes = 0;
     public long totalBytes = 0;
-    public static Timestamp START_TIME;
-    public static Timestamp END_TIME;
-    public static boolean timeout;
+    public static List ERRORS;
+    //    public static String URL;
+//    public boolean FINISHED=false;
+//
 
-    public WebBrowser(String URL) throws InterruptedException {
-        this.URL = URL;
+//    public List CALL_BACKS;
+
+
+
+//    public static boolean timeout;
+
+    public WebBrowser() throws InterruptedException {
         WebSettings settings = HomeFragment.webpage_view.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDatabaseEnabled(true);
@@ -71,134 +76,94 @@ public class WebBrowser extends WebViewClient{
         settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         HomeFragment.webpage_view.setWebViewClient(this);
-        timestamps = new ArrayList<Timestamp>();
         HomeFragment.webpage_view.clearCache(true);
         HomeFragment.webpage_view.clearView();
-        HomeFragment.webpage_view.loadUrl(this.URL);
-        CALL_BACKS = new ArrayList();
-        waitForCompletion();
+        ERRORS = new ArrayList();
+
     }
-
-    private void waitForCompletion() throws InterruptedException {
-        int[] size_previous = {CALL_BACKS.size()};
-        Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                int size_next = CALL_BACKS.size();
-                System.out.println("SHIVAM RUNNING TEST");
-                System.out.println(String.valueOf(size_previous[0]) + String.valueOf(size_next));
-                if (FINISHED){
-                    if (size_previous[0] == size_next){
-                        System.out.println("SHIVAM FINISHED TEST");
-                        RUNNING = false;
-                    }
-                    else {
-                        handler.postDelayed(this, 1000);
-                    }
-                }
-
-                if (size_previous[0] != size_next){
-                    handler.postDelayed(this, 1000);
-                }
-                size_previous[0] = size_next;
-
-            }
-        };
-        handler.postDelayed(runnable, 1000);
+    public static void startTest(String URL){
+        ERRORS = new ArrayList();
+        HomeFragment.webpage_view.loadUrl(URL);
+    }
+    public static void stopTest(){
+        STOP = true;
     }
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
-        System.out.println("Page Load Started");
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        START_TIME = timestamp;
+        totalUrls =  0;
         initial_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
-        System.out.println(initial_bytes);
-        System.out.println(timestamp);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                timeout = true;
-
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if(timeout) {
-                    System.out.println("Timeout");
-                }
-            }
-        }).start();
+        System.out.println("Page Load Started");
+        RUNNING=true;
+        ERRORS = new ArrayList();
+        START_TIME = new Timestamp(System.currentTimeMillis());
     }
-
 
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-        System.out.println("Page Load Finished");
-        FINISHED = true;
-        timeout = false;
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println(timestamp);
-    }
-
-    @SuppressLint("NewApi")
-    @Override
-    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-        super.onReceivedError(view, request, error);
-        ERRORS = true;
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println(timestamp);
-        END_TIME = timestamp;
         current_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
-        System.out.println(current_bytes);
         totalBytes = current_bytes - initial_bytes;
-        System.out.println("Page Load Received Error");
-        System.out.println("" + String.valueOf(error.getErrorCode()) +  String.valueOf(error.getDescription().toString()));
+        System.out.println("Page Load Finished");
+        RUNNING=false;
+        totalUrls =  1;
+        END_TIME = new Timestamp(System.currentTimeMillis());
+        if (!STOP) {
+//            HomeFragment.webpage_test_btn.performClick();
+            HomeFragment.webpage_view.clearCache(true);
+            HomeFragment.webpage_view.clearView();
+            HomeFragment.webpage_view.loadUrl(url);
+        }
     }
-
-    @Override
-    public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-        super.onReceivedHttpError(view, request, errorResponse);
-    }
-
-    @Override
-    public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-        super.onReceivedHttpAuthRequest(view, handler, host, realm);
-    }
-
     @Override
     public void onLoadResource(WebView view, String url) {
         super.onLoadResource(view, url);
+        current_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
+        totalBytes = current_bytes - initial_bytes;
         System.out.println("Loading Resource");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(timestamp);
         END_TIME = timestamp;
+        System.out.println(totalBytes);
+    }
+    @SuppressLint("NewApi")
+    @Override
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        super.onReceivedError(view, request, error);
         current_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
         totalBytes = current_bytes - initial_bytes;
-        System.out.println(totalBytes);
-        CALL_BACKS.add(url);
-
+        System.out.println("Page Load Received Error");
+        ERRORS.add(error.getErrorCode());
     }
 
-    @Override
-    public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
-        return super.onRenderProcessGone(view, detail);
-    }
+//    @Override
+//    public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+//        super.onReceivedHttpError(view, request, errorResponse);
+//    }
+//
+//    @Override
+//    public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+//        super.onReceivedHttpAuthRequest(view, handler, host, realm);
+//    }
 
-    @Override
-    public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event) {
-        return super.shouldOverrideKeyEvent(view, event);
-    }
 
-    @Override
-    public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
-        super.onReceivedClientCertRequest(view, request);
-
-    }
+//
+//    @Override
+//    public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+//        return super.onRenderProcessGone(view, detail);
+//    }
+//
+//    @Override
+//    public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event) {
+//        return super.shouldOverrideKeyEvent(view, event);
+//    }
+//
+//    @Override
+//    public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
+//        super.onReceivedClientCertRequest(view, request);
+//
+//    }
 
 
 
