@@ -597,38 +597,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     }
 
     @Override
-    public Vector<StringKeyVal> RunWebBrowserTest(String s, L4EndpTxThread l4EndpTxThread) {
-        System.out.println("RunWebBrowserTest:: " + "URL:: " + s + "  webBrowser Thread::" + webBrowser);
-        if (webBrowser != null && webBrowser.STOP) {
-            thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        synchronized (this) {
-                            wait(1000);
-
-                            runOnUiThread(new Runnable() {
-                                @RequiresApi(api = Build.VERSION_CODES.P)
-                                @Override
-                                public void run() {
-                                    HomeFragment.webpage_test_btn.performClick();
-                                    HomeFragment.webpage_view.clearCache(true);
-                                    HomeFragment.webpage_view.clearView();
-                                    webBrowser.startTest(s);
-                                }
-                            });
-
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-                ;
-            };
-            thread.start();
-        }
+    public Vector<StringKeyVal> doRxPayload() {
         Vector<StringKeyVal> l4_browser_data = new Vector<StringKeyVal>();
         if (webBrowser!= null) {
             l4_browser_data.add(new StringKeyVal("CURRENT-BYTES", String.valueOf(webBrowser.totalBytes)));
@@ -638,94 +607,45 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                 l4_browser_data.add(new StringKeyVal("ERRORS-" + webBrowser.ERRORS.get(0) , "1"));
             }
             System.out.println(l4_browser_data);
+            System.out.println("shivam-bytes:" + webBrowser.totalBytes);
         }
-//        if (thread != null && thread.isAlive()){
-//            l4_browser_data.add(new StringKeyVal("url-state",String.valueOf(false)));
-//        }
-//        else{
-//            l4_browser_data.add(new StringKeyVal("url-state",String.valueOf(true)));
-//        }
-//        if (thread2 == null || thread == null || !thread.isAlive() && !thread2.isAlive() && webBrowser == null || webBrowser.RUNNING == false){
-
-//            thread2 = new Thread() {
-//                @Override
-//                public void run() {
-//                    while (true) {
-//                        try {
-//                            Thread.sleep(2000);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        System.out.println(webBrowser.CALL_BACKS.size());
-//                        System.out.println(webBrowser.RUNNING);
-//                        if (webBrowser.RUNNING == false || webBrowser.FINISHED) {
-//                            break;
-//                        }
-//                        if (webBrowser.ERRORS) {
-//                            break;
-//                        }
-//                    }
-//                }
-//            };
-//            thread2.start();
-//
-//        }
-
-
-//        new
-//        l4_browser_data
-
-//        l4_browser_data.add(new StringKeyVal("bytes-rd",String.valueOf(webBrowser.totalBytes)));
-//        l4_browser_data.add(new StringKeyVal("START_TIME",webBrowser.START_TIME.toString()));
-//        l4_browser_data.add(new StringKeyVal("END_TIME",webBrowser.END_TIME.toString()));
-//        if (webBrowser.ERRORS){
-//            l4_browser_data.add(new StringKeyVal("ERROR",String.valueOf(1)));
-//        }
-//        else {
-//            l4_browser_data.add(new StringKeyVal("ERROR",String.valueOf(0)));
-//        }
-//        for (StringKeyVal kv: l4_browser_data) {
-//            switch (kv.key) {
-//                case "bytes-rd":
-//                    System.out.println("shivam-debug-data: " + Integer.valueOf(kv.val));
-//                    break;
-//                case "START_TIME":
-//                    System.out.println("shivam-debug-data: " + kv.val);
-//                    break;
-//                case "END_TIME":
-//                    System.out.println("shivam-debug-data: " +kv.val);
-//                    break;
-//            }
-//        }
-
         return l4_browser_data;
+
     }
+
+
 
     @Override
     public Object CreateWebBrowserObject() {
         System.out.println("Into CreateWebBrowserObject:: ");
+        runOnUiThread(() -> {
+            try {
+                webBrowser = new WebBrowser();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        return webBrowser;
+    }
+
+    @Override
+    public void doQuiesceBrowserTest() {
+        System.out.println("Into doQuiesceBrowserTest:: ");
+        webBrowser.stopTest();
+    }
+
+    @Override
+    public void doStopBrowserTest() {
+        System.out.println("Into doStopBrowserTest:: ");
             thread = new Thread() {
                 @Override
                 public void run() {
                     try {
                         synchronized (this) {
                             wait(1000);
-
-                            runOnUiThread(new Runnable() {
-                                @RequiresApi(api = Build.VERSION_CODES.P)
-                                @Override
-                                public void run() {
-                                    try {
-//                                        HomeFragment.webpage_test_btn.performClick();
-//                                        HomeFragment.webpage_view.clearCache(true);
-//                                        HomeFragment.webpage_view.clearView();
-                                        webBrowser = new WebBrowser();
-
-
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
+                            runOnUiThread(() -> {
+                                webBrowser.stopTest();
+                                HomeFragment.webpage_view.stopLoading();
                             });
 
                         }
@@ -738,13 +658,40 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                 ;
             };
             thread.start();
-        return webBrowser;
-    }
+        }
+
+
 
     @Override
-    public void StopBrowser() {
-        System.out.println("Into StopBrowser:: ");
-        webBrowser.stopTest();
+    public Thread StartTest(String s) {
+        System.out.println("RunWebBrowserTest:: " + "URL:: " + s + "  webBrowser Thread::" + webBrowser + webBrowser.STOP);
+        if (webBrowser != null) {
+            thread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        synchronized (this) {
+                            wait(1000);
+                            runOnUiThread(() -> {
+                                HomeFragment.webpage_test_btn.performClick();
+                                HomeFragment.webpage_view.clearCache(true);
+                                HomeFragment.webpage_view.clearView();
+                                WebBrowser.STOP = false;
+                                webBrowser.startTest(s);
+                            });
+
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                ;
+            };
+            thread.start();
+        }
+        return thread;
     }
 }
 
