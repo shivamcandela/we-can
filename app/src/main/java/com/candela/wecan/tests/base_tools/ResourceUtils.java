@@ -593,8 +593,9 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         return null;
     }
 
+
     @Override
-    public Vector<StringKeyVal> RunWebBrowserTest(String s, L4EndpTxThread l4EndpTxThread) {
+    public Vector<StringKeyVal> RunWebBrowserTest(String s) {
         System.out.println("Shivam Thakur: " + s);
         Thread thread = new Thread(){
             @Override
