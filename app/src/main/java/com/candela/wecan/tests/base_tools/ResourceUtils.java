@@ -51,6 +51,8 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public static WebBrowser webBrowser;
     public Thread thread;
     private Thread thread2;
+    private Thread thread_stop;
+    private boolean Started=false;
 
     public ResourceUtils(StartupActivity activity, Context context){
         this.context = context;
@@ -598,6 +600,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public Vector<StringKeyVal> doRxPayload() {
+        System.out.println("shivam-doRxPayload:");
         Vector<StringKeyVal> l4_browser_data = new Vector<StringKeyVal>();
         if (webBrowser!= null) {
             l4_browser_data.add(new StringKeyVal("CURRENT-BYTES", String.valueOf(webBrowser.totalBytes)));
@@ -612,8 +615,6 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         return l4_browser_data;
 
     }
-
-
 
     @Override
     public Object CreateWebBrowserObject() {
@@ -631,13 +632,21 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     @Override
     public void doQuiesceBrowserTest() {
         System.out.println("Into doQuiesceBrowserTest:: ");
-        webBrowser.stopTest();
+        if (Started) {
+            webBrowser.stopTest();
+            thread = null;
+            webBrowser.totalBytes = 0;
+            webBrowser.totalUrls = 0;
+//            webBrowser = null;
+            Started = false;
+        }
     }
 
     @Override
     public void doStopBrowserTest() {
         System.out.println("Into doStopBrowserTest:: ");
-            thread = new Thread() {
+        if (Started) {
+            thread_stop = new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -646,6 +655,11 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                             runOnUiThread(() -> {
                                 webBrowser.stopTest();
                                 HomeFragment.webpage_view.stopLoading();
+                                thread = null;
+                                webBrowser.totalBytes = 0;
+                                webBrowser.totalUrls = 0;
+//                                webBrowser = null;
+                                Started = false;
                             });
 
                         }
@@ -657,15 +671,14 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
                 ;
             };
-            thread.start();
+            thread_stop.start();
         }
-
-
+    }
 
     @Override
     public Thread StartTest(String s) {
         System.out.println("RunWebBrowserTest:: " + "URL:: " + s + "  webBrowser Thread::" + webBrowser + webBrowser.STOP);
-        if (webBrowser != null) {
+        if (webBrowser != null && thread == null) {
             thread = new Thread() {
                 @Override
                 public void run() {
@@ -673,6 +686,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
                         synchronized (this) {
                             wait(1000);
                             runOnUiThread(() -> {
+                                Started = true;
                                 HomeFragment.webpage_test_btn.performClick();
                                 HomeFragment.webpage_view.clearCache(true);
                                 HomeFragment.webpage_view.clearView();

@@ -30,6 +30,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.candela.wecan.tests.base_tools.ResourceUtils;
 import com.candela.wecan.ui.home.HomeFragment;
 
 import java.io.ByteArrayInputStream;
@@ -46,7 +47,7 @@ import java.util.logging.Logger;
 public class WebBrowser extends WebViewClient{
 
     public static boolean STOP=false;
-    public static int totalUrls = 0;
+    public int totalUrls = 0;
     public boolean RUNNING=false;
     public static Timestamp START_TIME;
     public static Timestamp END_TIME;
@@ -74,19 +75,29 @@ public class WebBrowser extends WebViewClient{
         ERRORS = new ArrayList();
 
     }
-    public static void startTest(String URL){
+    public void startTest(String URL){
+        totalUrls =  0;
         ERRORS = new ArrayList();
         HomeFragment.webpage_view.loadUrl(URL);
     }
     public void stopTest(){
-            STOP = true;
+        STOP = true;
+        System.out.println("Stopping test...");
+        synchronized (this) {
+            try {
+                wait(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Test Stopped...");
+        totalUrls =  0;
 
     }
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
-        totalUrls =  0;
         initial_bytes = TrafficStats.getUidRxBytes(android.os.Process.myUid());
         System.out.println("Page Load Started");
         RUNNING=true;
@@ -101,12 +112,12 @@ public class WebBrowser extends WebViewClient{
         totalBytes = current_bytes - initial_bytes;
         System.out.println("Page Load Finished: Stop Test: "+ STOP);
         RUNNING=false;
-        totalUrls =  1;
+        totalUrls =  totalUrls + 1;
         END_TIME = new Timestamp(System.currentTimeMillis());
         if (!STOP) {
             synchronized (this) {
                 try {
-                    wait(1000);
+                    wait(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -115,6 +126,7 @@ public class WebBrowser extends WebViewClient{
             HomeFragment.webpage_view.clearCache(true);
             HomeFragment.webpage_view.clearView();
             HomeFragment.webpage_view.loadUrl(url);
+//            STOP = true;
         }
     }
     @Override
