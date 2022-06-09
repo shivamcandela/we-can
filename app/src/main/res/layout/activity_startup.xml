@@ -11,7 +11,9 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="45dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,26 +37,16 @@
                 app:srcCompat="@drawable/ic_candelalogo"
                 tools:ignore="VectorDrawableCompat" />
 
+
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/textView6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="sans-serif-black"
-                android:text="WELCOME TO"
+                android:text="\nLANforge \nInterOp Solution\n"
                 android:textAlignment="center"
-                android:textColor="#2196F3"
-                android:textSize="17sp"
+                android:textColor="#4CAF50"
+                android:textSize="48sp"
                 android:textStyle="bold" />
-
-            <pl.droidsonroids.gif.GifImageView
-                android:id="@+id/gifImageView"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_gravity="center"
-                android:src="@drawable/candela_splash"
-                tools:ignore="MissingConstraints" />
-
 
             <EditText
                 android:id="@+id/user_name"
