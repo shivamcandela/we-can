@@ -196,8 +196,11 @@ public class StartupActivity extends AppCompatActivity {
             if (StartupActivity.active){
                 return;
             }
+            finishAffinity();
             Toast.makeText(getApplicationContext(), "Disconnected from Server, Closing the View", Toast.LENGTH_LONG).show();
-            Intent myIntent = new Intent(this, StartupActivity.class);
+            Intent myIntent = new Intent(navigation.context, StartupActivity.class);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(myIntent);
             button.setEnabled(true);
             // TODO: How to switch back to first view so user can reconnect if they want?
