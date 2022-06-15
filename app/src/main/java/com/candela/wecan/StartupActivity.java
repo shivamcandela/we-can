@@ -46,7 +46,7 @@ public class StartupActivity extends AppCompatActivity {
     private TextView server_ip,u_name,test_name_tv;
     static int state;
     private String ssid, passwd;
-    public Context context;
+    public static Context context;
     protected static LF_Resource lf_resource = null;
     public View my_view = null;
     public static SharedPreferences sharedpreferences = null;
@@ -64,6 +64,7 @@ public class StartupActivity extends AppCompatActivity {
         server_ip = findViewById(R.id.ip_enter_page);
         u_name = findViewById(R.id.user_name);
         test_name_tv = findViewById(R.id.test_name);
+        context = getBaseContext();
         sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String,?> keys = sharedpreferences.getAll();
         String last_ip = (String) keys.get("current_ip");
