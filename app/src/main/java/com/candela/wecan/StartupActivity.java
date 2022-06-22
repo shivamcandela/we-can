@@ -113,7 +113,11 @@ public class StartupActivity extends AppCompatActivity {
                     if (data.containsKey("server_ip-" + server_ip.getText())){
                         connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
                                 data.get("resource_id-" + server_ip.getText()).toString(),
-                                data.get("realm_id-" + server_ip.getText()).toString(), view);
+                                data.get("realm_id-" + server_ip.getText()).toString(),
+                                data.get("current_username").toString(),
+                                view
+
+                        );
 
                     }
                     // Registering server details if it is not registered already
@@ -123,7 +127,8 @@ public class StartupActivity extends AppCompatActivity {
                                 "-1",
                                 u_name.getText().toString(),
                                 test_name_tv.getText().toString());
-                        connect_server(server_ip.getText().toString(), "-1", "-1", view);
+                        connect_server(server_ip.getText().toString(), "-1", "-1", u_name.getText().toString(),
+                                view);
                     }
                 }
             }
@@ -138,7 +143,8 @@ public class StartupActivity extends AppCompatActivity {
        startActivity(myIntent);
     }
 
-    public void connect_server(String ip, String resource_id, String realm_id, View v){
+    public void connect_server(String ip, String resource_id, String realm_id, String username,
+                               View v){
         my_view = v;
 
         if (lf_resource != null) {
@@ -151,7 +157,8 @@ public class StartupActivity extends AppCompatActivity {
             }
         }
 
-        lf_resource = new LF_Resource(this, ip, resource_id, realm_id, getApplicationContext());
+        lf_resource = new LF_Resource(this, ip, resource_id, realm_id, username,
+                getApplicationContext());
         lf_resource.start();
     }
 

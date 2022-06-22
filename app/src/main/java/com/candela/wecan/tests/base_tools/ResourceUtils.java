@@ -81,7 +81,9 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public void setResourceInfo(int i, int i1) {
-       startup_activity.updateRealmInfo();
+
+        System.out.println("TAG-SHIVAM : " + String.valueOf(i1));
+        startup_activity.updateRealmInfo();
     }
 
     @Override
