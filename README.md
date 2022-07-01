@@ -1,5 +1,7 @@
 # WE-CAN Android Application Project
 
+NOTE:  lfresource.jar is removed from repo.  Build it in btbits/x64_btbits/client directory with:
+make -f Makefile.resource
 
 Code QL Badge
 
