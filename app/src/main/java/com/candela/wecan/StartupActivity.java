@@ -48,7 +48,6 @@ public class StartupActivity extends AppCompatActivity {
     private String ssid, passwd;
     public static Context context;
     protected static LF_Resource lf_resource = null;
-    public View my_view = null;
     public static SharedPreferences sharedpreferences = null;
     public static boolean active=false;
     private LocationManager locationManager;
@@ -70,9 +69,28 @@ public class StartupActivity extends AppCompatActivity {
         String last_ip = (String) keys.get("current_ip");
         String user_name = (String) keys.get("current_username");
         String test_name = (String) keys.get("current_testname");
+
+        // Allow cmd-line to override.
+        String extra = getIntent().getStringExtra("test_name");
+        if (extra != null) {
+            test_name = extra;
+            System.out.println("Setting testname from intent Extra: " + test_name);
+        }
+        extra = getIntent().getStringExtra("user_name");
+        if (extra != null) {
+            user_name = extra;
+            System.out.println("Setting username from intent Extra: " + user_name);
+        }
+        extra = getIntent().getStringExtra("manager");
+        if (extra != null) {
+            last_ip = extra;
+            System.out.println("Setting last_ip from intent Extra: " + last_ip);
+        }
+
         server_ip.setText(last_ip);
         u_name.setText(user_name);
         test_name_tv.setText(test_name);
+
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
                 android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -95,40 +113,50 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 button.setEnabled(false);
-                // Condition for minimum character limits
-                if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
-                        test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
-                    Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
-                    button.setEnabled(true);
-                    return;
-                }
 
-                // If everything is good, then do the logic
-                else {
-                    // u_name.getText()
-                    // server_ip.getText()
-
-
-                    // If server is already registered
-                    Hashtable data = getLFResourceCredentials();
-                    if (data.containsKey("server_ip-" + server_ip.getText())){
-                        connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
-                                data.get("resource_id-" + server_ip.getText()).toString(),
-                                data.get("realm_id-" + server_ip.getText()).toString(), view);
-
-                    }
-                    // Registering server details if it is not registered already
-                    else{
-                        setLFResourceCredentials(server_ip.getText().toString(),
-                                "-1",
-                                "-1",
-                                u_name.getText().toString(),
-                                test_name_tv.getText().toString());
-                        connect_server(server_ip.getText().toString(), "-1", "-1", view);
-                    }
-                }
+                checkConnect();
             }
         });
+
+        extra = getIntent().getStringExtra("auto_start");
+        if (extra != null) {
+            if (extra.equals("1")) {
+                System.out.println("Enabling auto-start based on Intent auto_start");
+                checkConnect();
+            }
+        }
+    }
+
+    public void checkConnect() {
+        // Condition for minimum character limits
+        if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
+            test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
+            Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
+            button.setEnabled(true);
+            return;
+        }
+        // If everything is good, then do the logic
+        else {
+            // u_name.getText()
+            // server_ip.getText()
+
+            // If server is already registered
+            Hashtable data = getLFResourceCredentials();
+            if (data.containsKey("server_ip-" + server_ip.getText())) {
+                connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
+                               data.get("resource_id-" + server_ip.getText()).toString(),
+                               data.get("realm_id-" + server_ip.getText()).toString());
+            }
+            // Registering server details if it is not registered already
+            else{
+                setLFResourceCredentials(server_ip.getText().toString(),
+                                         "-1",
+                                         "-1",
+                                         u_name.getText().toString(),
+                                         test_name_tv.getText().toString());
+                connect_server(server_ip.getText().toString(), "-1", "-1");
+            }
+        }
     }
 
     public void openServerConnection () {
@@ -139,9 +167,7 @@ public class StartupActivity extends AppCompatActivity {
        startActivity(myIntent);
     }
 
-    public void connect_server(String ip, String resource_id, String realm_id, View v){
-        my_view = v;
-
+    public void connect_server(String ip, String resource_id, String realm_id) {
         if (lf_resource != null) {
             lf_resource.do_run = false;
             try {
