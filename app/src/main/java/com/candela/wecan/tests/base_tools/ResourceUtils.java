@@ -531,54 +531,18 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         return pi;
     }
 
+    // encryption string format:  psk|pask2|sae|open
     @Override
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
 
         if (ssid.equals("DEFAULT")){
             return null;
         }
-//        Thread thread = new Thread(){
-//            @Override
-//            public void run() {
-//                try {
-//                    synchronized (this) {
-//                        wait(1000);
-//
-//                        runOnUiThread(new Runnable() {
-//                            @RequiresApi(api = Build.VERSION_CODES.P)
-//                            @Override
-//                            public void run() {
-//                                HomeFragment.webpage_test_btn.performClick();
-//                                try {
-//                                    WebBrowser webBrowser = new WebBrowser("https://www.google.com");
-//
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        });
-//
-//                    }
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            };
-//        };
-//        thread.start();
-////        try {
-////            thread.join();
-////        } catch (InterruptedException e) {
-////            e.printStackTrace();
-////        }
-//
-//        System.out.println("SHIVAM-WEBPAGE DONE");
-//        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-//        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-//        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
-//        if (configureWifi.isConnectedto(ssid)){
-//            Log.i("iron",configureWifi.cc_data.toString());
-//        }
+
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        // This will make 'connect' attempt upon creation, the connect logic will run in the background.
+        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
 
         /*
             Need to structure the cc_data in a Vector format and collect usefull info from this
