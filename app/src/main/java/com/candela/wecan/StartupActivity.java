@@ -43,7 +43,7 @@ public class StartupActivity extends AppCompatActivity {
     static final int STARTING = 0;
     static final int RUNNING = 1;
     static final int STOPPED = 2;
-    private TextView server_ip,u_name,test_name_tv;
+    private TextView server_ip,u_name;
     static int state;
     private String ssid, passwd;
     public static Context context;
@@ -62,21 +62,14 @@ public class StartupActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.enter_button);
         server_ip = findViewById(R.id.ip_enter_page);
         u_name = findViewById(R.id.user_name);
-        test_name_tv = findViewById(R.id.test_name);
         context = getBaseContext();
         sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String,?> keys = sharedpreferences.getAll();
         String last_ip = (String) keys.get("current_ip");
         String user_name = (String) keys.get("current_username");
-        String test_name = (String) keys.get("current_testname");
 
         // Allow cmd-line to override.
-        String extra = getIntent().getStringExtra("test_name");
-        if (extra != null) {
-            test_name = extra;
-            System.out.println("Setting testname from intent Extra: " + test_name);
-        }
-        extra = getIntent().getStringExtra("user_name");
+        String extra = getIntent().getStringExtra("user_name");
         if (extra != null) {
             user_name = extra;
             System.out.println("Setting username from intent Extra: " + user_name);
@@ -89,7 +82,6 @@ public class StartupActivity extends AppCompatActivity {
 
         server_ip.setText(last_ip);
         u_name.setText(user_name);
-        test_name_tv.setText(test_name);
 
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
@@ -129,9 +121,8 @@ public class StartupActivity extends AppCompatActivity {
 
     public void checkConnect() {
         // Condition for minimum character limits
-        if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
-            test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
-            Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
+        if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4) {
+            Toast.makeText(getApplicationContext(), "user-name must be at least 5 characters", Toast.LENGTH_SHORT).show();
             button.setEnabled(true);
             return;
         }
@@ -152,8 +143,7 @@ public class StartupActivity extends AppCompatActivity {
                 setLFResourceCredentials(server_ip.getText().toString(),
                                          "-1",
                                          "-1",
-                                         u_name.getText().toString(),
-                                         test_name_tv.getText().toString());
+                                         u_name.getText().toString());
                 connect_server(server_ip.getText().toString(), "-1", "-1");
             }
         }
@@ -204,7 +194,6 @@ public class StartupActivity extends AppCompatActivity {
        editor.putString("current_username", u_name.getText().toString());
        editor.putString("current_resource", new_resource_id);
        editor.putString("current_realm", new_realm_id);
-        editor.putString("current_testname", test_name_tv.getText().toString());
        editor.apply();
        editor.commit();
        navigation.setRealmInfoTextUI();
@@ -259,13 +248,12 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     // Set the sharedpreference for locally stored data
-    public int setLFResourceCredentials(String server_ip, String realm, String resource_id, String username, String test_name){
+    public int setLFResourceCredentials(String server_ip, String realm, String resource_id, String username){
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString("server_ip-" + server_ip, server_ip);
         editor.putString("resource_id-" + server_ip, resource_id);
         editor.putString("realm_id-" + server_ip ,realm);
         editor.putString("user_name-" + server_ip, username);
-        editor.putString("test_name-" + server_ip, test_name);
         editor.apply();
         editor.commit();
         return -1;

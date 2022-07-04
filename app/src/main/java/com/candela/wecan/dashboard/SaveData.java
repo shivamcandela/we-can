@@ -50,10 +50,9 @@ public class SaveData extends ActivityCompat implements Runnable{
             //                                  Getting file as Test Name
             SharedPreferences sharedPreferences = HomeFragment.home_fragment_activity.getSharedPreferences("userdata", Context.MODE_PRIVATE);
             Map<String, ?> keys = sharedPreferences.getAll();
-            String test_name = (String) keys.get("test_name");
             File appDirectory = new File(String.valueOf(Environment.getExternalStorageDirectory()) + "/WE-CAN");
             File logDirectory = new File(appDirectory + "/LiveData/");
-            File logFile = new File(logDirectory, test_name + ".csv");
+            File logFile = new File(logDirectory, "interop_log.csv");
             File file = new File(String.valueOf(logFile));
             if (!logDirectory.exists()) {
                 logDirectory.mkdirs();

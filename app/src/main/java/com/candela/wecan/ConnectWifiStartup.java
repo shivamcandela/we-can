@@ -51,7 +51,7 @@ public class ConnectWifiStartup extends AppCompatActivity {
         Spinner spinner = findViewById(R.id.test_network_ssid);
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         Button connect_nw_btn = findViewById(R.id.connect_nw_btn);
-        EditText passkey = findViewById(R.id.test_name);
+        EditText passkey = findViewById(R.id.test_network_passwd);
         ImageButton refresh_scan = findViewById(R.id.refresh_scan);
         Button skip_conn_btn = findViewById(R.id.skip_conn_btn);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

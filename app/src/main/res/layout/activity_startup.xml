@@ -84,25 +84,6 @@
                 android:textColorHint="#000000"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/test_name"
-                style="@style/Widget.AppCompat.EditText"
-                android:layout_width="294dp"
-                android:layout_height="37dp"
-                android:layout_gravity="center"
-                android:layout_margin="10sp"
-                android:background="#52009688"
-                android:ems="10"
-                android:hint=" Enter Test Name"
-                android:inputType="textPersonName"
-                android:maxLength="15"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="#000000"
-                android:textColorHint="#000000"
-                android:textStyle="bold" />
-
             <Button
                 android:id="@+id/enter_button"
                 android:layout_width="wrap_content"
