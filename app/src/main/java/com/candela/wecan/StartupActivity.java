@@ -43,12 +43,11 @@ public class StartupActivity extends AppCompatActivity {
     static final int STARTING = 0;
     static final int RUNNING = 1;
     static final int STOPPED = 2;
-    private TextView server_ip,u_name,test_name_tv;
+    private TextView server_ip,u_name;
     static int state;
     private String ssid, passwd;
-    public Context context;
+    public static Context context;
     protected static LF_Resource lf_resource = null;
-    public View my_view = null;
     public static SharedPreferences sharedpreferences = null;
     public static boolean active=false;
     private LocationManager locationManager;
@@ -63,15 +62,27 @@ public class StartupActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.enter_button);
         server_ip = findViewById(R.id.ip_enter_page);
         u_name = findViewById(R.id.user_name);
-        test_name_tv = findViewById(R.id.test_name);
+        context = getBaseContext();
         sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String,?> keys = sharedpreferences.getAll();
         String last_ip = (String) keys.get("current_ip");
         String user_name = (String) keys.get("current_username");
-        String test_name = (String) keys.get("current_testname");
+
+        // Allow cmd-line to override.
+        String extra = getIntent().getStringExtra("user_name");
+        if (extra != null) {
+            user_name = extra;
+            System.out.println("Setting username from intent Extra: " + user_name);
+        }
+        extra = getIntent().getStringExtra("manager");
+        if (extra != null) {
+            last_ip = extra;
+            System.out.println("Setting last_ip from intent Extra: " + last_ip);
+        }
+
         server_ip.setText(last_ip);
         u_name.setText(user_name);
-        test_name_tv.setText(test_name);
+
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
                 android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -94,59 +105,59 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 button.setEnabled(false);
-                // Condition for minimum character limits
-                if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4 ||
-                        test_name_tv.getText().toString().replaceAll("\\s", "").length() <= 4) {
-                    Toast.makeText(getApplicationContext(), "user-name and test-name should be of min 5 characters", Toast.LENGTH_SHORT).show();
-                    button.setEnabled(true);
-                    return;
-                }
 
-                // If everything is good, then do the logic
-                else {
-                    // u_name.getText()
-                    // server_ip.getText()
-
-
-                    // If server is already registered
-                    Hashtable data = getLFResourceCredentials();
-                    if (data.containsKey("server_ip-" + server_ip.getText())){
-                        connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
-                                data.get("resource_id-" + server_ip.getText()).toString(),
-                                data.get("realm_id-" + server_ip.getText()).toString(),
-                                data.get("current_username").toString(),
-                                view
-
-                        );
-
-                    }
-                    // Registering server details if it is not registered already
-                    else{
-                        setLFResourceCredentials(server_ip.getText().toString(),
-                                "-1",
-                                "-1",
-                                u_name.getText().toString(),
-                                test_name_tv.getText().toString());
-                        connect_server(server_ip.getText().toString(), "-1", "-1", u_name.getText().toString(),
-                                view);
-                    }
-                }
+                checkConnect();
             }
         });
+
+        extra = getIntent().getStringExtra("auto_start");
+        if (extra != null) {
+            if (extra.equals("1")) {
+                System.out.println("Enabling auto-start based on Intent auto_start");
+                checkConnect();
+            }
+        }
+    }
+
+    public void checkConnect() {
+        // Condition for minimum character limits
+        if (u_name.getText().toString().replaceAll("\\s", "").length() <= 4) {
+            Toast.makeText(getApplicationContext(), "user-name must be at least 5 characters", Toast.LENGTH_SHORT).show();
+            button.setEnabled(true);
+            return;
+        }
+        // If everything is good, then do the logic
+        else {
+            // u_name.getText()
+            // server_ip.getText()
+
+            // If server is already registered
+            Hashtable data = getLFResourceCredentials();
+            if (data.containsKey("server_ip-" + server_ip.getText())) {
+                connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
+                        data.get("resource_id-" + server_ip.getText()).toString(),
+                        data.get("realm_id-" + server_ip.getText()).toString());
+            }
+            // Registering server details if it is not registered already
+            else{
+                setLFResourceCredentials(server_ip.getText().toString(),
+                        "-1",
+                        "-1",
+                        u_name.getText().toString());
+                connect_server(server_ip.getText().toString(), "-1", "-1");
+            }
+        }
     }
 
     public void openServerConnection () {
         if (navigation.active){
             return;
         }
-       Intent myIntent = new Intent(this, navigation.class);
-       startActivity(myIntent);
+        Intent myIntent = new Intent(this, navigation.class);
+        startActivity(myIntent);
     }
 
-    public void connect_server(String ip, String resource_id, String realm_id, String username,
-                               View v){
-        my_view = v;
-
+    public void connect_server(String ip, String resource_id, String realm_id) {
         if (lf_resource != null) {
             lf_resource.do_run = false;
             try {
@@ -157,37 +168,35 @@ public class StartupActivity extends AppCompatActivity {
             }
         }
 
-        lf_resource = new LF_Resource(this, ip, resource_id, realm_id, username,
-                getApplicationContext());
+        lf_resource = new LF_Resource(this, ip, resource_id, realm_id, getApplicationContext());
         lf_resource.start();
     }
 
     public void notifyCxChanged() {
         runOnUiThread(new Runnable() {
-                public void run() {
-                    _notifyCxChanged();
-                }
-            });
+            public void run() {
+                _notifyCxChanged();
+            }
+        });
     }
 
     public void updateRealmInfo() {
-       String new_resource_id = lf_resource.getResource();
-       String new_realm_id = lf_resource.getRealm();
-       String ip = lf_resource.getRemoteHost();
-       SharedPreferences.Editor editor = sharedpreferences.edit();
-       Log.e("shivam-iron", new_resource_id);
-       editor.putString("server_ip-" + ip, ip);
-       editor.putString("resource_id-" + ip, new_resource_id);
-       editor.putString("realm_id-" + ip, new_realm_id);
-       editor.putString("user_name-" + ip, u_name.getText().toString());
-       editor.putString("current_ip", ip);
-       editor.putString("current_username", u_name.getText().toString());
-       editor.putString("current_resource", new_resource_id);
-       editor.putString("current_realm", new_realm_id);
-        editor.putString("current_testname", test_name_tv.getText().toString());
-       editor.apply();
-       editor.commit();
-       navigation.setRealmInfoTextUI();
+        String new_resource_id = lf_resource.getResource();
+        String new_realm_id = lf_resource.getRealm();
+        String ip = lf_resource.getRemoteHost();
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        Log.e("shivam-iron", new_resource_id);
+        editor.putString("server_ip-" + ip, ip);
+        editor.putString("resource_id-" + ip, new_resource_id);
+        editor.putString("realm_id-" + ip, new_realm_id);
+        editor.putString("user_name-" + ip, u_name.getText().toString());
+        editor.putString("current_ip", ip);
+        editor.putString("current_username", u_name.getText().toString());
+        editor.putString("current_resource", new_resource_id);
+        editor.putString("current_realm", new_realm_id);
+        editor.apply();
+        editor.commit();
+        navigation.setRealmInfoTextUI();
     }
 
     public void _notifyCxChanged() {
@@ -203,8 +212,11 @@ public class StartupActivity extends AppCompatActivity {
             if (StartupActivity.active){
                 return;
             }
+            finishAffinity();
             Toast.makeText(getApplicationContext(), "Disconnected from Server, Closing the View", Toast.LENGTH_LONG).show();
-            Intent myIntent = new Intent(this, StartupActivity.class);
+            Intent myIntent = new Intent(navigation.context, StartupActivity.class);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(myIntent);
             button.setEnabled(true);
             // TODO: How to switch back to first view so user can reconnect if they want?
@@ -236,13 +248,12 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     // Set the sharedpreference for locally stored data
-    public int setLFResourceCredentials(String server_ip, String realm, String resource_id, String username, String test_name){
+    public int setLFResourceCredentials(String server_ip, String realm, String resource_id, String username){
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString("server_ip-" + server_ip, server_ip);
         editor.putString("resource_id-" + server_ip, resource_id);
         editor.putString("realm_id-" + server_ip ,realm);
         editor.putString("user_name-" + server_ip, username);
-        editor.putString("test_name-" + server_ip, test_name);
         editor.apply();
         editor.commit();
         return -1;

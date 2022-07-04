@@ -710,4 +710,3 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         return thread;
     }
 }
-

@@ -45,9 +45,9 @@
 
     <TextView
         android:id="@+id/textView5"
-        android:layout_width="193dp"
-        android:layout_height="58dp"
-        android:text="WE-CAN"
+        android:layout_width="209dp"
+        android:layout_height="160dp"
+        android:text="LANforge InterOp"
         android:textAlignment="center"
         android:textColor="#471717"
         android:textSize="34sp"
@@ -56,5 +56,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView6"
-        app:layout_constraintVertical_bias="0.434" />
+        app:layout_constraintVertical_bias="0.179" />
 </androidx.constraintlayout.widget.ConstraintLayout>
