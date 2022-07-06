@@ -49,6 +49,11 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
     public static Context context;
     protected StartupActivity startup_activity;
     public static WebBrowser webBrowser;
+    public Thread thread;
+    private Thread thread2;
+    private Thread thread_stop;
+    private boolean Started=false;
+
     public ResourceUtils(StartupActivity activity, Context context){
         this.context = context;
         startup_activity = activity;
@@ -76,7 +81,9 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public void setResourceInfo(int i, int i1) {
-       startup_activity.updateRealmInfo();
+
+        System.out.println("TAG-SHIVAM : " + String.valueOf(i1));
+        startup_activity.updateRealmInfo();
     }
 
     @Override
@@ -531,111 +538,128 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         return pi;
     }
 
-    // encryption string format:  psk|pask2|sae|open
     @Override
     public Vector<StringKeyVal> configureWifi(String ssid, String password, String encryption) {
 
         if (ssid.equals("DEFAULT")){
             return null;
         }
-
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         // This will make 'connect' attempt upon creation, the connect logic will run in the background.
         ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
-
-        /*
-            Need to structure the cc_data in a Vector format and collect usefull info from this
-            {
-                "cx_time" : "" // in ms
-            }
-         */
-//        System.out.println("Ironman: " + configureWifi.cc_data.get(0).split("-:-")[0]);
-//        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
-//        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
-//        System.out.println("IronSpider: " + timestamp.toString());
         return null;
     }
 
+    @Override
+    public Vector<StringKeyVal> doRxPayload() {
+        System.out.println("shivam-doRxPayload:");
+        Vector<StringKeyVal> l4_browser_data = new Vector<StringKeyVal>();
+        if (webBrowser!= null) {
+            l4_browser_data.add(new StringKeyVal("CURRENT-BYTES", String.valueOf(webBrowser.totalBytes)));
+            l4_browser_data.add(new StringKeyVal("TOTAL-URLS", String.valueOf(webBrowser.totalUrls)));
+            if (webBrowser.ERRORS.size() != 0){
+                l4_browser_data.add(new StringKeyVal("ERRORS-TOTAL", "1"));
+                l4_browser_data.add(new StringKeyVal("ERRORS-" + webBrowser.ERRORS.get(0) , "1"));
+            }
+            System.out.println(l4_browser_data);
+            System.out.println("shivam-bytes:" + webBrowser.totalBytes);
+        }
+        return l4_browser_data;
+
+    }
 
     @Override
-    public Vector<StringKeyVal> RunWebBrowserTest(String s) {
-        System.out.println("Shivam Thakur: " + s);
-        Thread thread = new Thread(){
-            @Override
-            public void run() {
-                try {
-                    synchronized (this) {
-                        wait(1000);
+    public Object CreateWebBrowserObject() {
+        Log.i(StartupActivity.TAG, "Creating L4 Browser Object");
+        runOnUiThread(() -> {
+            try {
+                webBrowser = new WebBrowser();
+            } catch (InterruptedException e) {
+                Log.e(StartupActivity.TAG, e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        return webBrowser;
+    }
 
-                        runOnUiThread(new Runnable() {
-                            @RequiresApi(api = Build.VERSION_CODES.P)
-                            @Override
-                            public void run() {
+    @Override
+    public void doQuiesceBrowserTest() {
+        System.out.println("Into doQuiesceBrowserTest:: ");
+        if (Started) {
+            webBrowser.stopTest();
+            thread = null;
+            webBrowser.totalBytes = 0;
+            webBrowser.totalUrls = 0;
+            Started = false;
+        }
+    }
+
+    @Override
+    public void doStopBrowserTest() {
+        System.out.println("Into doStopBrowserTest:: ");
+        if (Started) {
+            thread_stop = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        synchronized (this) {
+                            wait(1000);
+                            runOnUiThread(() -> {
+                                webBrowser.stopTest();
+                                HomeFragment.webpage_view.stopLoading();
+                                thread = null;
+                                webBrowser.totalBytes = 0;
+                                webBrowser.totalUrls = 0;
+//                                webBrowser = null;
+                                Started = false;
+                            });
+
+                        }
+                    } catch (InterruptedException e) {
+                        Log.i(StartupActivity.TAG, e.toString());
+                        e.printStackTrace();
+                    }
+
+                }
+
+                ;
+            };
+            thread_stop.start();
+        }
+    }
+
+    @Override
+    public Thread StartTest(String s) {
+        Log.i(StartupActivity.TAG, "RunWebBrowserTest:: " + "URL:: " + s + "  webBrowser Thread::" + webBrowser + webBrowser.STOP);
+        if (webBrowser != null && thread == null) {
+            thread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        synchronized (this) {
+                            wait(1000);
+                            runOnUiThread(() -> {
+                                Started = true;
                                 HomeFragment.webpage_test_btn.performClick();
                                 HomeFragment.webpage_view.clearCache(true);
                                 HomeFragment.webpage_view.clearView();
-                                try {
-                                    webBrowser = new WebBrowser(s);
+                                WebBrowser.STOP = false;
+                                webBrowser.startTest(s);
+                            });
 
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-
+                        }
+                    } catch (InterruptedException e) {
+                        Log.i(StartupActivity.TAG, e.toString());
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
                 }
 
+                ;
             };
-        };
-        thread.start();
-        while (true){
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(webBrowser.CALL_BACKS.size());
-            System.out.println(webBrowser.RUNNING);
-            if (webBrowser.RUNNING == false || webBrowser.FINISHED ){
-                break;
-            }
-            if (webBrowser.ERRORS){
-                break;
-            }
+            thread.start();
         }
-//        new
-        System.out.println("total-bytes-debug: " + webBrowser.totalBytes);
-//        l4_browser_data
-        Vector<StringKeyVal> l4_browser_data = new Vector<StringKeyVal>();
-        l4_browser_data.add(new StringKeyVal("bytes-rd",String.valueOf(webBrowser.totalBytes)));
-        l4_browser_data.add(new StringKeyVal("START_TIME",webBrowser.START_TIME.toString()));
-        l4_browser_data.add(new StringKeyVal("END_TIME",webBrowser.END_TIME.toString()));
-        if (webBrowser.ERRORS){
-            l4_browser_data.add(new StringKeyVal("ERROR",String.valueOf(1)));
-        }
-        else {
-            l4_browser_data.add(new StringKeyVal("ERROR",String.valueOf(0)));
-        }
-        for (StringKeyVal kv: l4_browser_data) {
-            switch (kv.key) {
-                case "bytes-rd":
-                    System.out.println("shivam-debug-data: " + Integer.valueOf(kv.val));
-                    break;
-                case "START_TIME":
-                    System.out.println("shivam-debug-data: " + kv.val);
-                    break;
-                case "END_TIME":
-                    System.out.println("shivam-debug-data: " +kv.val);
-                    break;
-            }
-        }
-
-
-        return l4_browser_data;
+        return thread;
     }
 }
-

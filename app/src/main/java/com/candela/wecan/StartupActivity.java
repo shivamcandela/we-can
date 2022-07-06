@@ -38,7 +38,7 @@ import java.util.Map;
  *
  */
 public class StartupActivity extends AppCompatActivity {
-
+    public static final String TAG = "LANforge-Interop";
     private Button button;
     static final int STARTING = 0;
     static final int RUNNING = 1;
@@ -135,15 +135,15 @@ public class StartupActivity extends AppCompatActivity {
             Hashtable data = getLFResourceCredentials();
             if (data.containsKey("server_ip-" + server_ip.getText())) {
                 connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
-                               data.get("resource_id-" + server_ip.getText()).toString(),
-                               data.get("realm_id-" + server_ip.getText()).toString());
+                        data.get("resource_id-" + server_ip.getText()).toString(),
+                        data.get("realm_id-" + server_ip.getText()).toString());
             }
             // Registering server details if it is not registered already
             else{
                 setLFResourceCredentials(server_ip.getText().toString(),
-                                         "-1",
-                                         "-1",
-                                         u_name.getText().toString());
+                        "-1",
+                        "-1",
+                        u_name.getText().toString());
                 connect_server(server_ip.getText().toString(), "-1", "-1");
             }
         }
@@ -153,8 +153,8 @@ public class StartupActivity extends AppCompatActivity {
         if (navigation.active){
             return;
         }
-       Intent myIntent = new Intent(this, navigation.class);
-       startActivity(myIntent);
+        Intent myIntent = new Intent(this, navigation.class);
+        startActivity(myIntent);
     }
 
     public void connect_server(String ip, String resource_id, String realm_id) {
@@ -174,29 +174,29 @@ public class StartupActivity extends AppCompatActivity {
 
     public void notifyCxChanged() {
         runOnUiThread(new Runnable() {
-                public void run() {
-                    _notifyCxChanged();
-                }
-            });
+            public void run() {
+                _notifyCxChanged();
+            }
+        });
     }
 
     public void updateRealmInfo() {
-       String new_resource_id = lf_resource.getResource();
-       String new_realm_id = lf_resource.getRealm();
-       String ip = lf_resource.getRemoteHost();
-       SharedPreferences.Editor editor = sharedpreferences.edit();
-       Log.e("shivam-iron", new_resource_id);
-       editor.putString("server_ip-" + ip, ip);
-       editor.putString("resource_id-" + ip, new_resource_id);
-       editor.putString("realm_id-" + ip, new_realm_id);
-       editor.putString("user_name-" + ip, u_name.getText().toString());
-       editor.putString("current_ip", ip);
-       editor.putString("current_username", u_name.getText().toString());
-       editor.putString("current_resource", new_resource_id);
-       editor.putString("current_realm", new_realm_id);
-       editor.apply();
-       editor.commit();
-       navigation.setRealmInfoTextUI();
+        String new_resource_id = lf_resource.getResource();
+        String new_realm_id = lf_resource.getRealm();
+        String ip = lf_resource.getRemoteHost();
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        Log.e("shivam-iron", new_resource_id);
+        editor.putString("server_ip-" + ip, ip);
+        editor.putString("resource_id-" + ip, new_resource_id);
+        editor.putString("realm_id-" + ip, new_realm_id);
+        editor.putString("user_name-" + ip, u_name.getText().toString());
+        editor.putString("current_ip", ip);
+        editor.putString("current_username", u_name.getText().toString());
+        editor.putString("current_resource", new_resource_id);
+        editor.putString("current_realm", new_realm_id);
+        editor.apply();
+        editor.commit();
+        navigation.setRealmInfoTextUI();
     }
 
     public void _notifyCxChanged() {
