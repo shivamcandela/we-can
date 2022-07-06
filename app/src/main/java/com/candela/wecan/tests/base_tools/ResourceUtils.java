@@ -544,59 +544,10 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
         if (ssid.equals("DEFAULT")){
             return null;
         }
-//        Thread thread = new Thread(){
-//            @Override
-//            public void run() {
-//                try {
-//                    synchronized (this) {
-//                        wait(1000);
-//
-//                        runOnUiThread(new Runnable() {
-//                            @RequiresApi(api = Build.VERSION_CODES.P)
-//                            @Override
-//                            public void run() {
-//                                HomeFragment.webpage_test_btn.performClick();
-//                                try {
-//                                    WebBrowser webBrowser = new WebBrowser("https://www.google.com");
-//
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        });
-//
-//                    }
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            };
-//        };
-//        thread.start();
-////        try {
-////            thread.join();
-////        } catch (InterruptedException e) {
-////            e.printStackTrace();
-////        }
-//
-//        System.out.println("SHIVAM-WEBPAGE DONE");
-//        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-//        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-//        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
-//        if (configureWifi.isConnectedto(ssid)){
-//            Log.i("iron",configureWifi.cc_data.toString());
-//        }
-
-        /*
-            Need to structure the cc_data in a Vector format and collect usefull info from this
-            {
-                "cx_time" : "" // in ms
-            }
-         */
-//        System.out.println("Ironman: " + configureWifi.cc_data.get(0).split("-:-")[0]);
-//        System.out.println("Ironman: " + configureWifi.cc_data.get(configureWifi.cc_data.size()-1).split("-:-")[0]);
-//        Timestamp timestamp = new Timestamp(Timestamp.parse("2022-01-10 15:59:29.772"));
-//        System.out.println("IronSpider: " + timestamp.toString());
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        // This will make 'connect' attempt upon creation, the connect logic will run in the background.
+        ConfigureWifi configureWifi = new ConfigureWifi(context, wifiManager, ssid, password, encryption);
         return null;
     }
 
@@ -620,11 +571,12 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public Object CreateWebBrowserObject() {
-        System.out.println("Into CreateWebBrowserObject:: ");
+        Log.i(StartupActivity.TAG, "Creating L4 Browser Object");
         runOnUiThread(() -> {
             try {
                 webBrowser = new WebBrowser();
             } catch (InterruptedException e) {
+                Log.e(StartupActivity.TAG, e.getMessage());
                 e.printStackTrace();
             }
         });
@@ -639,7 +591,6 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
             thread = null;
             webBrowser.totalBytes = 0;
             webBrowser.totalUrls = 0;
-//            webBrowser = null;
             Started = false;
         }
     }
@@ -666,6 +617,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
                         }
                     } catch (InterruptedException e) {
+                        Log.i(StartupActivity.TAG, e.toString());
                         e.printStackTrace();
                     }
 
@@ -679,7 +631,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
     @Override
     public Thread StartTest(String s) {
-        System.out.println("RunWebBrowserTest:: " + "URL:: " + s + "  webBrowser Thread::" + webBrowser + webBrowser.STOP);
+        Log.i(StartupActivity.TAG, "RunWebBrowserTest:: " + "URL:: " + s + "  webBrowser Thread::" + webBrowser + webBrowser.STOP);
         if (webBrowser != null && thread == null) {
             thread = new Thread() {
                 @Override
@@ -698,6 +650,7 @@ public class ResourceUtils extends AppCompatActivity implements AndroidUI{
 
                         }
                     } catch (InterruptedException e) {
+                        Log.i(StartupActivity.TAG, e.toString());
                         e.printStackTrace();
                     }
 

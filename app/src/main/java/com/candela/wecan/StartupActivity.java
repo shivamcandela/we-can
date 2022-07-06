@@ -38,7 +38,7 @@ import java.util.Map;
  *
  */
 public class StartupActivity extends AppCompatActivity {
-
+    public static final String TAG = "LANforge-Interop";
     private Button button;
     static final int STARTING = 0;
     static final int RUNNING = 1;
