@@ -14,9 +14,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +45,7 @@ public class StartupActivity extends AppCompatActivity {
     static final int STARTING = 0;
     static final int RUNNING = 1;
     static final int STOPPED = 2;
-    private TextView server_ip,u_name;
+    private EditText server_ip,u_name;
     static int state;
     private String ssid, passwd;
     public static Context context;
@@ -59,14 +61,35 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
         getSupportActionBar().hide();
-        button = (Button) findViewById(R.id.enter_button);
-        server_ip = findViewById(R.id.ip_enter_page);
-        u_name = findViewById(R.id.user_name);
+        button = findViewById(R.id.enter_button);
+        server_ip =  (EditText) findViewById(R.id.ip_enter_page);
+        u_name = (EditText) findViewById(R.id.user_name);
         context = getBaseContext();
         sharedpreferences = getBaseContext().getSharedPreferences("userdata", Context.MODE_PRIVATE);
         Map<String,?> keys = sharedpreferences.getAll();
         String last_ip = (String) keys.get("current_ip");
         String user_name = (String) keys.get("current_username");
+        Bundle arg = getIntent().getExtras();
+        boolean click = false;
+        server_ip.setText(last_ip);
+        u_name.setText(user_name);
+        if (arg != null) {
+            Log.d(TAG,"Adding arguments from command line: " + arg);
+            if (arg.containsKey("username")) {
+                Log.d(TAG, arg.getString("username"));
+                u_name.setText(Editable.Factory.getInstance().newEditable(arg.getString("username")), EditText.BufferType.NORMAL);
+            }
+            if (arg.containsKey("serverip")) {
+                Log.d(TAG, arg.getString("serverip"));
+                server_ip.setText(Editable.Factory.getInstance().newEditable(arg.getString("serverip")), EditText.BufferType.NORMAL);
+            }
+            if (arg.containsKey("click")){
+                Log.d(TAG, arg.getString("click"));
+                click = true;
+            }
+        }
+
+;
 
         // Allow cmd-line to override.
         String extra = getIntent().getStringExtra("user_name");
@@ -80,8 +103,7 @@ public class StartupActivity extends AppCompatActivity {
             System.out.println("Setting last_ip from intent Extra: " + last_ip);
         }
 
-        server_ip.setText(last_ip);
-        u_name.setText(user_name);
+
 
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
@@ -116,6 +138,9 @@ public class StartupActivity extends AppCompatActivity {
                 System.out.println("Enabling auto-start based on Intent auto_start");
                 checkConnect();
             }
+        }
+        if (click){
+            button.callOnClick();
         }
     }
 
