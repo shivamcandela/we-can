@@ -11,6 +11,7 @@ import android.location.GpsStatus;
 import android.location.LocationManager;
 import android.location.LocationRequest;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -26,6 +27,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.candela.wecan.tests.base_tools.ConfigureWifi;
 import com.candela.wecan.tests.base_tools.LF_Resource;
 
 import java.util.Hashtable;
@@ -75,17 +77,42 @@ public class StartupActivity extends AppCompatActivity {
         u_name.setText(user_name);
         if (arg != null) {
             Log.d(TAG,"Adding arguments from command line: " + arg);
+            if (arg.containsKey("setwifi")){
+                Log.d(TAG, "setwifi : " + arg.getString("setwifi"));
+                if (arg.getString("setwifi").equals("true")) {
+                    boolean good_wifi_cred = true;
+                    if (!arg.containsKey("ssid")) {
+                        good_wifi_cred = false;
+                        Log.d(TAG, "ssid : " + arg.getString("ssid"));
+                    }
+                    if (!arg.containsKey("password")) {
+                        good_wifi_cred = false;
+                        Log.d(TAG, "password : " + arg.getString("password"));
+                    }
+                    if (!arg.containsKey("encryption")) {
+                        good_wifi_cred = false;
+                        Log.d(TAG, "encryption : " + arg.getString("encryption"));
+                    }
+                    Log.d(TAG, "good_wifi_cred: " + good_wifi_cred);
+                    if (good_wifi_cred){
+                        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                        ConfigureWifi configureWifi = new ConfigureWifi(getApplicationContext(),wifiManager,arg.getString("ssid"),arg.getString("password"),arg.getString("encryption"));
+                    }
+                }
+            }
             if (arg.containsKey("username")) {
-                Log.d(TAG, arg.getString("username"));
+                Log.d(TAG, "username : " + arg.getString("username"));
                 u_name.setText(Editable.Factory.getInstance().newEditable(arg.getString("username")), EditText.BufferType.NORMAL);
             }
             if (arg.containsKey("serverip")) {
-                Log.d(TAG, arg.getString("serverip"));
+                Log.d(TAG, "serverip : " + arg.getString("serverip"));
                 server_ip.setText(Editable.Factory.getInstance().newEditable(arg.getString("serverip")), EditText.BufferType.NORMAL);
             }
             if (arg.containsKey("click")){
-                Log.d(TAG, arg.getString("click"));
-                click = true;
+                Log.d(TAG, "click Button : " + arg.getString("click"));
+                if (arg.getString("click").equals("true")) {
+                    click = true;
+                }
             }
         }
 

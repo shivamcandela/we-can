@@ -10,8 +10,11 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+
+import com.candela.wecan.StartupActivity;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -38,6 +41,8 @@ public class ConfigureWifi {
         this.intentFilter = new IntentFilter();
         this.cc_data = new ArrayList<>();
         this.CC_Status = 0;
+        Log.d(StartupActivity.TAG, "Configure Wifi Credentials: ssid: " + ssid + "\tpassword: " + password + "\tencryption: " + encryption);
+        Toast.makeText(context, "Configuring Wifi", Toast.LENGTH_LONG).show();
         this.connect();
     }
     public void callback(){
@@ -50,7 +55,7 @@ public class ConfigureWifi {
                 final String action = intent.getAction();
                 WifiInfo wifiInfo = wifi.getConnectionInfo();
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                Log.i("device status", timestamp.toString() + " " + wifiInfo.toString());
+                Log.i(StartupActivity.TAG, timestamp.toString() + " " + wifiInfo.toString());
                 cc_data.add(timestamp.toString() + "-:-" + wifiInfo.toString());
                 if (wifiInfo.getSupplicantState().toString().equals("DISCONNECTED") && ("\"" + wifi_name + "\"").equals(wifiInfo.getSSID())){
 
@@ -85,10 +90,12 @@ public class ConfigureWifi {
         wifiManager.setWifiEnabled(false);
         wifiManager.setWifiEnabled(true);
         if (!wifiManager.isWifiEnabled()) {
+            Log.d(StartupActivity.TAG, "Enabling Wifi!");
             wifiManager.setWifiEnabled(true);
         }
         WifiInfo connectionInfo = wifiManager.getConnectionInfo();
         if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d(StartupActivity.TAG, "Enable Permission Please!");
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -99,6 +106,7 @@ public class ConfigureWifi {
             return;
         }
         List<WifiConfiguration> list1 = wifiManager.getConfiguredNetworks();
+        Log.d(StartupActivity.TAG, "Searching for Existing Wifi Configurations..." + list1.toString());
         int j = 10;
         for( WifiConfiguration i : list1 ) {
             j = j++;
@@ -106,6 +114,7 @@ public class ConfigureWifi {
             wifiManager.updateNetwork(i);
             wifiManager.saveConfiguration();
             if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                Log.d(StartupActivity.TAG, "SSID Found in saved Networks: " + i.SSID);
                 i.priority = 9999;
                 wifiManager.updateNetwork(i);
                 wifiManager.saveConfiguration();
@@ -117,18 +126,18 @@ public class ConfigureWifi {
                 return;
             }
         }
-
+        Log.d(StartupActivity.TAG, "SSID was not available in Existing Configuration! Making a new entry!");
         WifiConfiguration wifiConfiguration = new WifiConfiguration();
 
         wifiConfiguration.SSID = String.format("\"%s\"", this.ssid);
 
-        Log.i("log", "ssid -:" + ssid + ":- password -:" + password + ":-");
-        Log.i("log", "wifiConfiguration: " + wifiConfiguration.toString());
+        Log.i(StartupActivity.TAG, "ssid -:" + ssid + ":- password -:" + password + ":-");
+        Log.i(StartupActivity.TAG, "wifiConfiguration: " + wifiConfiguration.toString());
 
         StringTokenizer st = new StringTokenizer(encryption, "|");
         while (st.hasMoreTokens()) {
            String tok = st.nextToken();
-           Log.e("log", "crypt token: " + tok);
+           Log.d(StartupActivity.TAG, "crypt token: " + tok);
            if (tok.equals("open")) {
               wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
            }
@@ -184,7 +193,7 @@ public class ConfigureWifi {
 
         int wifiID = wifiManager.addNetwork(wifiConfiguration);
 
-        Log.i("log", "wifiID: " + wifiID);
+        Log.i(StartupActivity.TAG, "wifiID: " + wifiID);
 
 
         wifiManager.disconnect();
@@ -197,6 +206,7 @@ public class ConfigureWifi {
         for( WifiConfiguration i : list ) {
             System.out.println(i.SSID);
             if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                Log.d(StartupActivity.TAG, "Configuring the Target SSID, Sit back and Relax!");
                 wifiManager.disconnect();
 //                this.callback();
                 wifiManager.setWifiEnabled(true);
