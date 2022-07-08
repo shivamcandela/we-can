@@ -29,6 +29,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.candela.wecan.tests.base_tools.ConfigureWifi;
 import com.candela.wecan.tests.base_tools.LF_Resource;
+import com.candela.wecan.tools.LogCatManager;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -71,6 +72,7 @@ public class StartupActivity extends AppCompatActivity {
         Map<String,?> keys = sharedpreferences.getAll();
         String last_ip = (String) keys.get("current_ip");
         String user_name = (String) keys.get("current_username");
+        LogCatManager logCatManager = new LogCatManager();
         Bundle arg = getIntent().getExtras();
         boolean click = false;
         server_ip.setText(last_ip);
