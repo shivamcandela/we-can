@@ -105,27 +105,34 @@ public class ConfigureWifi {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
         List<WifiConfiguration> list1 = wifiManager.getConfiguredNetworks();
-        Log.d(StartupActivity.TAG, "Searching for Existing Wifi Configurations..." + list1.toString());
-        int j = 10;
-        for( WifiConfiguration i : list1 ) {
-            j = j++;
-            i.priority = j++;
-            wifiManager.updateNetwork(i);
-            wifiManager.saveConfiguration();
-            if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
-                Log.d(StartupActivity.TAG, "SSID Found in saved Networks: " + i.SSID);
-                i.priority = 9999;
-                wifiManager.updateNetwork(i);
-                wifiManager.saveConfiguration();
-                wifiManager.disconnect();
-                this.callback();
-                wifiManager.setWifiEnabled(true);
-                wifiManager.enableNetwork(i.networkId, true);
-                wifiManager.reconnect();
-                return;
-            }
+        if (list1 == null) {
+           Log.d(StartupActivity.TAG, "Existing Wifi Configurations is null in connect.");
         }
+        else {
+           Log.d(StartupActivity.TAG, "Searching for Existing Wifi Configurations..." + list1.toString());
+           int j = 10;
+           for( WifiConfiguration i : list1 ) {
+              j = j++;
+              i.priority = j++;
+              wifiManager.updateNetwork(i);
+              wifiManager.saveConfiguration();
+              if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                 Log.d(StartupActivity.TAG, "SSID Found in saved Networks: " + i.SSID);
+                 i.priority = 9999;
+                 wifiManager.updateNetwork(i);
+                 wifiManager.saveConfiguration();
+                 wifiManager.disconnect();
+                 this.callback();
+                 wifiManager.setWifiEnabled(true);
+                 wifiManager.enableNetwork(i.networkId, true);
+                 wifiManager.reconnect();
+                 return;
+              }
+           }
+        }
+
         Log.d(StartupActivity.TAG, "SSID was not available in Existing Configuration! Making a new entry!");
         WifiConfiguration wifiConfiguration = new WifiConfiguration();
 
@@ -201,19 +208,22 @@ public class ConfigureWifi {
         wifiManager.reconnect();
 
         wifiManager.setWifiEnabled(true);
+
 //        wifiConfiguration.
         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-        for( WifiConfiguration i : list ) {
-            System.out.println(i.SSID);
-            if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
-                Log.d(StartupActivity.TAG, "Configuring the Target SSID, Sit back and Relax!");
-                wifiManager.disconnect();
-//                this.callback();
-                wifiManager.setWifiEnabled(true);
-                wifiManager.enableNetwork(i.networkId, true);
-                wifiManager.reconnect();
-                break;
-            }
+        if (list != null) {
+           for( WifiConfiguration i : list ) {
+              System.out.println(i.SSID);
+              if ((i.SSID != null && i.SSID.equals("\"" + this.ssid + "\""))) {
+                 Log.d(StartupActivity.TAG, "Configuring the Target SSID, Sit back and Relax!");
+                 wifiManager.disconnect();
+                 // this.callback();
+                 wifiManager.setWifiEnabled(true);
+                 wifiManager.enableNetwork(i.networkId, true);
+                 wifiManager.reconnect();
+                 break;
+              }
+           }
         }
 
 //        wifiID = wifiManager.addNetwork(wifiConfiguration);
@@ -222,6 +232,4 @@ public class ConfigureWifi {
 //        wifiManager.reconnect();
 
     }
-
-
 }
