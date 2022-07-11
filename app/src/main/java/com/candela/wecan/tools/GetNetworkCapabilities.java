@@ -13,29 +13,41 @@ import androidx.annotation.RequiresApi;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class GetNetworkCapabilities {
     private ConnectivityManager connectivity;
-    private Network[] networks;
+    private Object[] networks; // type is Network if SDK supports it.
     Context context;
 
     public GetNetworkCapabilities(Context context){
         this.context = context;
         this.connectivity = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        this.networks = connectivity.getAllNetworks();
+        if (Build.VERSION.SDK_INT >= 21) { // TODO:  Also, deprecated in SDK 31
+            networks = connectivity.getAllNetworks();
+        }
+        else {
+            networks = new Object[0]; // empty array
+        }
+        // TODO:  How to mimic this on older SDK?
     }
 
     public String GetWifiCapabilities(){
-        for (Network network : networks) {
-            NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
-            Log.e("iron_man_spider", String.valueOf(capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED)));
+        if (Build.VERSION.SDK_INT >= 21) {
+            Network[] nws = (Network[])networks;
+            for (Network network : nws) {
+                NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
+                Log.e("iron_man_spider", String.valueOf(capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED)));
+            }
         }
         return "";
     }
 
     @SuppressLint("WrongConstant")
     public boolean isWifiNetworkCongested(){
-        for (Network network : networks) {
-            NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
-            if (capabilities.toString().contains("Transports: WIFI")){
-                return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
+        if (Build.VERSION.SDK_INT >= 21) {
+            Network[] nws = (Network[])networks;
+            for (Network network : nws) {
+                NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
+                if (capabilities.toString().contains("Transports: WIFI")){
+                    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
+                }
             }
         }
         return false;
@@ -43,10 +55,13 @@ public class GetNetworkCapabilities {
 
     @SuppressLint("WrongConstant")
     public boolean isCellularNetworkCongested(){
-        for (Network network : networks) {
-            NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
-            if (capabilities.toString().contains("Transports: CELLULAR")){
-                return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
+        if (Build.VERSION.SDK_INT >= 21) {
+            Network[] nws = (Network[])networks;
+            for (Network network : nws) {
+                NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
+                if (capabilities.toString().contains("Transports: CELLULAR")){
+                    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
+                }
             }
         }
         return false;
