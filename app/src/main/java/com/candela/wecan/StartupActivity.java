@@ -75,29 +75,36 @@ public class StartupActivity extends AppCompatActivity {
         LogCatManager logCatManager = new LogCatManager();
         Bundle arg = getIntent().getExtras();
         boolean click = false;
+
         server_ip.setText(last_ip);
         u_name.setText(user_name);
+
+        // Allow cmd-line to override.
         if (arg != null) {
             Log.d(TAG,"Adding arguments from command line: " + arg);
-                boolean good_wifi_cred = true;
-                if (!arg.containsKey("ssid")) {
-                    good_wifi_cred = false;
-                    Log.d(TAG, "ssid : " + arg.getString("ssid"));
-                }
-                if (!arg.containsKey("password")) {
-                    good_wifi_cred = false;
-                    Log.d(TAG, "password : " + arg.getString("password"));
-                }
-                if (!arg.containsKey("encryption")) {
-                    good_wifi_cred = false;
-                    Log.d(TAG, "encryption : " + arg.getString("encryption"));
-                }
-                Log.d(TAG, "good_wifi_cred: " + good_wifi_cred);
-                if (good_wifi_cred){
-                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                    ConfigureWifi configureWifi = new ConfigureWifi(getApplicationContext(),wifiManager,arg.getString("ssid"),arg.getString("password"),arg.getString("encryption"));
-                }
+            boolean good_wifi_cred = true;
+            String crypt = "open";
+            String passwd = "";
 
+            if (!arg.containsKey("ssid")) {
+                good_wifi_cred = false;
+                Log.d(TAG, "ssid : " + arg.getString("ssid"));
+            }
+            if (arg.containsKey("password")) {
+                passwd = arg.getString("password");
+                Log.d(TAG, "password : " + passwd);
+            }
+            if (arg.containsKey("encryption")) {
+                crypt = arg.getString("encryption");
+                Log.d(TAG, "encryption : " + crypt);
+            }
+
+            Log.d(TAG, "good_wifi_cred: " + good_wifi_cred);
+            if (good_wifi_cred){
+                WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                ConfigureWifi configureWifi = new ConfigureWifi(getApplicationContext(), wifiManager, arg.getString("ssid"),
+                                                                passwd, crypt);
+            }
 
             if (arg.containsKey("username")) {
                 Log.d(TAG, "username : " + arg.getString("username"));
@@ -114,22 +121,6 @@ public class StartupActivity extends AppCompatActivity {
                 }
             }
         }
-
-;
-
-        // Allow cmd-line to override.
-        String extra = getIntent().getStringExtra("user_name");
-        if (extra != null) {
-            user_name = extra;
-            System.out.println("Setting username from intent Extra: " + user_name);
-        }
-        extra = getIntent().getStringExtra("manager");
-        if (extra != null) {
-            last_ip = extra;
-            System.out.println("Setting last_ip from intent Extra: " + last_ip);
-        }
-
-
 
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
@@ -158,13 +149,6 @@ public class StartupActivity extends AppCompatActivity {
             }
         });
 
-        extra = getIntent().getStringExtra("auto_start");
-        if (extra != null) {
-            if (extra.equals("1")) {
-                System.out.println("Enabling auto-start based on Intent auto_start");
-                checkConnect();
-            }
-        }
         if (click){
             button.callOnClick();
         }
