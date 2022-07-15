@@ -83,19 +83,21 @@ public class LiveData implements Runnable{
             live_data.put("DHCP Server", serverAddress);
             live_data.put("Gateway", gateway);
             live_data.put("LeaseDuration", leaseDuration + " Sec");
-            if (networkSniffTask.isWifiNetworkCongested()){
-                live_data.put("WIFI Congested","NO");
-            }
-            if (!networkSniffTask.isWifiNetworkCongested()){
-                live_data.put("WIFI Congested","YES");
-            }
-            if(networkSniffTask.isCellularNetworkCongested()) {
-                live_data.put("Cellular Congested","NO");
 
-            }
-            if(!networkSniffTask.isCellularNetworkCongested()) {
-                live_data.put("Cellular Congested","YES");
+            if (Build.VERSION.SDK_INT >= 21) {
+               if (networkSniffTask.isWifiNetworkCongested()){
+                  live_data.put("WIFI Congested","YES");
+               }
+               else {
+                  live_data.put("WIFI Congested","NO");
+               }
 
+               if (networkSniffTask.isCellularNetworkCongested()) {
+                  live_data.put("Cellular Congested","YES");
+               }
+               else {
+                  live_data.put("Cellular Congested","NO");
+               }
             }
 
             TableRow heading = new TableRow(HomeFragment.home_fragment_activity);
