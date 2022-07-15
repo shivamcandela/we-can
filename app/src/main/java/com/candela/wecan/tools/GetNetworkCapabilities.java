@@ -33,7 +33,7 @@ public class GetNetworkCapabilities {
             Network[] nws = (Network[])networks;
             for (Network network : nws) {
                 NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
-                Log.e("iron_man_spider", String.valueOf(capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED)));
+                Log.e("wifi-capabilities", String.valueOf(capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED)));
             }
         }
         return "";
