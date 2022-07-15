@@ -163,24 +163,19 @@ public class StartupActivity extends AppCompatActivity {
         }
         // If everything is good, then do the logic
         else {
-            // u_name.getText()
-            // server_ip.getText()
+            String username = u_name.getText().toString().trim();
+            String serverip = server_ip.getText().toString().trim();
+            String realm = "-1";
+            String resource = "-1";
 
             // If server is already registered
             Hashtable data = getLFResourceCredentials();
-            if (data.containsKey("server_ip-" + server_ip.getText())) {
-                connect_server(data.get("server_ip-" + server_ip.getText()).toString(),
-                        data.get("resource_id-" + server_ip.getText()).toString(),
-                        data.get("realm_id-" + server_ip.getText()).toString());
+            if (data.containsKey("server_ip-" + serverip)) {
+                realm = data.get("realm_id-" + serverip).toString();
+                resource = data.get("resource_id-" + serverip).toString();
             }
-            // Registering server details if it is not registered already
-            else{
-                setLFResourceCredentials(server_ip.getText().toString(),
-                        "-1",
-                        "-1",
-                        u_name.getText().toString());
-                connect_server(server_ip.getText().toString(), "-1", "-1");
-            }
+
+            connect_server(serverip, resource, realm, username);
         }
     }
 
@@ -192,7 +187,7 @@ public class StartupActivity extends AppCompatActivity {
         startActivity(myIntent);
     }
 
-    public void connect_server(String ip, String resource_id, String realm_id) {
+    public void connect_server(String ip, String resource_id, String realm_id, String username) {
         if (lf_resource != null) {
             lf_resource.do_run = false;
             try {
@@ -203,7 +198,7 @@ public class StartupActivity extends AppCompatActivity {
             }
         }
 
-        lf_resource = new LF_Resource(this, ip, resource_id, realm_id, getApplicationContext());
+        lf_resource = new LF_Resource(this, ip, resource_id, realm_id, username, getApplicationContext());
         lf_resource.start();
     }
 
@@ -283,16 +278,17 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     // Set the sharedpreference for locally stored data
-    public int setLFResourceCredentials(String server_ip, String realm, String resource_id, String username){
+    // TODO:  Call this once lfresource is assigned a realm and resource.
+    public int setLFResourceCredentials(String server_ip, String realm, String resource_id){
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString("server_ip-" + server_ip, server_ip);
         editor.putString("resource_id-" + server_ip, resource_id);
         editor.putString("realm_id-" + server_ip ,realm);
-        editor.putString("user_name-" + server_ip, username);
         editor.apply();
         editor.commit();
         return -1;
     }
+
     @Override
     public void onStart() {
         super.onStart();

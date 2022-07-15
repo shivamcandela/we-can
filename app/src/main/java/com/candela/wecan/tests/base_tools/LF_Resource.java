@@ -31,7 +31,8 @@ public class LF_Resource extends Thread {
     public boolean do_run = true;
 
     @SuppressLint("NewApi")
-    public LF_Resource(StartupActivity act, String ip_address, String resource, String realm_id, Context context) {
+    public LF_Resource(StartupActivity act, String ip_address, String resource, String realm_id,
+                       String username, Context context) {
         startup_activity = act;
         this.context = context;
         this.lfresource = new lfresource();
@@ -44,7 +45,7 @@ public class LF_Resource extends Thread {
         this.pi.model = "a11";
         this.pi.wifi_capabilities = new Vector<>();
 //        this.pi.dhcp_info = new Vector<>();
-        this.pi.username = "";
+        this.pi.username = username;
 
         this.ru = new ResourceUtils(startup_activity, this.context);
         this.pi = ru.requestPlatformUpdate();
