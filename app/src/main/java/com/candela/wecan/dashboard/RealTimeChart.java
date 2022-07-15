@@ -12,85 +12,91 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RealTimeChart implements Runnable{
 
-    AtomicInteger counter = new AtomicInteger(0);
-    DataPoint dp;
-    public static double prev_data_up= 0;
-    public static double prev_data_down = 0;
-    public static int prev_data_total = 0;
+    LineGraphSeries<DataPoint> series_upload;
+    LineGraphSeries<DataPoint> series_download;
+    LineGraphSeries<DataPoint> series_total;
+    boolean initialized = false;
+    long started_at_ms = 0;
+    int max_data_points = 60 * 5; /* 5 minutes by default */
+
     @Override
     public void run() {
         String up_down[] = HomeFragment.up_down_data;
         double downlink = Double.parseDouble(up_down[0]);
-        double uplink =Double.parseDouble(up_down[1]);
-        LineGraphSeries<DataPoint> series_upload = new LineGraphSeries<>();
-        LineGraphSeries<DataPoint> series_download = new LineGraphSeries<>();
-        LineGraphSeries<DataPoint> series_total = new LineGraphSeries<>();
+        double uplink = Double.parseDouble(up_down[1]);
 
-        series_upload.appendData(new DataPoint(1, 2),true,100);
-        series_download.appendData(new DataPoint(1, 2),true,100);
-        series_total.appendData(new DataPoint(1, 2),true,100);
-        double prev_count = counter.doubleValue() - 1;
-//        if (prev_count < 0){
-//            prev_count = 0;
-//        }
-        int count = counter.intValue();
-            double prev_data_total = prev_data_up + prev_data_down;
+        double data_total = downlink + uplink;
 
-        series_upload = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(prev_count, prev_data_up),
-                new DataPoint(count, prev_data_up = uplink)
-        });
-        series_download = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(prev_count, prev_data_down),
-                new DataPoint(count, prev_data_down = downlink)
-        });
-        series_total = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(prev_count, prev_data_total),
-                new DataPoint(count, prev_data_total = prev_data_up + prev_data_down)
-        });
+        if (!initialized) {
+            boolean animated = false;
 
-//        Log.e("uplink",String.valueOf(series_total));
-        series_upload.setTitle("Upload");
-        series_upload.setColor(Color.GREEN);
-        series_upload.setDrawDataPoints(true);
-        series_upload.setDataPointsRadius(0);
-        series_upload.setThickness(2);
-        series_upload.setDrawBackground(true);
-        series_upload.setAnimated(true);
-        HomeFragment.graph.addSeries(series_upload);
-////
-        series_download.setTitle("download");
-        series_download.setColor(Color.RED);
-        series_download.setDrawDataPoints(true);
-        series_download.setDataPointsRadius(0);
-        series_download.setThickness(2);
-        series_download.setDrawBackground(true);
-        series_download.setAnimated(true);
-        HomeFragment.graph.addSeries(series_download);
-//
-        series_total.setTitle("Total");
-        series_total.setColor(Color.BLUE);
-        series_total.setDrawDataPoints(true);
-        series_total.setDataPointsRadius(0);
-        series_total.setThickness(2);
-        series_total.setDrawBackground(true);
-        series_total.setAnimated(true);
-        HomeFragment.graph.addSeries(series_total);
-//
+            initialized = true;
+            started_at_ms = System.currentTimeMillis();
+            series_upload = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                    new DataPoint(0, uplink)
+                });
+            series_download = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                    new DataPoint(0, downlink)
+                });
+            series_total = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                    new DataPoint(0, data_total)
+                });
 
-        counter.incrementAndGet();
-        HomeFragment.graph.getViewport().scrollToEnd();
-        HomeFragment.graph.getViewport().setScalable(true); // enabling horizontal zooming and scrolling
+            series_upload.setTitle("Upload");
+            series_upload.setColor(Color.GREEN);
+            series_upload.setDrawDataPoints(true);
+            series_upload.setDataPointsRadius(0);
+            series_upload.setThickness(2);
+            series_upload.setDrawBackground(true);
+            series_upload.setAnimated(animated);
+            HomeFragment.graph.addSeries(series_upload);
 
-//            HomeFragment.graph.takeSnapshotAndShare(HomeFragment.home_fragment_activity, "exampleGraph", "GraphViewSnapshot");
-//            Bitmap bitmap = HomeFragment.graph.takeSnapshot();
+            series_download.setTitle("download");
+            series_download.setColor(Color.RED);
+            series_download.setDrawDataPoints(true);
+            series_download.setDataPointsRadius(0);
+            series_download.setThickness(2);
+            series_download.setDrawBackground(true);
+            series_download.setAnimated(animated);
+            HomeFragment.graph.addSeries(series_download);
 
-        GridLabelRenderer gridLabel = HomeFragment.graph.getGridLabelRenderer();
-        gridLabel.setHorizontalAxisTitleColor(Color.BLUE);
-        gridLabel.setVerticalAxisTitleColor(Color.BLUE);
-//            gridLabel.setHorizontalAxisTitle("Time in seconds");
-//            gridLabel.setVerticalAxisTitle("Traffic in Mbps");
-        HomeFragment.graph.setTitle("Traffic status (Y-axis in Mbps X-axis in Sec)");
+            series_total.setTitle("Total");
+            series_total.setColor(Color.BLUE);
+            series_total.setDrawDataPoints(true);
+            series_total.setDataPointsRadius(0);
+            series_total.setThickness(2);
+            series_total.setDrawBackground(true);
+            series_total.setAnimated(animated);
+            HomeFragment.graph.addSeries(series_total);
+
+            // If enabled, this causes only last datapoint to be shown.
+            //HomeFragment.graph.getViewport().setScalable(true); // enabling horizontal zooming and scrolling
+
+            GridLabelRenderer gridLabel = HomeFragment.graph.getGridLabelRenderer();
+            gridLabel.setHorizontalAxisTitleColor(Color.BLUE);
+            gridLabel.setVerticalAxisTitleColor(Color.BLUE);
+            // gridLabel.setHorizontalAxisTitle("Time in seconds");
+            // gridLabel.setVerticalAxisTitle("Traffic in Mbps");
+            HomeFragment.graph.setTitle("Traffic status (Y-axis in Mbps X-axis in Sec)");
+        }
+        else {
+            // add next set of data
+            long now = System.currentTimeMillis();
+            long count = (now - started_at_ms) / 1000;
+            boolean scroll_to_end = false;
+
+            //System.out.println("adding chart datapoint, count: " + count + " uplink: " + uplink
+            //                   + " downlink: " + downlink + " max-data-points: " + max_data_points);
+            series_upload.appendData(new DataPoint(count, uplink), scroll_to_end, max_data_points, true);
+            series_download.appendData(new DataPoint(count, downlink), scroll_to_end, max_data_points, true);
+            series_total.appendData(new DataPoint(count, data_total), scroll_to_end, max_data_points, false);
+        }
+
+        // Call this again in another second
         HomeFragment.handler_graph.postDelayed(HomeFragment.runnable_graph, 1000);
+
+//      HomeFragment.graph.takeSnapshotAndShare(HomeFragment.home_fragment_activity, "exampleGraph", "GraphViewSnapshot");
+//      Bitmap bitmap = HomeFragment.graph.takeSnapshot();
+
     }
 }
