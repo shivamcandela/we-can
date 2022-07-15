@@ -222,7 +222,7 @@ public class HomeFragment extends Fragment {
                 system_info_btn.setEnabled(true);
                 speedometer_btn.setOnClickListener(homeTableManager);
                 system_info_btn.setOnClickListener(homeTableManager);
-                Toast.makeText(getContext(), "WECAN is Connected to LANforge Server", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Connected to LANforge Server", Toast.LENGTH_LONG).show();
             }
         };
         handler_ready_state.postDelayed(runnable_ready_state, 1000);
