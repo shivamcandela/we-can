@@ -198,6 +198,8 @@ public class StartupActivity extends AppCompatActivity {
             }
         }
 
+        System.out.println("Attempting to connect to LANforgeServer, ip: " + ip + " resource: " + resource_id
+                           + " realm: " + realm_id + " user-name: " + username);
         lf_resource = new LF_Resource(this, ip, resource_id, realm_id, username, getApplicationContext());
         lf_resource.start();
     }
@@ -214,19 +216,26 @@ public class StartupActivity extends AppCompatActivity {
         String new_resource_id = lf_resource.getResource();
         String new_realm_id = lf_resource.getRealm();
         String ip = lf_resource.getRemoteHost();
+        String username = u_name.getText().toString();
+
+        Log.e("updateRealmInfo, new-resource-id:", new_resource_id);
+
         SharedPreferences.Editor editor = sharedpreferences.edit();
-        Log.e("shivam-iron", new_resource_id);
+
+        // Add per-server-ip information
         editor.putString("server_ip-" + ip, ip);
         editor.putString("resource_id-" + ip, new_resource_id);
         editor.putString("realm_id-" + ip, new_realm_id);
-        editor.putString("user_name-" + ip, u_name.getText().toString());
+
+        // Add last-settings information.
         editor.putString("current_ip", ip);
-        editor.putString("current_username", u_name.getText().toString());
+        editor.putString("current_username", username);
         editor.putString("current_resource", new_resource_id);
         editor.putString("current_realm", new_realm_id);
+
         editor.apply();
         editor.commit();
-        navigation.setRealmInfoTextUI();
+        navigation.setRealmInfoTextUI(ip, username, new_resource_id, new_realm_id);
     }
 
     public void _notifyCxChanged() {
@@ -275,18 +284,6 @@ public class StartupActivity extends AppCompatActivity {
             }
         }
         return data;
-    }
-
-    // Set the sharedpreference for locally stored data
-    // TODO:  Call this once lfresource is assigned a realm and resource.
-    public int setLFResourceCredentials(String server_ip, String realm, String resource_id){
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putString("server_ip-" + server_ip, server_ip);
-        editor.putString("resource_id-" + server_ip, resource_id);
-        editor.putString("realm_id-" + server_ip ,realm);
-        editor.apply();
-        editor.commit();
-        return -1;
     }
 
     @Override

@@ -40,6 +40,7 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
 
     public static Context context;
     public static boolean active=false;
+
     public static String getUserName() {
         return username;
     }
@@ -89,20 +90,16 @@ public class navigation extends AppCompatActivity implements NavigationView.OnNa
 
     }
 
-    public static void setRealmInfoTextUI() {
+    public static void setRealmInfoTextUI(String current_ip, String user_name,
+                                          String current_resource, String current_realm) {
+        username = user_name;
 
-        SharedPreferences sharedPreferences = StartupActivity.context.getSharedPreferences("userdata", Context.MODE_PRIVATE);
-        Map<String, ?> keys = sharedPreferences.getAll();
-        username = (String) keys.get("current_username");
-
-        String current_ip = (String) keys.get("current_ip");
-        String current_resource = (String) keys.get("current_resource");
-        String current_realm = (String) keys.get("current_realm");
-        if (nav_user!= null || nav_server!= null || nav_resource_realm != null) {
+        if (nav_user != null)
             nav_user.setText("User: " + username);
+        if (nav_server != null)
             nav_server.setText("Server: " + current_ip);
+        if (nav_resource_realm != null)
             nav_resource_realm.setText("Realm: " + current_realm + "\nResource: " + current_resource);
-        }
     }
 
     @Override
