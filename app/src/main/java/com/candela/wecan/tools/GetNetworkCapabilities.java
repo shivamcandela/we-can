@@ -46,7 +46,7 @@ public class GetNetworkCapabilities {
             for (Network network : nws) {
                 NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
                 if (capabilities.toString().contains("Transports: WIFI")){
-                    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
+                    return !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
                 }
             }
         }
@@ -60,7 +60,7 @@ public class GetNetworkCapabilities {
             for (Network network : nws) {
                 NetworkCapabilities capabilities = connectivity.getNetworkCapabilities(network);
                 if (capabilities.toString().contains("Transports: CELLULAR")){
-                    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
+                    return !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED);
                 }
             }
         }
